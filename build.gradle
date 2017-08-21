@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    compile("com.github.bitsquare.bitsquare:core:8747f0e099")
+    compile("com.github.bitsquare.bitsquare:core:391910576")
     compile("org.projectlombok:lombok:1.16.16")
     compile("com.sparkjava:spark-core:2.5.2")
 }
