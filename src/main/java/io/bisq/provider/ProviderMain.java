@@ -45,7 +45,7 @@ public class ProviderMain {
         Log.setup(System.getProperty("user.home") + File.separator + "provider");
         Log.setLevel(Level.INFO);
 
-        port(8080);
+        port(System.getenv("PORT") != null ? Integer.valueOf(System.getenv("PORT")) : 8080);
 
         handleGetAllMarketPrices(args);
         handleGetFees();
