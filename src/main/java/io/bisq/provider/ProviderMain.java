@@ -20,14 +20,10 @@ package io.bisq.provider;
 import io.bisq.provider.fee.FeeRequestService;
 import io.bisq.provider.price.PriceRequestService;
 
-import io.bisq.network.http.HttpException;
-
 import io.bisq.common.app.Log;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.spec.InvalidKeySpecException;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,7 +42,7 @@ public class ProviderMain {
     public ProviderMain() {
     }
 
-    public static void main(String[] args) throws IOException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException, InvalidKeyException, HttpException {
+    public static void main(String[] args) throws Exception {
         Log.setup(System.getProperty("user.home") + File.separator + "provider");
         Log.setLevel(Level.INFO);
 
