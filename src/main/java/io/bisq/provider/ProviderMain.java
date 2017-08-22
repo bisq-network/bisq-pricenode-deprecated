@@ -39,20 +39,17 @@ public class ProviderMain {
 
     private static final Logger log = LoggerFactory.getLogger(ProviderMain.class);
 
-    public ProviderMain() {
-    }
-
     public static void main(String[] args) throws Exception {
         Log.setup(System.getProperty("user.home") + File.separator + "provider");
         Log.setLevel(Level.INFO);
 
         port(System.getenv("PORT") != null ? Integer.valueOf(System.getenv("PORT")) : 8080);
 
-        handleGetAllMarketPrices(args);
+        handleGetAllMarketPrices();
         handleGetFees();
     }
 
-    private static void handleGetAllMarketPrices(String[] args) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
+    private static void handleGetAllMarketPrices() throws IOException, NoSuchAlgorithmException, InvalidKeyException {
         if (System.getenv("BITCOIN_AVG_PRIVKEY") != null && System.getenv("BITCOIN_AVG_PUBKEY") != null) {
             String bitcoinAveragePrivKey = System.getenv("BITCOIN_AVG_PRIVKEY");
             String bitcoinAveragePubKey = System.getenv("BITCOIN_AVG_PUBKEY");
