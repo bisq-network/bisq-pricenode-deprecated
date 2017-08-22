@@ -44,9 +44,9 @@ public class FeeRequestService {
     public static final long BTC_MAX_TX_FEE = 2000;
 
     private final Timer timerBitcoinFeesLocal = new Timer();
-
     private final BtcFeesProvider btcFeesProvider;
     private final Map<String, Long> dataMap = new ConcurrentHashMap<>();
+
     private long bitcoinFeesTs;
     private String json;
 
