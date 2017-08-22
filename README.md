@@ -61,7 +61,7 @@ When the process reports that it is "100% bootstrapped", leave the process runni
 
 To register the node as a Tor hidden service, first install the Heroku Tor buildpack:
 
-    heroku buildpacks:add https://github.com/hernanex3/heroku-buildpack-tor.git
+    heroku buildpacks:add https://github.com/hernanex3/heroku-buildpack-tor.git#c766cb6d
     git commit --allow-empty -m"Add Tor buildpack"
     git push heroku master
 
@@ -70,7 +70,7 @@ To register the node as a Tor hidden service, first install the Heroku Tor build
 Next, generate your Tor hidden service private key and .onion address:
 
     heroku run bash
-    ./bin/tor -f torrc
+    ./tor/bin/tor -f torrc
 
 When the process reports that it is "100% bootstrapped", kill it, then copy the generated private key and .onion hostname values:
 
