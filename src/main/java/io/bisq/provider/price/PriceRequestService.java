@@ -69,7 +69,8 @@ public class PriceRequestService {
 
     private String json;
 
-    public PriceRequestService(String bitcoinAveragePrivKey, String bitcoinAveragePubKey) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
+    public PriceRequestService(String bitcoinAveragePrivKey, String bitcoinAveragePubKey)
+            throws IOException, NoSuchAlgorithmException, InvalidKeyException {
         btcAverageProvider = new BtcAverageProvider(bitcoinAveragePrivKey, bitcoinAveragePubKey);
         poloniexProvider = new PoloniexProvider();
         coinmarketcapProvider = new CoinmarketcapProvider();

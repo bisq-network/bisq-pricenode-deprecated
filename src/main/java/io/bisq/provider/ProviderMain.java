@@ -61,7 +61,9 @@ public class ProviderMain {
             String bitcoinAveragePrivKey = System.getenv("BITCOIN_AVG_PRIVKEY");
             String bitcoinAveragePubKey = System.getenv("BITCOIN_AVG_PUBKEY");
 
-            PriceRequestService priceRequestService = new PriceRequestService(bitcoinAveragePrivKey, bitcoinAveragePubKey);
+            PriceRequestService priceRequestService =
+                    new PriceRequestService(bitcoinAveragePrivKey, bitcoinAveragePubKey);
+
             get("/getAllMarketPrices", (req, res) -> {
                 log.info("Incoming getAllMarketPrices request from: " + req.userAgent());
                 return priceRequestService.getJson();
