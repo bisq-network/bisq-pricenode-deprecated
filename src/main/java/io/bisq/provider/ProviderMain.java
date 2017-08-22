@@ -52,9 +52,9 @@ public class ProviderMain {
     }
 
     private static void handleGetAllMarketPrices(String[] args) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
-        if (System.getenv("BITCOIN_AVERAGE_PRIVATE_KEY") != null && System.getenv("BITCOIN_AVERAGE_PUBLIC_KEY") != null) {
-            String bitcoinAveragePrivKey = System.getenv("BITCOIN_AVERAGE_PRIVATE_KEY");
-            String bitcoinAveragePubKey = System.getenv("BITCOIN_AVERAGE_PUBLIC_KEY");
+        if (System.getenv("BITCOIN_AVG_PRIVKEY") != null && System.getenv("BITCOIN_AVG_PUBKEY") != null) {
+            String bitcoinAveragePrivKey = System.getenv("BITCOIN_AVG_PRIVKEY");
+            String bitcoinAveragePubKey = System.getenv("BITCOIN_AVG_PUBKEY");
 
             PriceRequestService priceRequestService = new PriceRequestService(bitcoinAveragePrivKey, bitcoinAveragePubKey);
             get("/getAllMarketPrices", (req, res) -> {
@@ -62,7 +62,9 @@ public class ProviderMain {
                 return priceRequestService.getJson();
             });
         } else {
-            throw new IllegalArgumentException("You need to provide the BitcoinAverage API keys. Private key as BITCOIN_AVERAGE_PRIVATE_KEY environment variable, public key as BITCOIN_AVERAGE_PUBLIC_KEY environment variable");
+            throw new IllegalArgumentException("You need to provide the BitcoinAverage API keys. " +
+                    "Private key as BITCOIN_AVG_PRIVKEY environment variable, " +
+                    "public key as BITCOIN_AVG_PUBKEY environment variable");
         }
     }
 
