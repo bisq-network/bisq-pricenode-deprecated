@@ -39,23 +39,20 @@ public class BtcFeesProvider {
 
     private final HttpClient httpClient;
 
-    // other: https://estimatefee.com/n/2
     public BtcFeesProvider() {
+        // we previously used https://bitcoinfees.21.co/api/v1/fees/recommended but fees were way too high
+        // see also: https://estimatefee.com/n/2
         this.httpClient = new HttpClient("https://bitcoinfees.21.co/api/v1/fees/");
     }
 
     public Long getFee() throws IOException {
-        // prev. used:  https://bitcoinfees.21.co/api/v1/fees/recommended
-        // but was way too high
-
-        //https://bitcoinfees.21.co/api/v1/fees/list
         String response = httpClient.requestWithGET("list", "User-Agent", "");
         log.info("Get recommended fee response:  " + response);
 
         LinkedTreeMap<String, ArrayList<LinkedTreeMap<String, Double>>> treeMap = new Gson().fromJson(response, LinkedTreeMap.class);
         final long[] fee = new long[1];
-        // we want a fee which is at least in 10 blocks in (21.co estimation seem to be way too high, so we get
-        // prob much faster in
+
+        // we want a fee that gets us in within 10 blocks max
         int maxBlocks = 10;
         treeMap.entrySet().stream()
                 .flatMap(e -> e.getValue().stream())
