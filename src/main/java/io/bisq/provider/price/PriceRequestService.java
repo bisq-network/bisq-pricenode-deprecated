@@ -41,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PriceRequestService {
+
     private static final Logger log = LoggerFactory.getLogger(PriceRequestService.class);
 
     private static final long INTERVAL_BTC_AV_LOCAL_MS = 60_000;      // 60 sec

@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import static java.lang.Double.parseDouble;
 
 public class PoloniexProvider {
+
     private static final Logger log = LoggerFactory.getLogger(PoloniexProvider.class);
 
     private final Set<String> supportedAltcoins;

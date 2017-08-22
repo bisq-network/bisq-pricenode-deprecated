@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class FeeRequestService {
+
     private static final Logger log = LoggerFactory.getLogger(FeeRequestService.class);
 
     private static final long INTERVAL_BTC_FEES_MS = 600_000;      // 10 min
