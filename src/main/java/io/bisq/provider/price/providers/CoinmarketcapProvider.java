@@ -46,8 +46,8 @@ import static java.lang.Double.parseDouble;
 public class CoinmarketcapProvider {
 
     private static final Logger log = LoggerFactory.getLogger(CoinmarketcapProvider.class);
-    private final Set<String> supportedAltcoins;
 
+    private final Set<String> supportedAltcoins;
     private final HttpClient httpClient;
 
     public CoinmarketcapProvider() {
