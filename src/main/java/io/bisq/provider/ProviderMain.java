@@ -47,11 +47,8 @@ public class ProviderMain {
 
         port(System.getenv("PORT") != null ? Integer.valueOf(System.getenv("PORT")) : 8080);
 
-        log.info("HERE 0");
         handleGetAllMarketPrices(args);
-        log.info("HERE 1");
         handleGetFees();
-        log.info("HERE 2");
     }
 
     private static void handleGetAllMarketPrices(String[] args) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
@@ -73,7 +70,6 @@ public class ProviderMain {
 
     private static void handleGetFees() throws IOException {
         FeeRequestService feeRequestService = new FeeRequestService();
-        log.info("HERE 1.1");
         get("/getFees", (req, res) -> {
             log.info("Incoming getFees request from: " + req.userAgent());
             return feeRequestService.getJson();
