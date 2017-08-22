@@ -17,16 +17,21 @@
 
 package io.bisq.provider.fee.providers;
 
+import io.bisq.provider.fee.FeeRequestService;
+
+import io.bisq.network.http.HttpClient;
+
+import io.bisq.common.util.MathUtils;
+
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
-import io.bisq.common.util.MathUtils;
-import io.bisq.network.http.HttpClient;
-import io.bisq.provider.fee.FeeRequestService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+
 import java.util.ArrayList;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 //TODO use protobuffer instead of json
 public class BtcFeesProvider {

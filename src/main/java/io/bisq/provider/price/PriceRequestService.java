@@ -17,23 +17,28 @@
 
 package io.bisq.provider.price;
 
-import io.bisq.common.util.Utilities;
 import io.bisq.provider.price.providers.BtcAverageProvider;
 import io.bisq.provider.price.providers.CoinmarketcapProvider;
 import io.bisq.provider.price.providers.PoloniexProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import io.bisq.common.util.Utilities;
+
+import java.time.Instant;
+
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.time.Instant;
+
+import java.io.IOException;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PriceRequestService {
     private static final Logger log = LoggerFactory.getLogger(PriceRequestService.class);

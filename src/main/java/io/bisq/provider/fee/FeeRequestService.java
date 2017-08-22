@@ -17,18 +17,22 @@
 
 package io.bisq.provider.fee;
 
-import io.bisq.common.util.Utilities;
 import io.bisq.provider.fee.providers.BtcFeesProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import io.bisq.common.util.Utilities;
+
+import java.time.Instant;
 
 import java.io.IOException;
-import java.time.Instant;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 //TODO use protobuffer instead of json
 public class FeeRequestService {

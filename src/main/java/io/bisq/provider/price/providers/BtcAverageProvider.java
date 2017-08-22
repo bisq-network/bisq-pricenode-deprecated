@@ -17,23 +17,31 @@
 
 package io.bisq.provider.price.providers;
 
+import io.bisq.provider.price.PriceData;
+
+import io.bisq.network.http.HttpClient;
+
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
-import io.bisq.network.http.HttpClient;
-import io.bisq.provider.price.PriceData;
+
 import org.bouncycastle.util.encoders.Hex;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.IOException;
+
+import java.time.Instant;
+
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.time.Instant;
+
+import java.io.IOException;
+
 import java.util.HashMap;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BtcAverageProvider {
     private static final Logger log = LoggerFactory.getLogger(BtcAverageProvider.class);
