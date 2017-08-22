@@ -34,7 +34,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-//TODO use protobuffer instead of json
 public class FeeRequestService {
     private static final Logger log = LoggerFactory.getLogger(FeeRequestService.class);
 

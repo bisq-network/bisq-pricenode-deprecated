@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-//TODO use protobuffer instead of json
 public class BtcFeesProvider {
     private static final Logger log = LoggerFactory.getLogger(BtcFeesProvider.class);
 
