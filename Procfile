@@ -1,1 +1,1 @@
-web: if [ "$HIDDEN" == true ]; then ./tor/bin/run_tor build/install/provider/bin/provider; else build/install/provider/bin/provider; fi
+web: if [ "$HIDDEN" == true ]; then ./tor/bin/run_tor build/install/price-relay/bin/price-relay; else build/install/price-relay/bin/price-relay; fi
