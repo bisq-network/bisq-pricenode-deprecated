@@ -17,11 +17,10 @@
 
 package io.bisq.provider.price;
 
-import lombok.Value;
+import java.util.Objects;
 
-@SuppressWarnings("FieldCanBeLocal")
-@Value
 public class PriceData {
+
     private final String currencyCode;
     private final double price;
     private final long timestampSec;
@@ -30,5 +29,37 @@ public class PriceData {
         this.currencyCode = currencyCode;
         this.price = price;
         this.timestampSec = timestampSec;
+    }
+
+    double getPrice() {
+        return this.price;
+    }
+
+    long getTimestampSec() {
+        return this.timestampSec;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PriceData priceData = (PriceData) o;
+        return Double.compare(priceData.price, price) == 0 &&
+                timestampSec == priceData.timestampSec &&
+                Objects.equals(currencyCode, priceData.currencyCode);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(currencyCode, price, timestampSec);
+    }
+
+    @Override
+    public String toString() {
+        return "PriceData{" +
+                "currencyCode='" + currencyCode + '\'' +
+                ", price=" + price +
+                ", timestampSec=" + timestampSec +
+                '}';
     }
 }
