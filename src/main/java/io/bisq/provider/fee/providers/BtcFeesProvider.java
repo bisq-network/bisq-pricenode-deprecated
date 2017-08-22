@@ -32,7 +32,7 @@ public class BtcFeesProvider {
 
         LinkedTreeMap<String, ArrayList<LinkedTreeMap<String, Double>>> treeMap = new Gson().fromJson(response, LinkedTreeMap.class);
         final long[] fee = new long[1];
-        // we want a fee which is at least in 10 blocks in (21.co estimation seem to be way too high, so we get 
+        // we want a fee which is at least in 10 blocks in (21.co estimation seem to be way too high, so we get
         // prob much faster in
         int maxBlocks = 10;
         treeMap.entrySet().stream()
