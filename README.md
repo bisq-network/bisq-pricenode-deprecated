@@ -18,7 +18,7 @@ Price relays can be run anywhere Java and Tor binaries can be run. Instructions 
 
 Price relays should be cheap to run with regard to both time and money. The application itself is non-resource intensive and can be run on the low-end of most providers' paid tiers, and possibly even on some providers' free tiers.
 
-A price relay operator's main responsibilities are to ensure their node(s) are available and up-to-date. Releases are currently source-only, with the assumption that most operators will favor Git-based "push to deploy" workflows. To stay up to date with releases, operators can [subscribe to this repository's releases.atom feed](/releases.atom).
+A price relay operator's main responsibilities are to ensure their node(s) are available and up-to-date. Releases are currently source-only, with the assumption that most operators will favor Git-based "push to deploy" workflows. To stay up to date with releases, operators can [subscribe to this repository's releases.atom feed](https://github.com/bitsquare/bisq-price-relay/releases.atom).
 
 Operating a production price relay is a valuable service to the bisq network. Accordingly, operators should issue BSQ compensation requests that cover their time and money costs.
 
