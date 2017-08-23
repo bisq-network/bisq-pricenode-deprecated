@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    compile("com.github.bitsquare.bitsquare:core:391910576")
+    compile("com.github.bisq-network.bisq-exchange:core:6ffa52a00")
     compile("com.sparkjava:spark-core:2.5.2")
 }
 
