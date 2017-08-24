@@ -40,7 +40,7 @@ Deployment Instructions
 ### On localhost
 
     ./gradlew installDist
-    BITCOIN_AVG_PUBKEY=[your pubkey] BITCOIN_AVG_PRIVKEY=[your privkey] ./build/install/price-relay/bin/price-relay
+    BITCOIN_AVG_PUBKEY=[your pubkey] BITCOIN_AVG_PRIVKEY=[your privkey] ./build/install/bisq-price-relay/bin/bisq-price-relay
     curl http://localhost:8080/getAllMarketPrices
 
 To register the node as a Tor hidden service, run:
