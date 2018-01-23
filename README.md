@@ -1,26 +1,26 @@
-bisq network price relay node
+bisq-pricenode
 ========
 
 
 Overview
 --------
 
-The price relay node ("pricenode" for short) is a simple HTTP service that fetches data from third-party price providers and relays that data to bisq exchange clients on request. Available prices include:
+The Bisq price relay node ("pricenode" for short) is a simple HTTP service that fetches data from third-party price providers and relays that data to Bisq exchange clients on request. Available prices include:
 
  - BTC exchange rates, available at `/getAllMarketPrices`, and
  - BTC mining fees, available at `/getFees`
 
-Price relays are deployed as Tor hidden services. This is not because the location of these nodes needs to be kept secret, but rather so that bisq exchange clients do not need to exit the Tor network in order to get price data.
+Price relays are deployed as Tor hidden services. This is not because the location of these nodes needs to be kept secret, but rather so that Bisq exchange clients do not need to exit the Tor network in order to get price data.
 
-Anyone can run a price relay, but a relay must be _discoverable_ in order for it to do any good. For exchange clients to discover your relay, its .onion address must be (a) hard coded in the bisq exchange client's `ProviderRepository` class or (b) specified explicitly via the exchange client's `--providers` command line option.
+Anyone can run a price relay, but a relay must be _discoverable_ in order for it to do any good. For exchange clients to discover your relay, its .onion address must be (a) hard coded in the Bisq exchange client's `ProviderRepository` class or (b) specified explicitly via the exchange client's `--providers` command line option.
 
 Price relays can be run anywhere Java and Tor binaries can be run. Instructions below cover deployment on localhost and Heroku, but nothing in principle prevents these nodes from being run across a broader selection of platforms and regions. Note however that the exchange client is currently naive about selecting price relays (it does so once randomly at startup), but this could be improved in various ways to accommodate a larger number of better-distributed nodes.
 
 Price relays should be cheap to run with regard to both time and money. The application itself is non-resource intensive and can be run on the low-end of most providers' paid tiers, and possibly even on some providers' free tiers.
 
-A price relay operator's main responsibilities are to ensure their node(s) are available and up-to-date. Releases are currently source-only, with the assumption that most operators will favor Git-based "push to deploy" workflows. To stay up to date with releases, operators can [subscribe to this repository's releases.atom feed](https://github.com/bitsquare/pricenode/releases.atom).
+A price relay operator's main responsibilities are to ensure their node(s) are available and up-to-date. Releases are currently source-only, with the assumption that most operators will favor Git-based "push to deploy" workflows. To stay up to date with releases, operators can [subscribe to this repository's releases.atom feed](https://github.com/bisq-network/pricenode/releases.atom).
 
-Operating a production price relay is a valuable service to the bisq network. Accordingly, operators should issue BSQ compensation requests that cover their time and money costs.
+Operating a production price relay is a valuable service to the Bisq network. Accordingly, operators should issue BSQ compensation requests that cover their time and money costs.
 
 
 Prerequisites
@@ -40,7 +40,7 @@ Deployment Instructions
 ### On localhost
 
     ./gradlew installDist
-    BITCOIN_AVG_PUBKEY=[your pubkey] BITCOIN_AVG_PRIVKEY=[your privkey] ./build/install/pricenode/bin/pricenode
+    BITCOIN_AVG_PUBKEY=[your pubkey] BITCOIN_AVG_PRIVKEY=[your privkey] ./build/install/bisq-pricenode/bin/bisq-pricenode
     curl http://localhost:8080/getAllMarketPrices
 
 To register the node as a Tor hidden service, run:
