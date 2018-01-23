@@ -15,7 +15,7 @@
  * along with Bisq. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.bisq.provider.price;
+package bisq.pricenode.price;
 
 import java.util.Objects;
 

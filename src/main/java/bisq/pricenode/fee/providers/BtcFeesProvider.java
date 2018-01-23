@@ -15,9 +15,9 @@
  * along with Bisq. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.bisq.provider.fee.providers;
+package bisq.pricenode.fee.providers;
 
-import io.bisq.provider.fee.FeeRequestService;
+import bisq.pricenode.fee.FeeRequestService;
 
 import io.bisq.network.http.HttpClient;
 

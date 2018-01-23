@@ -15,7 +15,7 @@
  * along with bisq. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.bisq.provider;
+package bisq.pricenode;
 
 public class ProviderVersion {
     public static final String VERSION = "0.6.4";

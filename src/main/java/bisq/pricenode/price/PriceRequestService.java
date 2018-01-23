@@ -15,11 +15,11 @@
  * along with Bisq. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.bisq.provider.price;
+package bisq.pricenode.price;
 
-import io.bisq.provider.price.providers.BtcAverageProvider;
-import io.bisq.provider.price.providers.CoinmarketcapProvider;
-import io.bisq.provider.price.providers.PoloniexProvider;
+import bisq.pricenode.price.providers.BtcAverageProvider;
+import bisq.pricenode.price.providers.CoinmarketcapProvider;
+import bisq.pricenode.price.providers.PoloniexProvider;
 
 import io.bisq.common.util.Utilities;
 

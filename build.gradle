@@ -6,7 +6,7 @@ plugins {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-mainClassName = "io.bisq.provider.ProviderMain"
+mainClassName = "bisq.pricenode.ProviderMain"
 
 repositories {
     jcenter()

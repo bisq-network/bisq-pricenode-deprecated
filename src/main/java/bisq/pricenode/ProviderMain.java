@@ -15,11 +15,11 @@
  * along with Bisq. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.bisq.provider;
+package bisq.pricenode;
 
-import io.bisq.provider.fee.FeeRequestService;
-import io.bisq.provider.fee.providers.BtcFeesProvider;
-import io.bisq.provider.price.PriceRequestService;
+import bisq.pricenode.fee.FeeRequestService;
+import bisq.pricenode.fee.providers.BtcFeesProvider;
+import bisq.pricenode.price.PriceRequestService;
 
 import io.bisq.common.app.Log;
 import io.bisq.common.app.Version;
