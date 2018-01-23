@@ -62,7 +62,10 @@ public class BtcFeesProvider {
         String response = httpClient.requestWithGET("list", "User-Agent", "");
         log.info("Get recommended fee response:  " + response);
 
-        LinkedTreeMap<String, ArrayList<LinkedTreeMap<String, Double>>> treeMap = new Gson().fromJson(response, LinkedTreeMap.class);
+        @SuppressWarnings("unchecked")
+        LinkedTreeMap<String, ArrayList<LinkedTreeMap<String, Double>>> treeMap =
+                new Gson().fromJson(response, LinkedTreeMap.class);
+
         final long[] fee = new long[1];
         // we want a fee which is at least in 20 blocks in (21.co estimation seem to be way too high, so we get
         // prob much faster in

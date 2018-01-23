@@ -56,7 +56,7 @@ public class ProviderMain {
         Utilities.removeCryptographyRestrictions();
     }
 
-    public static void main(String[] args) throws IOException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException, InvalidKeyException, HttpException {
+    public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
         final String logPath = System.getProperty("user.home") + File.separator + "provider";
         Log.setup(logPath);
         Log.setLevel(Level.INFO);
