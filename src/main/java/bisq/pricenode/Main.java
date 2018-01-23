@@ -41,9 +41,9 @@ import ch.qos.logback.classic.Level;
 import static spark.Spark.get;
 import static spark.Spark.port;
 
-public class ProviderMain {
+public class Main {
 
-    private static final Logger log = LoggerFactory.getLogger(ProviderMain.class);
+    private static final Logger log = LoggerFactory.getLogger(Main.class);
 
     static {
         // Need to set default locale initially otherwise we get problems at non-english OS
