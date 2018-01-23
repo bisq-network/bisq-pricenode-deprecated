@@ -90,7 +90,7 @@ public class ProviderMain {
             requestIntervalInMs = TimeUnit.MINUTES.toMillis(Long.valueOf(args[2]));
         }
 
-        port(8080);
+        port(System.getenv("PORT") != null ? Integer.valueOf(System.getenv("PORT")) : 8080);
 
         handleGetAllMarketPrices(bitcoinAveragePrivKey, bitcoinAveragePubKey);
         handleGetFees(capacity, maxBlocks, requestIntervalInMs);
