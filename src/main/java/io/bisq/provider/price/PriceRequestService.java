@@ -21,7 +21,6 @@ import io.bisq.common.util.Utilities;
 import io.bisq.provider.price.providers.BtcAverageProvider;
 import io.bisq.provider.price.providers.CoinmarketcapProvider;
 import io.bisq.provider.price.providers.PoloniexProvider;
-import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -34,8 +33,12 @@ import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-@Slf4j
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class PriceRequestService {
+    private static final Logger log = LoggerFactory.getLogger(PriceRequestService.class);
+
     public static final String POLO_PROVIDER = "POLO";
     public static final String COINMKTC_PROVIDER = "CMC";
     public static final String BTCAVERAGE_LOCAL_PROVIDER = "BTCA_L";

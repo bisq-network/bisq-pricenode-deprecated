@@ -19,7 +19,6 @@ package io.bisq.provider.fee;
 
 import io.bisq.common.util.Utilities;
 import io.bisq.provider.fee.providers.BtcFeesProvider;
-import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -29,8 +28,12 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Slf4j
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class FeeRequestService {
+    private static final Logger log = LoggerFactory.getLogger(FeeRequestService.class);
+
     public static int REQUEST_INTERVAL_MIN = 5;
 
     public static final long BTC_MIN_TX_FEE = 10; // satoshi/byte

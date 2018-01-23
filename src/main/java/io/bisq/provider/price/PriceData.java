@@ -17,12 +17,52 @@
 
 package io.bisq.provider.price;
 
-import lombok.Value;
+import java.util.Objects;
 
-@Value
 public class PriceData {
     private final String currencyCode;
     private final double price;
     private final long timestampSec;
     private final String provider;
+
+    public PriceData(String currencyCode, double price, long timestampSec, String provider) {
+        this.currencyCode = currencyCode;
+        this.price = price;
+        this.timestampSec = timestampSec;
+        this.provider = provider;
+    }
+
+    double getPrice() {
+        return this.price;
+    }
+
+    long getTimestampSec() {
+        return this.timestampSec;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PriceData priceData = (PriceData) o;
+        return Double.compare(priceData.price, price) == 0 &&
+                timestampSec == priceData.timestampSec &&
+                Objects.equals(currencyCode, priceData.currencyCode) &&
+                Objects.equals(provider, priceData.provider);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(currencyCode, price, timestampSec, provider);
+    }
+
+    @Override
+    public String toString() {
+        return "PriceData{" +
+                "currencyCode='" + currencyCode + '\'' +
+                ", price=" + price +
+                ", timestampSec=" + timestampSec +
+                ", provider=" + provider +
+                '}';
+    }
 }

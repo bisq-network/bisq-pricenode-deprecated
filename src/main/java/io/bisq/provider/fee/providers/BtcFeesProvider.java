@@ -22,15 +22,18 @@ import com.google.gson.internal.LinkedTreeMap;
 import io.bisq.common.util.MathUtils;
 import io.bisq.network.http.HttpClient;
 import io.bisq.provider.fee.FeeRequestService;
-import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 //TODO consider alternative https://www.bitgo.com/api/v1/tx/fee?numBlocks=3
-@Slf4j
 public class BtcFeesProvider {
+    private static final Logger log = LoggerFactory.getLogger(BtcFeesProvider.class);
+
     public static int CAPACITY = 4; // if we request each 5 min. we take average of last 20 min.
     public static int MAX_BLOCKS = 10;
 
