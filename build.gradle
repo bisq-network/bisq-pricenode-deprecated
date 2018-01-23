@@ -11,10 +11,11 @@ mainClassName = "io.bisq.provider.ProviderMain"
 repositories {
     jcenter()
     maven { url "https://jitpack.io" }
+    maven { url "https://raw.githubusercontent.com/JesusMcCloud/tor-binary/testrelease/release/" }
 }
 
 dependencies {
-    compile("com.github.bisq-network.bisq-exchange:core:6ffa52a00")
+    compile("com.github.bisq-network.bisq-exchange:core:v0.6.4")
     compile("com.sparkjava:spark-core:2.5.2")
 }
 
