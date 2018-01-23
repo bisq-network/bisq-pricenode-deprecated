@@ -46,6 +46,7 @@ import static spark.Spark.get;
 import static spark.Spark.port;
 
 public class ProviderMain {
+
     private static final Logger log = LoggerFactory.getLogger(ProviderMain.class);
 
     static {

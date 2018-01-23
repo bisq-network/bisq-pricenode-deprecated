@@ -41,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PriceRequestService {
+
     private static final Logger log = LoggerFactory.getLogger(PriceRequestService.class);
 
     public static final String POLO_PROVIDER = "POLO";

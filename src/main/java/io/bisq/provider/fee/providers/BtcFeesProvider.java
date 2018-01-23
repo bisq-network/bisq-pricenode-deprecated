@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 //TODO consider alternative https://www.bitgo.com/api/v1/tx/fee?numBlocks=3
 public class BtcFeesProvider {
+
     private static final Logger log = LoggerFactory.getLogger(BtcFeesProvider.class);
 
     public static int CAPACITY = 4; // if we request each 5 min. we take average of last 20 min.

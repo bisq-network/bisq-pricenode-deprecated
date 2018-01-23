@@ -20,6 +20,7 @@ package io.bisq.provider.price;
 import java.util.Objects;
 
 public class PriceData {
+
     private final String currencyCode;
     private final double price;
     private final long timestampSec;

@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class FeeRequestService {
+
     private static final Logger log = LoggerFactory.getLogger(FeeRequestService.class);
 
     public static int REQUEST_INTERVAL_MIN = 5;
