@@ -72,21 +72,22 @@ public class ProviderMain {
         int maxBlocks = BtcFeesProvider.MAX_BLOCKS;
         long requestIntervalInMs = TimeUnit.MINUTES.toMillis(FeeRequestService.REQUEST_INTERVAL_MIN);
 
+        if (System.getenv("BITCOIN_AVG_PRIVKEY") != null && System.getenv("BITCOIN_AVG_PUBKEY") != null) {
+            bitcoinAveragePrivKey = System.getenv("BITCOIN_AVG_PRIVKEY");
+            bitcoinAveragePubKey = System.getenv("BITCOIN_AVG_PUBKEY");
+        } else {
+            throw new IllegalArgumentException("You need to provide the BitcoinAverage API keys. " +
+                    "Private key as BITCOIN_AVG_PRIVKEY environment variable, " +
+                    "public key as BITCOIN_AVG_PUBKEY environment variable");
+        }
+
         // extract command line arguments
-        if (args.length < 2) {
-            log.error("You need to provide the BitcoinAverage API keys. Private key as first argument, public key as second argument.");
-            System.exit(1);
-        }
         if (args.length >= 2) {
-            bitcoinAveragePrivKey = args[0];
-            bitcoinAveragePubKey = args[1];
+            capacity = Integer.valueOf(args[0]);
+            maxBlocks = Integer.valueOf(args[1]);
         }
-        if (args.length >= 4) {
-            capacity = Integer.valueOf(args[2]);
-            maxBlocks = Integer.valueOf(args[3]);
-        }
-        if (args.length >= 5) {
-            requestIntervalInMs = TimeUnit.MINUTES.toMillis(Long.valueOf(args[4]));
+        if (args.length >= 3) {
+            requestIntervalInMs = TimeUnit.MINUTES.toMillis(Long.valueOf(args[2]));
         }
 
         port(8080);
