@@ -21,16 +21,12 @@ import io.bisq.provider.fee.FeeRequestService;
 import io.bisq.provider.fee.providers.BtcFeesProvider;
 import io.bisq.provider.price.PriceRequestService;
 
-import io.bisq.network.http.HttpException;
-
 import io.bisq.common.app.Log;
 import io.bisq.common.app.Version;
 import io.bisq.common.util.Utilities;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.spec.InvalidKeySpecException;
 
 import java.io.File;
 import java.io.IOException;
@@ -56,7 +52,7 @@ public class ProviderMain {
         Utilities.removeCryptographyRestrictions();
     }
 
-    public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
+    public static void main(String[] args) throws Exception {
         final String logPath = System.getProperty("user.home") + File.separator + "provider";
         Log.setup(logPath);
         Log.setLevel(Level.INFO);
