@@ -7,6 +7,11 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 mainClassName = "bisq.pricenode.Main"
+version = "0.6.4"
+
+jar.manifest.attributes(
+        "Implementation-Title": rootProject.name,
+        "Implementation-Version": version)
 
 repositories {
     jcenter()

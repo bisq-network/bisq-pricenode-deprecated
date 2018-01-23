@@ -44,7 +44,7 @@ import static spark.Spark.port;
 public class Main {
 
     private static final Logger log = LoggerFactory.getLogger(Main.class);
-    private static final String VERSION = "0.6.4";
+    private static final String VERSION = Main.class.getPackage().getImplementationVersion();
 
     static {
         // Need to set default locale initially otherwise we get problems at non-english OS
