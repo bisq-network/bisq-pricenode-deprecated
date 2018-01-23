@@ -17,13 +17,17 @@
 
 package io.bisq.provider.fee.providers;
 
-import com.google.gson.Gson;
-import com.google.gson.internal.LinkedTreeMap;
-import io.bisq.common.util.MathUtils;
-import io.bisq.network.http.HttpClient;
 import io.bisq.provider.fee.FeeRequestService;
 
+import io.bisq.network.http.HttpClient;
+
+import io.bisq.common.util.MathUtils;
+
+import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
+
 import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 

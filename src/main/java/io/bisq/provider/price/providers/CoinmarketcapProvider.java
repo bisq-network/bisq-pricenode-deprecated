@@ -17,17 +17,26 @@
 
 package io.bisq.provider.price.providers;
 
-import com.google.gson.Gson;
-import com.google.gson.internal.LinkedTreeMap;
-import io.bisq.common.locale.CurrencyUtil;
-import io.bisq.common.locale.TradeCurrency;
-import io.bisq.network.http.HttpClient;
 import io.bisq.provider.price.PriceData;
 import io.bisq.provider.price.PriceRequestService;
 
-import java.io.IOException;
+import io.bisq.network.http.HttpClient;
+
+import io.bisq.common.locale.CurrencyUtil;
+import io.bisq.common.locale.TradeCurrency;
+
+import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
+
 import java.time.Instant;
-import java.util.*;
+
+import java.io.IOException;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.lang.Double.parseDouble;

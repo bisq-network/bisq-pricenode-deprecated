@@ -17,15 +17,19 @@
 
 package io.bisq.provider.price;
 
-import io.bisq.common.util.Utilities;
 import io.bisq.provider.price.providers.BtcAverageProvider;
 import io.bisq.provider.price.providers.CoinmarketcapProvider;
 import io.bisq.provider.price.providers.PoloniexProvider;
 
-import java.io.IOException;
+import io.bisq.common.util.Utilities;
+
+import java.time.Instant;
+
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.time.Instant;
+
+import java.io.IOException;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Timer;

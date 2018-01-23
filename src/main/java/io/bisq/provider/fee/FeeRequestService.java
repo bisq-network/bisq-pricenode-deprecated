@@ -17,11 +17,14 @@
 
 package io.bisq.provider.fee;
 
-import io.bisq.common.util.Utilities;
 import io.bisq.provider.fee.providers.BtcFeesProvider;
 
-import java.io.IOException;
+import io.bisq.common.util.Utilities;
+
 import java.time.Instant;
+
+import java.io.IOException;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
