@@ -44,6 +44,7 @@ import static spark.Spark.port;
 public class Main {
 
     private static final Logger log = LoggerFactory.getLogger(Main.class);
+    private static final String VERSION = "0.6.4";
 
     static {
         // Need to set default locale initially otherwise we get problems at non-english OS
@@ -57,8 +58,8 @@ public class Main {
         Log.setup(logPath);
         Log.setLevel(Level.INFO);
         log.info("Log files under: " + logPath);
-        log.info("ProviderVersion.VERSION: " + ProviderVersion.VERSION);
-        log.info("Bisq exchange Version{" +
+        log.info("bisq-pricenode version: " + VERSION);
+        log.info("bisq-exchange versions{" +
                 "VERSION=" + Version.VERSION +
                 ", P2P_NETWORK_VERSION=" + Version.P2P_NETWORK_VERSION +
                 ", LOCAL_DB_VERSION=" + Version.LOCAL_DB_VERSION +
@@ -120,7 +121,7 @@ public class Main {
     private static void handleGetVersion() throws IOException {
         get("/getVersion", (req, res) -> {
             log.info("Incoming getVersion request from: " + req.userAgent());
-            return ProviderVersion.VERSION;
+            return VERSION;
         });
     }
 
