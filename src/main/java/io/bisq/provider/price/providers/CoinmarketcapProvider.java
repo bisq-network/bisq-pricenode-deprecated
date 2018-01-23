@@ -44,7 +44,6 @@ import static java.lang.Double.parseDouble;
 public class CoinmarketcapProvider {
 
     private final Set<String> supportedAltcoins;
-
     private final HttpClient httpClient;
 
     public CoinmarketcapProvider() {
