@@ -31,6 +31,7 @@ When the process reports that it is "100% bootstrapped", kill it, then copy the 
 Now configure the hostname and private key values as environment variables for your Heroku app:
 
     heroku config:set HIDDEN=true HIDDEN_DOT_ONION=[your .onion] HIDDEN_PRIVATE_KEY="[your tor privkey]"
+    git push heroku master
 
 When the application finishes restarting, you should still be able to access it via the clearnet, e.g. with:
 
