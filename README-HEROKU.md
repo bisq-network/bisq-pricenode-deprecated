@@ -10,8 +10,7 @@ Run the following commands:
 
 To register the node as a Tor hidden service, first install the Heroku Tor buildpack:
 
-    heroku buildpacks:add https://github.com/hernanex3/heroku-buildpack-tor.git#c766cb6d
-    git commit --allow-empty -m"Add Tor buildpack"
+    heroku buildpacks:add https://github.com/cbeams/heroku-buildpack-tor.git
     git push heroku master
 
 > NOTE: this deployment will take a while, because the new buildpack must download and build Tor from source.
