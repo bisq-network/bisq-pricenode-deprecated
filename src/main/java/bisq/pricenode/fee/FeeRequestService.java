@@ -15,9 +15,9 @@
  * along with Bisq. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.bisq.provider.fee;
+package bisq.pricenode.fee;
 
-import io.bisq.provider.fee.providers.BtcFeesProvider;
+import bisq.pricenode.fee.providers.BtcFeesProvider;
 
 import io.bisq.common.util.Utilities;
 
@@ -38,10 +38,10 @@ public class FeeRequestService {
 
     private static final Logger log = LoggerFactory.getLogger(FeeRequestService.class);
 
-    private static final long INTERVAL_BTC_FEES_MS = 600_000;      // 10 min
+    public static int REQUEST_INTERVAL_MIN = 5;
 
-    public static final long BTC_MIN_TX_FEE = 40; // satoshi/byte
-    public static final long BTC_MAX_TX_FEE = 2000;
+    public static final long BTC_MIN_TX_FEE = 10; // satoshi/byte
+    public static final long BTC_MAX_TX_FEE = 1000;
 
     private final Timer timerBitcoinFeesLocal = new Timer();
     private final BtcFeesProvider btcFeesProvider;
@@ -50,8 +50,8 @@ public class FeeRequestService {
     private long bitcoinFeesTs;
     private String json;
 
-    public FeeRequestService() throws IOException {
-        btcFeesProvider = new BtcFeesProvider();
+    public FeeRequestService(int capacity, int maxBlocks, long requestIntervalInMs) throws IOException {
+        btcFeesProvider = new BtcFeesProvider(capacity, maxBlocks);
 
         // For now we don't need a fee estimation for LTC so we set it fixed, but we keep it in the provider to
         // be flexible if fee pressure grows on LTC
@@ -60,10 +60,10 @@ public class FeeRequestService {
         dataMap.put("dashTxFee", 50L /*FeeService.DASH_DEFAULT_TX_FEE*/);
 
         writeToJson();
-        startRequests();
+        startRequests(requestIntervalInMs);
     }
 
-    private void startRequests() throws IOException {
+    private void startRequests(long requestIntervalInMs) throws IOException {
         timerBitcoinFeesLocal.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -74,7 +74,7 @@ public class FeeRequestService {
                     e.printStackTrace();
                 }
             }
-        }, INTERVAL_BTC_FEES_MS, INTERVAL_BTC_FEES_MS);
+        }, requestIntervalInMs, requestIntervalInMs);
 
 
         requestBitcoinFees();

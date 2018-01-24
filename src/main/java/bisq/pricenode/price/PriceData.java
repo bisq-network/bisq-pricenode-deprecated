@@ -15,7 +15,7 @@
  * along with Bisq. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.bisq.provider.price;
+package bisq.pricenode.price;
 
 import java.util.Objects;
 
@@ -24,11 +24,13 @@ public class PriceData {
     private final String currencyCode;
     private final double price;
     private final long timestampSec;
+    private final String provider;
 
-    public PriceData(String currencyCode, double price, long timestampSec) {
+    public PriceData(String currencyCode, double price, long timestampSec, String provider) {
         this.currencyCode = currencyCode;
         this.price = price;
         this.timestampSec = timestampSec;
+        this.provider = provider;
     }
 
     double getPrice() {
@@ -46,12 +48,13 @@ public class PriceData {
         PriceData priceData = (PriceData) o;
         return Double.compare(priceData.price, price) == 0 &&
                 timestampSec == priceData.timestampSec &&
-                Objects.equals(currencyCode, priceData.currencyCode);
+                Objects.equals(currencyCode, priceData.currencyCode) &&
+                Objects.equals(provider, priceData.provider);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(currencyCode, price, timestampSec);
+        return Objects.hash(currencyCode, price, timestampSec, provider);
     }
 
     @Override
@@ -60,6 +63,7 @@ public class PriceData {
                 "currencyCode='" + currencyCode + '\'' +
                 ", price=" + price +
                 ", timestampSec=" + timestampSec +
+                ", provider=" + provider +
                 '}';
     }
 }

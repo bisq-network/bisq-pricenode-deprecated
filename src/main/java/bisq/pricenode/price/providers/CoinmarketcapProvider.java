@@ -15,9 +15,10 @@
  * along with Bisq. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.bisq.provider.price.providers;
+package bisq.pricenode.price.providers;
 
-import io.bisq.provider.price.PriceData;
+import bisq.pricenode.price.PriceData;
+import bisq.pricenode.price.PriceRequestService;
 
 import io.bisq.network.http.HttpClient;
 
@@ -62,9 +63,7 @@ public class CoinmarketcapProvider {
             String code = (String) treeMap.get("symbol");
             if (supportedAltcoins.contains(code)) {
                 double price_btc = parseDouble((String) treeMap.get("price_btc"));
-                marketPriceMap.put(code, new PriceData(code,
-                        price_btc,
-                        ts));
+                marketPriceMap.put(code, new PriceData(code, price_btc, ts, PriceRequestService.COINMKTC_PROVIDER));
             }
         });
         return marketPriceMap;

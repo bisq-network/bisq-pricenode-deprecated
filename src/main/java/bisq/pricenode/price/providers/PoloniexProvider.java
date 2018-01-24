@@ -15,9 +15,10 @@
  * along with Bisq. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.bisq.provider.price.providers;
+package bisq.pricenode.price.providers;
 
-import io.bisq.provider.price.PriceData;
+import bisq.pricenode.price.PriceData;
+import bisq.pricenode.price.PriceRequestService;
 
 import io.bisq.network.http.HttpClient;
 
@@ -77,7 +78,8 @@ public class PoloniexProvider {
                             marketPriceMap.put(altcoinCurrency,
                                     new PriceData(altcoinCurrency,
                                             parseDouble((String) data.get("last")),
-                                            ts)
+                                            ts,
+                                            PriceRequestService.POLO_PROVIDER)
                             );
                         }
                     }

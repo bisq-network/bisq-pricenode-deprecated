@@ -15,9 +15,9 @@
  * along with Bisq. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package io.bisq.provider.fee.providers;
+package bisq.pricenode.fee.providers;
 
-import io.bisq.provider.fee.FeeRequestService;
+import bisq.pricenode.fee.FeeRequestService;
 
 import io.bisq.network.http.HttpClient;
 
@@ -29,23 +29,36 @@ import com.google.gson.internal.LinkedTreeMap;
 import java.io.IOException;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+//TODO consider alternative https://www.bitgo.com/api/v1/tx/fee?numBlocks=3
 public class BtcFeesProvider {
 
     private static final Logger log = LoggerFactory.getLogger(BtcFeesProvider.class);
 
-    private final HttpClient httpClient;
+    public static int CAPACITY = 4; // if we request each 5 min. we take average of last 20 min.
+    public static int MAX_BLOCKS = 10;
 
-    public BtcFeesProvider() {
-        // we previously used https://bitcoinfees.21.co/api/v1/fees/recommended but fees were way too high
-        // see also: https://estimatefee.com/n/2
-        this.httpClient = new HttpClient("https://bitcoinfees.21.co/api/v1/fees/");
+    private final HttpClient httpClient;
+    LinkedList<Long> fees = new LinkedList<>();
+    private final int capacity;
+    private final int maxBlocks;
+
+    // other: https://estimatefee.com/n/2
+    public BtcFeesProvider(int capacity, int maxBlocks) {
+        this.capacity = capacity;
+        this.maxBlocks = maxBlocks;
+        this.httpClient = new HttpClient("https://bitcoinfees.earn.com/api/v1/fees/");
     }
 
     public Long getFee() throws IOException {
+        // prev. used:  https://bitcoinfees.earn.com/api/v1/fees/recommended
+        // but was way too high
+
+        // https://bitcoinfees.earn.com/api/v1/fees/list
         String response = httpClient.requestWithGET("list", "User-Agent", "");
         log.info("Get recommended fee response:  " + response);
 
@@ -54,9 +67,8 @@ public class BtcFeesProvider {
                 new Gson().fromJson(response, LinkedTreeMap.class);
 
         final long[] fee = new long[1];
-
-        // we want a fee that gets us in within 10 blocks max
-        int maxBlocks = 10;
+        // we want a fee which is at least in 20 blocks in (21.co estimation seem to be way too high, so we get
+        // prob much faster in
         treeMap.entrySet().stream()
                 .flatMap(e -> e.getValue().stream())
                 .forEach(e -> {
@@ -65,7 +77,20 @@ public class BtcFeesProvider {
                         fee[0] = MathUtils.roundDoubleToLong(e.get("maxFee"));
                 });
         fee[0] = Math.min(Math.max(fee[0], FeeRequestService.BTC_MIN_TX_FEE), FeeRequestService.BTC_MAX_TX_FEE);
-        log.info("fee " + fee[0]);
-        return fee[0];
+
+        return getAverage(fee[0]);
+    }
+
+    // We take the average of the last 12 calls (every 5 minute) so we smooth extreme values.
+    // We observed very radical jumps in the fee estimations, so that should help to avoid that.
+    long getAverage(long newFee) {
+        log.info("new fee " + newFee);
+        fees.add(newFee);
+        long average = ((Double) fees.stream().mapToDouble(e -> e).average().getAsDouble()).longValue();
+        log.info("average of last {} calls: {}", fees.size(), average);
+        if (fees.size() == capacity)
+            fees.removeFirst();
+
+        return average;
     }
 }
