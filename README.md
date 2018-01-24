@@ -34,10 +34,10 @@ To run a price relay, you will need:
   - The `tor` binary (e.g. `brew install tor`) if you want to run a hidden service locally.
 
 
-Deployment Instructions
+Deploy Locally
 --------
 
-### On localhost
+Run the following commands:
 
     ./gradlew installDist
     BITCOIN_AVG_PUBKEY=[your pubkey] BITCOIN_AVG_PRIVKEY=[your privkey] ./build/install/bisq-pricenode/bin/bisq-pricenode
@@ -52,42 +52,7 @@ When the process reports that it is "100% bootstrapped", leave the process runni
 > NOTE: It may take a few minutes for your new .onion address to get registered and become resolvable. Registration of Tor hidden service descriptors can take some time.
 
 
-### On Heroku
+Deploy Elsewhere
+--------
 
-    heroku create
-    heroku config:set BITCOIN_AVG_PUBKEY=[your pubkey] BITCOIN_AVG_PRIVKEY=[your privkey]
-    git push heroku master
-    curl https://your-app-123456.herokuapp.com/getAllMarketPrices
-
-To register the node as a Tor hidden service, first install the Heroku Tor buildpack:
-
-    heroku buildpacks:add https://github.com/hernanex3/heroku-buildpack-tor.git#c766cb6d
-    git commit --allow-empty -m"Add Tor buildpack"
-    git push heroku master
-
-> NOTE: this deployment will take a while, because the new buildpack must download and build Tor from source.
-
-Next, generate your Tor hidden service private key and .onion address:
-
-    heroku run bash
-    ./tor/bin/tor -f torrc
-
-When the process reports that it is "100% bootstrapped", kill it, then copy the generated private key and .onion hostname values:
-
-    cat build/tor-hidden-service/hostname
-    cat build/tor-hidden-service/private_key
-    exit
-
-> IMPORTANT: Save the private key value in a secure location so that this node can be re-created elsewhere with the same .onion address in the future if necessary.
-
-Now configure the hostname and private key values as environment variables for your Heroku app:
-
-    heroku config:set HIDDEN=true HIDDEN_DOT_ONION=[your .onion] HIDDEN_PRIVATE_KEY="[your tor privkey]"
-
-When the application finishes restarting, you should still be able to access it via the clearnet, e.g. with:
-
-    curl https://your-app-123456.herokuapp.com/getAllMarketPrices
-
-And via your Tor Browser at:
-
-    http://$YOUR_ONION/getAllMarketPrices
+ - [README-HEROKU.md](README-HEROKU.md)
