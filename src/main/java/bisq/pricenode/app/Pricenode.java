@@ -15,34 +15,32 @@ public class Pricenode {
 
     private static final Logger log = LoggerFactory.getLogger(Pricenode.class);
 
+    private final PriceRequestService priceRequestService;
     private final Config config;
 
     public static class Config {
         public int port;
         public String version;
-        public String bitcoinAveragePrivKey;
-        public String bitcoinAveragePubKey;
         public int capacity;
         public int maxBlocks;
         public long requestIntervalInMs;
     }
 
-    public Pricenode(Config config) {
+    public Pricenode(PriceRequestService priceRequestService, Config config) {
+        this.priceRequestService = priceRequestService;
         this.config = config;
     }
 
     public void start() throws Exception {
         port(config.port);
 
-        handleGetAllMarketPrices(config.bitcoinAveragePrivKey, config.bitcoinAveragePubKey);
+        handleGetAllMarketPrices(priceRequestService);
         handleGetFees(config.capacity, config.maxBlocks, config.requestIntervalInMs);
         handleGetVersion(config.version);
         handleGetParams(config.capacity, config.maxBlocks, config.requestIntervalInMs);
     }
 
-    private static void handleGetAllMarketPrices(String bitcoinAveragePrivKey, String bitcoinAveragePubKey)
-            throws Exception {
-        PriceRequestService priceRequestService = new PriceRequestService(bitcoinAveragePrivKey, bitcoinAveragePubKey);
+    private static void handleGetAllMarketPrices(PriceRequestService priceRequestService) {
         get("/getAllMarketPrices", (req, res) -> {
             log.info("Incoming getAllMarketPrices request from: " + req.userAgent());
             return priceRequestService.getJson();

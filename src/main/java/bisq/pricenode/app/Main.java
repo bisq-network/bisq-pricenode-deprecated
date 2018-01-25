@@ -19,6 +19,7 @@ package bisq.pricenode.app;
 
 import bisq.pricenode.fee.FeeRequestService;
 import bisq.pricenode.fee.providers.BtcFeesProvider;
+import bisq.pricenode.price.PriceRequestService;
 
 import io.bisq.common.app.Log;
 import io.bisq.common.app.Version;
@@ -33,12 +34,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Level;
 
+import static java.lang.String.format;
 
 public class Main {
 
     private static final Logger log = LoggerFactory.getLogger(Main.class);
     private static final String VERSION = loadVersionFromJarManifest(Main.class);
     private static final int DEFAULT_PORT = 8080;
+    private static final String BITCOIN_AVG_PUBKEY_VAR = "BITCOIN_AVG_PUBKEY";
+    private static final String BITCOIN_AVG_PRIVKEY_VAR = "BITCOIN_AVG_PRIVKEY";
 
     static {
         // Need to set default locale initially otherwise we get problems at non-english OS
@@ -56,14 +60,20 @@ public class Main {
         config.maxBlocks = BtcFeesProvider.MAX_BLOCKS;
         config.requestIntervalInMs = TimeUnit.MINUTES.toMillis(FeeRequestService.REQUEST_INTERVAL_MIN);
 
-        if (System.getenv("BITCOIN_AVG_PRIVKEY") != null && System.getenv("BITCOIN_AVG_PUBKEY") != null) {
-            config.bitcoinAveragePrivKey = System.getenv("BITCOIN_AVG_PRIVKEY");
-            config.bitcoinAveragePubKey = System.getenv("BITCOIN_AVG_PUBKEY");
-        } else {
-            throw new IllegalArgumentException("You need to provide the BitcoinAverage API keys. " +
-                    "Private key as BITCOIN_AVG_PRIVKEY environment variable, " +
-                    "public key as BITCOIN_AVG_PUBKEY environment variable");
+        if (System.getenv(BITCOIN_AVG_PUBKEY_VAR) == null) {
+            throw new IllegalArgumentException(
+                    format("Error: %s environment variable not specified.", BITCOIN_AVG_PUBKEY_VAR));
         }
+
+        if (System.getenv(BITCOIN_AVG_PRIVKEY_VAR) == null) {
+            throw new IllegalArgumentException(
+                    format("Error: %s environment variable not specified.", BITCOIN_AVG_PUBKEY_VAR));
+        }
+
+        PriceRequestService priceRequestService =
+                new PriceRequestService(
+                        System.getenv(BITCOIN_AVG_PRIVKEY_VAR),
+                        System.getenv(BITCOIN_AVG_PUBKEY_VAR));
 
         // extract command line arguments
         if (args.length >= 2) {
@@ -76,7 +86,8 @@ public class Main {
 
         config.port = System.getenv("PORT") != null ? Integer.valueOf(System.getenv("PORT")) : DEFAULT_PORT;
 
-        Pricenode pricenode = new Pricenode(config);
+
+        Pricenode pricenode = new Pricenode(priceRequestService, config);
         pricenode.start();
     }
 
