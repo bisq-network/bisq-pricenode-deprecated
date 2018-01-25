@@ -21,19 +21,9 @@ import bisq.pricenode.fee.FeeRequestService;
 import bisq.pricenode.fee.providers.BtcFeesProvider;
 import bisq.pricenode.price.PriceRequestService;
 
-import io.bisq.common.util.Utilities;
-
-import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class Main {
-
-    static {
-        // Need to set default locale initially otherwise we get problems at non-english OS
-        Locale.setDefault(new Locale("en", Locale.getDefault().getCountry()));
-
-        Utilities.removeCryptographyRestrictions();
-    }
 
     public static void main(String[] args) throws Exception {
         Environment env = new Environment();
