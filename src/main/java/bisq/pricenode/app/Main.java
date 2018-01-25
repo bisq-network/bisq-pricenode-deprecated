@@ -19,17 +19,12 @@ package bisq.pricenode.app;
 
 import bisq.pricenode.fee.FeeRequestService;
 import bisq.pricenode.fee.providers.BtcFeesProvider;
-import bisq.pricenode.price.PriceRequestService;
 
 import io.bisq.common.app.Log;
 import io.bisq.common.app.Version;
 import io.bisq.common.util.Utilities;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-
 import java.io.File;
-import java.io.IOException;
 
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
@@ -38,13 +33,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Level;
 
-import static spark.Spark.get;
-import static spark.Spark.port;
 
 public class Main {
 
     private static final Logger log = LoggerFactory.getLogger(Main.class);
     private static final String VERSION = loadVersionFromJarManifest(Main.class);
+    private static final int DEFAULT_PORT = 8080;
 
     static {
         // Need to set default locale initially otherwise we get problems at non-english OS
@@ -69,15 +63,15 @@ public class Main {
                 '}');
         Utilities.printSysInfo();
 
-        String bitcoinAveragePrivKey = null;
-        String bitcoinAveragePubKey = null;
-        int capacity = BtcFeesProvider.CAPACITY;
-        int maxBlocks = BtcFeesProvider.MAX_BLOCKS;
-        long requestIntervalInMs = TimeUnit.MINUTES.toMillis(FeeRequestService.REQUEST_INTERVAL_MIN);
+        Pricenode.Config config = new Pricenode.Config();
+
+        config.capacity = BtcFeesProvider.CAPACITY;
+        config.maxBlocks = BtcFeesProvider.MAX_BLOCKS;
+        config.requestIntervalInMs = TimeUnit.MINUTES.toMillis(FeeRequestService.REQUEST_INTERVAL_MIN);
 
         if (System.getenv("BITCOIN_AVG_PRIVKEY") != null && System.getenv("BITCOIN_AVG_PUBKEY") != null) {
-            bitcoinAveragePrivKey = System.getenv("BITCOIN_AVG_PRIVKEY");
-            bitcoinAveragePubKey = System.getenv("BITCOIN_AVG_PUBKEY");
+            config.bitcoinAveragePrivKey = System.getenv("BITCOIN_AVG_PRIVKEY");
+            config.bitcoinAveragePubKey = System.getenv("BITCOIN_AVG_PUBKEY");
         } else {
             throw new IllegalArgumentException("You need to provide the BitcoinAverage API keys. " +
                     "Private key as BITCOIN_AVG_PRIVKEY environment variable, " +
@@ -86,50 +80,17 @@ public class Main {
 
         // extract command line arguments
         if (args.length >= 2) {
-            capacity = Integer.valueOf(args[0]);
-            maxBlocks = Integer.valueOf(args[1]);
+            config.capacity = Integer.valueOf(args[0]);
+            config.maxBlocks = Integer.valueOf(args[1]);
         }
         if (args.length >= 3) {
-            requestIntervalInMs = TimeUnit.MINUTES.toMillis(Long.valueOf(args[2]));
+            config.requestIntervalInMs = TimeUnit.MINUTES.toMillis(Long.valueOf(args[2]));
         }
 
-        port(System.getenv("PORT") != null ? Integer.valueOf(System.getenv("PORT")) : 8080);
+        config.port = System.getenv("PORT") != null ? Integer.valueOf(System.getenv("PORT")) : DEFAULT_PORT;
 
-        handleGetAllMarketPrices(bitcoinAveragePrivKey, bitcoinAveragePubKey);
-        handleGetFees(capacity, maxBlocks, requestIntervalInMs);
-        handleGetVersion();
-        handleGetParams(capacity, maxBlocks, requestIntervalInMs);
-    }
-
-    private static void handleGetAllMarketPrices(String bitcoinAveragePrivKey, String bitcoinAveragePubKey)
-            throws IOException, NoSuchAlgorithmException, InvalidKeyException {
-        PriceRequestService priceRequestService = new PriceRequestService(bitcoinAveragePrivKey, bitcoinAveragePubKey);
-        get("/getAllMarketPrices", (req, res) -> {
-            log.info("Incoming getAllMarketPrices request from: " + req.userAgent());
-            return priceRequestService.getJson();
-        });
-    }
-
-    private static void handleGetFees(int capacity, int maxBlocks, long requestIntervalInMs) throws IOException {
-        FeeRequestService feeRequestService = new FeeRequestService(capacity, maxBlocks, requestIntervalInMs);
-        get("/getFees", (req, res) -> {
-            log.info("Incoming getFees request from: " + req.userAgent());
-            return feeRequestService.getJson();
-        });
-    }
-
-    private static void handleGetVersion() throws IOException {
-        get("/getVersion", (req, res) -> {
-            log.info("Incoming getVersion request from: " + req.userAgent());
-            return VERSION;
-        });
-    }
-
-    private static void handleGetParams(int capacity, int maxBlocks, long requestIntervalInMs) throws IOException {
-        get("/getParams", (req, res) -> {
-            log.info("Incoming getParams request from: " + req.userAgent());
-            return capacity + ";" + maxBlocks + ";" + requestIntervalInMs;
-        });
+        Pricenode pricenode = new Pricenode(config);
+        pricenode.start();
     }
 
     /**
