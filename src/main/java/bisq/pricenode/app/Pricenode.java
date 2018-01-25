@@ -3,8 +3,6 @@ package bisq.pricenode.app;
 import bisq.pricenode.fee.FeeRequestService;
 import bisq.pricenode.price.PriceRequestService;
 
-import java.io.IOException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +14,7 @@ public class Pricenode {
     private static final Logger log = LoggerFactory.getLogger(Pricenode.class);
 
     private final PriceRequestService priceRequestService;
+    private final FeeRequestService feeRequestService;
     private final Config config;
 
     public static class Config {
@@ -26,16 +25,17 @@ public class Pricenode {
         public long requestIntervalInMs;
     }
 
-    public Pricenode(PriceRequestService priceRequestService, Config config) {
+    public Pricenode(PriceRequestService priceRequestService, FeeRequestService feeRequestService, Config config) {
         this.priceRequestService = priceRequestService;
+        this.feeRequestService = feeRequestService;
         this.config = config;
     }
 
-    public void start() throws Exception {
+    public void start() {
         port(config.port);
 
         handleGetAllMarketPrices(priceRequestService);
-        handleGetFees(config.capacity, config.maxBlocks, config.requestIntervalInMs);
+        handleGetFees(feeRequestService);
         handleGetVersion(config.version);
         handleGetParams(config.capacity, config.maxBlocks, config.requestIntervalInMs);
     }
@@ -47,8 +47,7 @@ public class Pricenode {
         });
     }
 
-    private static void handleGetFees(int capacity, int maxBlocks, long requestIntervalInMs) throws IOException {
-        FeeRequestService feeRequestService = new FeeRequestService(capacity, maxBlocks, requestIntervalInMs);
+    private static void handleGetFees(FeeRequestService feeRequestService) {
         get("/getFees", (req, res) -> {
             log.info("Incoming getFees request from: " + req.userAgent());
             return feeRequestService.getJson();

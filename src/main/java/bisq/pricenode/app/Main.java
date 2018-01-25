@@ -72,10 +72,12 @@ public class Main {
             config.requestIntervalInMs = TimeUnit.MINUTES.toMillis(Long.valueOf(args[2]));
         }
 
+        FeeRequestService feeRequestService =
+                new FeeRequestService(config.capacity, config.maxBlocks, config.requestIntervalInMs);
+
         config.port = System.getenv("PORT") != null ? Integer.valueOf(System.getenv("PORT")) : DEFAULT_PORT;
 
-
-        Pricenode pricenode = new Pricenode(priceRequestService, config);
+        Pricenode pricenode = new Pricenode(priceRequestService, feeRequestService, config);
         pricenode.start();
     }
 
