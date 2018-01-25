@@ -81,11 +81,13 @@ public class PriceRequestService {
 
     private String json;
 
-    public PriceRequestService(String bitcoinAveragePrivKey, String bitcoinAveragePubKey)
+    public PriceRequestService(BtcAverageProvider btcAverageProvider,
+                               PoloniexProvider poloniexProvider,
+                               CoinmarketcapProvider coinmarketcapProvider)
             throws IOException, NoSuchAlgorithmException, InvalidKeyException {
-        btcAverageProvider = new BtcAverageProvider(bitcoinAveragePrivKey, bitcoinAveragePubKey);
-        poloniexProvider = new PoloniexProvider();
-        coinmarketcapProvider = new CoinmarketcapProvider();
+        this.btcAverageProvider = btcAverageProvider;
+        this.poloniexProvider = poloniexProvider;
+        this.coinmarketcapProvider = coinmarketcapProvider;
 
         startRequests();
     }

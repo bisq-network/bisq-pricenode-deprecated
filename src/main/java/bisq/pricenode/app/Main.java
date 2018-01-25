@@ -20,6 +20,9 @@ package bisq.pricenode.app;
 import bisq.pricenode.fee.FeeRequestService;
 import bisq.pricenode.fee.providers.BtcFeesProvider;
 import bisq.pricenode.price.PriceRequestService;
+import bisq.pricenode.price.providers.BtcAverageProvider;
+import bisq.pricenode.price.providers.CoinmarketcapProvider;
+import bisq.pricenode.price.providers.PoloniexProvider;
 
 import java.util.concurrent.TimeUnit;
 
@@ -28,10 +31,13 @@ public class Main {
     public static void main(String[] args) throws Exception {
         Environment env = new Environment();
 
-        PriceRequestService priceRequestService =
-                new PriceRequestService(
+        PriceRequestService priceRequestService = new PriceRequestService(
+                new BtcAverageProvider(
                         env.getRequiredVar("BITCOIN_AVG_PRIVKEY"),
-                        env.getRequiredVar("BITCOIN_AVG_PUBKEY"));
+                        env.getRequiredVar("BITCOIN_AVG_PUBKEY")),
+                new PoloniexProvider(),
+                new CoinmarketcapProvider()
+        );
 
         BtcFeesProvider btcFeesProvider = new BtcFeesProvider();
         if (args.length >= 2) {
