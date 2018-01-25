@@ -38,10 +38,8 @@ public class Pricenode {
         this.port = port;
     }
 
-    public void start() throws IOException {
+    public void start() throws Exception {
         initLog();
-
-        feeRequestService.start();
 
         port(port);
 
@@ -49,6 +47,9 @@ public class Pricenode {
         handleGetFees(feeRequestService);
         handleGetVersion(version);
         handleGetParams(feeRequestService);
+
+        priceRequestService.start();
+        feeRequestService.start();
     }
 
     private static void handleGetAllMarketPrices(PriceRequestService priceRequestService) {

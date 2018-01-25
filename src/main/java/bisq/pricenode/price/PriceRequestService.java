@@ -83,20 +83,17 @@ public class PriceRequestService {
 
     public PriceRequestService(BtcAverageProvider btcAverageProvider,
                                PoloniexProvider poloniexProvider,
-                               CoinmarketcapProvider coinmarketcapProvider)
-            throws IOException, NoSuchAlgorithmException, InvalidKeyException {
+                               CoinmarketcapProvider coinmarketcapProvider){
         this.btcAverageProvider = btcAverageProvider;
         this.poloniexProvider = poloniexProvider;
         this.coinmarketcapProvider = coinmarketcapProvider;
-
-        startRequests();
     }
 
     public String getJson() {
         return json;
     }
 
-    private void startRequests() throws InvalidKeyException, NoSuchAlgorithmException, IOException {
+    public void start() throws Exception {
         timerBtcAverageLocal.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
