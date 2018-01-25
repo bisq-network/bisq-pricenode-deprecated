@@ -44,7 +44,7 @@ import static spark.Spark.port;
 public class Main {
 
     private static final Logger log = LoggerFactory.getLogger(Main.class);
-    private static final String VERSION = Main.class.getPackage().getImplementationVersion();
+    private static final String VERSION = loadVersionFromJarManifest(Main.class);
 
     static {
         // Need to set default locale initially otherwise we get problems at non-english OS
@@ -130,5 +130,17 @@ public class Main {
             log.info("Incoming getParams request from: " + req.userAgent());
             return capacity + ";" + maxBlocks + ";" + requestIntervalInMs;
         });
+    }
+
+    /**
+     * Returns the value of 'Implementation-Version' from the application JAR's
+     * MANIFEST.MF file or the value '0.0.0' if no such value could be found,
+     * e.g. when running this application from source within an IDE or if
+     * something has gone wrong with the build system instructions that populate
+     * the manifest with this value at JAR creation time.
+     */
+    private static String loadVersionFromJarManifest(Class<?> clazz) {
+        String version = clazz.getPackage().getImplementationVersion();
+        return version != null ? version : "0.0.0";
     }
 }
