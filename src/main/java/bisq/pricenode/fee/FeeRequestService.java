@@ -50,8 +50,8 @@ public class FeeRequestService {
     private long bitcoinFeesTs;
     private String json;
 
-    public FeeRequestService(int capacity, int maxBlocks, long requestIntervalInMs) throws IOException {
-        btcFeesProvider = new BtcFeesProvider(capacity, maxBlocks);
+    public FeeRequestService(BtcFeesProvider btcFeesProvider, long requestIntervalInMs) throws IOException {
+        this.btcFeesProvider = btcFeesProvider;
 
         // For now we don't need a fee estimation for LTC so we set it fixed, but we keep it in the provider to
         // be flexible if fee pressure grows on LTC

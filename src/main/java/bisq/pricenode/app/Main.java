@@ -40,8 +40,8 @@ public class Main {
     public static void main(String[] args) throws Exception {
         Pricenode.Config config = new Pricenode.Config();
 
-        config.capacity = BtcFeesProvider.CAPACITY;
-        config.maxBlocks = BtcFeesProvider.MAX_BLOCKS;
+        config.capacity = BtcFeesProvider.DEFAULT_CAPACITY;
+        config.maxBlocks = BtcFeesProvider.DEFAULT_MAX_BLOCKS;
         config.requestIntervalInMs = TimeUnit.MINUTES.toMillis(FeeRequestService.REQUEST_INTERVAL_MIN);
 
         Environment env = new Environment();
@@ -51,17 +51,18 @@ public class Main {
                         env.getRequiredVar("BITCOIN_AVG_PRIVKEY"),
                         env.getRequiredVar("BITCOIN_AVG_PUBKEY"));
 
-        // extract command line arguments
+        BtcFeesProvider btcFeesProvider = new BtcFeesProvider();
         if (args.length >= 2) {
-            config.capacity = Integer.valueOf(args[0]);
-            config.maxBlocks = Integer.valueOf(args[1]);
+            btcFeesProvider.setCapacity(Integer.valueOf(args[0]));
+            btcFeesProvider.setMaxBlocks(Integer.valueOf(args[1]));
         }
+
         if (args.length >= 3) {
             config.requestIntervalInMs = TimeUnit.MINUTES.toMillis(Long.valueOf(args[2]));
         }
 
         FeeRequestService feeRequestService =
-                new FeeRequestService(config.capacity, config.maxBlocks, config.requestIntervalInMs);
+                new FeeRequestService(btcFeesProvider, config.requestIntervalInMs);
 
         config.port = System.getenv("PORT") != null ? Integer.valueOf(System.getenv("PORT")) : DEFAULT_PORT;
 

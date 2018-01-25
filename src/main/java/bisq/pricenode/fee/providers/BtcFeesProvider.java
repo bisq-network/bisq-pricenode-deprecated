@@ -39,19 +39,26 @@ public class BtcFeesProvider {
 
     private static final Logger log = LoggerFactory.getLogger(BtcFeesProvider.class);
 
-    public static int CAPACITY = 4; // if we request each 5 min. we take average of last 20 min.
-    public static int MAX_BLOCKS = 10;
+    public static int DEFAULT_CAPACITY = 4; // if we request each 5 min. we take average of last 20 min.
+    public static int DEFAULT_MAX_BLOCKS = 10;
 
     private final HttpClient httpClient;
     private final LinkedList<Long> fees = new LinkedList<>();
-    private final int capacity;
-    private final int maxBlocks;
+
+    private int capacity = DEFAULT_CAPACITY;
+    private int maxBlocks = DEFAULT_MAX_BLOCKS;
 
     // other: https://estimatefee.com/n/2
-    public BtcFeesProvider(int capacity, int maxBlocks) {
-        this.capacity = capacity;
-        this.maxBlocks = maxBlocks;
+    public BtcFeesProvider() {
         this.httpClient = new HttpClient("https://bitcoinfees.earn.com/api/v1/fees/");
+    }
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
+    }
+
+    public void setMaxBlocks(int maxBlocks) {
+        this.maxBlocks = maxBlocks;
     }
 
     public Long getFee() throws IOException {
