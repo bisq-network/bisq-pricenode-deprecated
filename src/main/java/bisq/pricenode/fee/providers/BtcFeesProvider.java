@@ -43,7 +43,7 @@ public class BtcFeesProvider {
     public static int MAX_BLOCKS = 10;
 
     private final HttpClient httpClient;
-    LinkedList<Long> fees = new LinkedList<>();
+    private final LinkedList<Long> fees = new LinkedList<>();
     private final int capacity;
     private final int maxBlocks;
 
