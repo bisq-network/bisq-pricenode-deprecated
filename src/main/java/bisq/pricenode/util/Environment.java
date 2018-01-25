@@ -1,9 +1,9 @@
-package bisq.pricenode.app;
+package bisq.pricenode.util;
 
 import java.util.Optional;
 import java.util.function.Consumer;
 
-class Environment {
+public class Environment {
 
     public String getRequiredVar(String name) {
         return Optional.ofNullable(System.getenv(name))

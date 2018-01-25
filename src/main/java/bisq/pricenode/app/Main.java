@@ -23,6 +23,7 @@ import bisq.pricenode.price.PriceRequestService;
 import bisq.pricenode.price.providers.BtcAverageProvider;
 import bisq.pricenode.price.providers.CoinmarketcapProvider;
 import bisq.pricenode.price.providers.PoloniexProvider;
+import bisq.pricenode.util.Environment;
 
 import java.util.concurrent.TimeUnit;
 
