@@ -63,6 +63,14 @@ public class FeeRequestService {
         writeToJson();
     }
 
+    public BtcFeesProvider getBtcFeesProvider() {
+        return btcFeesProvider;
+    }
+
+    public long getRequestIntervalMs() {
+        return requestIntervalMs;
+    }
+
     public void setRequestIntervalMs(long requestIntervalMs) {
         this.requestIntervalMs = requestIntervalMs;
     }

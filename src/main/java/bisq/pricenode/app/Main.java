@@ -28,8 +28,6 @@ import java.util.concurrent.TimeUnit;
 
 public class Main {
 
-    private static final int DEFAULT_PORT = 8080;
-
     static {
         // Need to set default locale initially otherwise we get problems at non-english OS
         Locale.setDefault(new Locale("en", Locale.getDefault().getCountry()));
@@ -38,12 +36,6 @@ public class Main {
     }
 
     public static void main(String[] args) throws Exception {
-        Pricenode.Config config = new Pricenode.Config();
-
-        config.capacity = BtcFeesProvider.DEFAULT_CAPACITY;
-        config.maxBlocks = BtcFeesProvider.DEFAULT_MAX_BLOCKS;
-        config.requestIntervalInMs = FeeRequestService.DEFAULT_REQUEST_INTERVAL_MS;
-
         Environment env = new Environment();
 
         PriceRequestService priceRequestService =
@@ -62,9 +54,9 @@ public class Main {
             feeRequestService.setRequestIntervalMs(TimeUnit.MINUTES.toMillis(Long.valueOf(args[2])));
         }
 
-        config.port = System.getenv("PORT") != null ? Integer.valueOf(System.getenv("PORT")) : DEFAULT_PORT;
+        Pricenode pricenode = new Pricenode(priceRequestService, feeRequestService);
+        env.doWithOptionalVar("PORT", port -> pricenode.setPort(Integer.valueOf(port)));
 
-        Pricenode pricenode = new Pricenode(priceRequestService, feeRequestService, config);
         pricenode.start();
     }
 }

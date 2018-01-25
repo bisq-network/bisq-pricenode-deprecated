@@ -20,25 +20,22 @@ import static spark.Spark.port;
 public class Pricenode {
 
     private static final Logger log = LoggerFactory.getLogger(Pricenode.class);
+    private static final int DEFAULT_PORT = 8080;
 
     private final PriceRequestService priceRequestService;
     private final FeeRequestService feeRequestService;
-    private final Config config;
     private final String version;
 
-    public static class Config {
-        public int port;
-        public String version;
-        public int capacity;
-        public int maxBlocks;
-        public long requestIntervalInMs;
-    }
+    private int port = DEFAULT_PORT;
 
-    public Pricenode(PriceRequestService priceRequestService, FeeRequestService feeRequestService, Config config) {
+    public Pricenode(PriceRequestService priceRequestService, FeeRequestService feeRequestService) {
         this.priceRequestService = priceRequestService;
         this.feeRequestService = feeRequestService;
-        this.config = config;
         this.version = loadVersionFromJarManifest(Pricenode.class);
+    }
+
+    public void setPort(int port) {
+        this.port = port;
     }
 
     public void start() throws IOException {
@@ -46,12 +43,12 @@ public class Pricenode {
 
         feeRequestService.start();
 
-        port(config.port);
+        port(port);
 
         handleGetAllMarketPrices(priceRequestService);
         handleGetFees(feeRequestService);
-        handleGetVersion(config.version);
-        handleGetParams(config.capacity, config.maxBlocks, config.requestIntervalInMs);
+        handleGetVersion(version);
+        handleGetParams(feeRequestService);
     }
 
     private static void handleGetAllMarketPrices(PriceRequestService priceRequestService) {
@@ -75,10 +72,12 @@ public class Pricenode {
         });
     }
 
-    private static void handleGetParams(int capacity, int maxBlocks, long requestIntervalInMs) {
+    private static void handleGetParams(FeeRequestService feeRequestService) {
         get("/getParams", (req, res) -> {
             log.info("Incoming getParams request from: " + req.userAgent());
-            return capacity + ";" + maxBlocks + ";" + requestIntervalInMs;
+            return feeRequestService.getBtcFeesProvider().getCapacity() + ";" +
+                    feeRequestService.getBtcFeesProvider().getMaxBlocks() + ";" +
+                    feeRequestService.getRequestIntervalMs();
         });
     }
 

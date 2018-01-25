@@ -53,8 +53,16 @@ public class BtcFeesProvider {
         this.httpClient = new HttpClient("https://bitcoinfees.earn.com/api/v1/fees/");
     }
 
+    public int getCapacity() {
+        return capacity;
+    }
+
     public void setCapacity(int capacity) {
         this.capacity = capacity;
+    }
+
+    public int getMaxBlocks() {
+        return maxBlocks;
     }
 
     public void setMaxBlocks(int maxBlocks) {
