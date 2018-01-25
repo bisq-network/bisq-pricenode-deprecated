@@ -38,7 +38,7 @@ public class Pricenode {
     }
 
     public void start() throws Exception {
-        initLog();
+        initLogging();
         priceRequestService.start();
         feeRequestService.start();
         mapRoutesAndStart();
@@ -83,7 +83,7 @@ public class Pricenode {
         });
     }
 
-    private void initLog() {
+    private void initLogging() {
         final String logPath = System.getProperty("user.home") + File.separator + "provider";
         Log.setup(logPath);
         Log.setLevel(Level.INFO);
