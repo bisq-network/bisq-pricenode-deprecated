@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Level;
 
+import static spark.Spark.before;
 import static spark.Spark.get;
 import static spark.Spark.port;
 
@@ -47,6 +48,8 @@ public class Pricenode {
     private void mapRoutesAndStart() {
         port(port);
 
+        before("/*", (req, res) -> log.info("Incoming {} request from: {}", req.pathInfo(), req.userAgent()));
+
         handleGetAllMarketPrices(priceRequestService);
         handleGetFees(feeRequestService);
         handleGetVersion(version);
@@ -54,33 +57,22 @@ public class Pricenode {
     }
 
     private static void handleGetAllMarketPrices(PriceRequestService priceRequestService) {
-        get("/getAllMarketPrices", (req, res) -> {
-            log.info("Incoming getAllMarketPrices request from: " + req.userAgent());
-            return priceRequestService.getJson();
-        });
+        get("/getAllMarketPrices", (req, res) -> priceRequestService.getJson());
     }
 
     private static void handleGetFees(FeeRequestService feeRequestService) {
-        get("/getFees", (req, res) -> {
-            log.info("Incoming getFees request from: " + req.userAgent());
-            return feeRequestService.getJson();
-        });
+        get("/getFees", (req, res) -> feeRequestService.getJson());
     }
 
     private static void handleGetVersion(Version version) {
-        get("/getVersion", (req, res) -> {
-            log.info("Incoming getVersion request from: " + req.userAgent());
-            return version.toString();
-        });
+        get("/getVersion", (req, res) -> version.toString());
     }
 
     private static void handleGetParams(FeeRequestService feeRequestService) {
-        get("/getParams", (req, res) -> {
-            log.info("Incoming getParams request from: " + req.userAgent());
-            return feeRequestService.getBtcFeesProvider().getCapacity() + ";" +
-                    feeRequestService.getBtcFeesProvider().getMaxBlocks() + ";" +
-                    feeRequestService.getRequestIntervalMs();
-        });
+        get("/getParams", (req, res) ->
+                feeRequestService.getBtcFeesProvider().getCapacity() + ";" +
+                feeRequestService.getBtcFeesProvider().getMaxBlocks() + ";" +
+                feeRequestService.getRequestIntervalMs());
     }
 
     private void initLogging() {
