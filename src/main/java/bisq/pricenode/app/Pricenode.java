@@ -8,6 +8,7 @@ import io.bisq.common.app.Version;
 import io.bisq.common.util.Utilities;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,8 +41,10 @@ public class Pricenode {
         this.version = loadVersionFromJarManifest(Pricenode.class);
     }
 
-    public void start() {
+    public void start() throws IOException {
         initLog();
+
+        feeRequestService.start();
 
         port(config.port);
 

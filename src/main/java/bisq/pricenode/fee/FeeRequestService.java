@@ -38,7 +38,7 @@ public class FeeRequestService {
 
     private static final Logger log = LoggerFactory.getLogger(FeeRequestService.class);
 
-    public static int REQUEST_INTERVAL_MIN = 5;
+    public static int DEFAULT_REQUEST_INTERVAL_MS = 300_000; // 5 mins
 
     public static final long BTC_MIN_TX_FEE = 10; // satoshi/byte
     public static final long BTC_MAX_TX_FEE = 1000;
@@ -47,10 +47,11 @@ public class FeeRequestService {
     private final BtcFeesProvider btcFeesProvider;
     private final Map<String, Long> dataMap = new ConcurrentHashMap<>();
 
+    private long requestIntervalMs = DEFAULT_REQUEST_INTERVAL_MS;
     private long bitcoinFeesTs;
     private String json;
 
-    public FeeRequestService(BtcFeesProvider btcFeesProvider, long requestIntervalInMs) throws IOException {
+    public FeeRequestService(BtcFeesProvider btcFeesProvider) {
         this.btcFeesProvider = btcFeesProvider;
 
         // For now we don't need a fee estimation for LTC so we set it fixed, but we keep it in the provider to
@@ -60,10 +61,13 @@ public class FeeRequestService {
         dataMap.put("dashTxFee", 50L /*FeeService.DASH_DEFAULT_TX_FEE*/);
 
         writeToJson();
-        startRequests(requestIntervalInMs);
     }
 
-    private void startRequests(long requestIntervalInMs) throws IOException {
+    public void setRequestIntervalMs(long requestIntervalMs) {
+        this.requestIntervalMs = requestIntervalMs;
+    }
+
+    public void start() throws IOException {
         timerBitcoinFeesLocal.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -74,7 +78,7 @@ public class FeeRequestService {
                     e.printStackTrace();
                 }
             }
-        }, requestIntervalInMs, requestIntervalInMs);
+        }, requestIntervalMs, requestIntervalMs);
 
 
         requestBitcoinFees();

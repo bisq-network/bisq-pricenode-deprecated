@@ -42,7 +42,7 @@ public class Main {
 
         config.capacity = BtcFeesProvider.DEFAULT_CAPACITY;
         config.maxBlocks = BtcFeesProvider.DEFAULT_MAX_BLOCKS;
-        config.requestIntervalInMs = TimeUnit.MINUTES.toMillis(FeeRequestService.REQUEST_INTERVAL_MIN);
+        config.requestIntervalInMs = FeeRequestService.DEFAULT_REQUEST_INTERVAL_MS;
 
         Environment env = new Environment();
 
@@ -57,12 +57,10 @@ public class Main {
             btcFeesProvider.setMaxBlocks(Integer.valueOf(args[1]));
         }
 
+        FeeRequestService feeRequestService = new FeeRequestService(btcFeesProvider);
         if (args.length >= 3) {
-            config.requestIntervalInMs = TimeUnit.MINUTES.toMillis(Long.valueOf(args[2]));
+            feeRequestService.setRequestIntervalMs(TimeUnit.MINUTES.toMillis(Long.valueOf(args[2])));
         }
-
-        FeeRequestService feeRequestService =
-                new FeeRequestService(btcFeesProvider, config.requestIntervalInMs);
 
         config.port = System.getenv("PORT") != null ? Integer.valueOf(System.getenv("PORT")) : DEFAULT_PORT;
 
