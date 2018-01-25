@@ -48,20 +48,7 @@ public class Main {
     }
 
     public static void main(String[] args) throws Exception {
-        final String logPath = System.getProperty("user.home") + File.separator + "provider";
-        Log.setup(logPath);
-        Log.setLevel(Level.INFO);
-        log.info("Log files under: " + logPath);
-        log.info("bisq-pricenode version: " + VERSION);
-        log.info("bisq-exchange versions{" +
-                "VERSION=" + Version.VERSION +
-                ", P2P_NETWORK_VERSION=" + Version.P2P_NETWORK_VERSION +
-                ", LOCAL_DB_VERSION=" + Version.LOCAL_DB_VERSION +
-                ", TRADE_PROTOCOL_VERSION=" + Version.TRADE_PROTOCOL_VERSION +
-                ", BASE_CURRENCY_NETWORK=NOT SET" +
-                ", getP2PNetworkId()=NOT SET" +
-                '}');
-        Utilities.printSysInfo();
+        initLog();
 
         Pricenode.Config config = new Pricenode.Config();
 
@@ -91,6 +78,23 @@ public class Main {
 
         Pricenode pricenode = new Pricenode(config);
         pricenode.start();
+    }
+
+    private static void initLog() {
+        final String logPath = System.getProperty("user.home") + File.separator + "provider";
+        Log.setup(logPath);
+        Log.setLevel(Level.INFO);
+        log.info("Log files under: " + logPath);
+        log.info("bisq-pricenode version: " + VERSION);
+        log.info("bisq-exchange versions{" +
+                "VERSION=" + Version.VERSION +
+                ", P2P_NETWORK_VERSION=" + Version.P2P_NETWORK_VERSION +
+                ", LOCAL_DB_VERSION=" + Version.LOCAL_DB_VERSION +
+                ", TRADE_PROTOCOL_VERSION=" + Version.TRADE_PROTOCOL_VERSION +
+                ", BASE_CURRENCY_NETWORK=NOT SET" +
+                ", getP2PNetworkId()=NOT SET" +
+                '}');
+        Utilities.printSysInfo();
     }
 
     /**
