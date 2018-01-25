@@ -34,15 +34,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Level;
 
-import static java.lang.String.format;
-
 public class Main {
 
     private static final Logger log = LoggerFactory.getLogger(Main.class);
     private static final String VERSION = loadVersionFromJarManifest(Main.class);
     private static final int DEFAULT_PORT = 8080;
-    private static final String BITCOIN_AVG_PUBKEY_VAR = "BITCOIN_AVG_PUBKEY";
-    private static final String BITCOIN_AVG_PRIVKEY_VAR = "BITCOIN_AVG_PRIVKEY";
 
     static {
         // Need to set default locale initially otherwise we get problems at non-english OS
@@ -60,20 +56,12 @@ public class Main {
         config.maxBlocks = BtcFeesProvider.MAX_BLOCKS;
         config.requestIntervalInMs = TimeUnit.MINUTES.toMillis(FeeRequestService.REQUEST_INTERVAL_MIN);
 
-        if (System.getenv(BITCOIN_AVG_PUBKEY_VAR) == null) {
-            throw new IllegalArgumentException(
-                    format("Error: %s environment variable not specified.", BITCOIN_AVG_PUBKEY_VAR));
-        }
-
-        if (System.getenv(BITCOIN_AVG_PRIVKEY_VAR) == null) {
-            throw new IllegalArgumentException(
-                    format("Error: %s environment variable not specified.", BITCOIN_AVG_PUBKEY_VAR));
-        }
+        Environment env = new Environment();
 
         PriceRequestService priceRequestService =
                 new PriceRequestService(
-                        System.getenv(BITCOIN_AVG_PRIVKEY_VAR),
-                        System.getenv(BITCOIN_AVG_PUBKEY_VAR));
+                        env.getRequiredVar("BITCOIN_AVG_PRIVKEY"),
+                        env.getRequiredVar("BITCOIN_AVG_PUBKEY"));
 
         // extract command line arguments
         if (args.length >= 2) {
