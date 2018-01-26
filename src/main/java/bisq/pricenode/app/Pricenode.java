@@ -50,25 +50,9 @@ public class Pricenode {
 
         before("/*", (req, res) -> log.info("Incoming {} request from: {}", req.pathInfo(), req.userAgent()));
 
-        handleGetAllMarketPrices(priceRequestService);
-        handleGetFees(feeRequestService);
-        handleGetVersion(version);
-        handleGetParams(feeRequestService);
-    }
-
-    private static void handleGetAllMarketPrices(PriceRequestService priceRequestService) {
         get("/getAllMarketPrices", (req, res) -> priceRequestService.getJson());
-    }
-
-    private static void handleGetFees(FeeRequestService feeRequestService) {
         get("/getFees", (req, res) -> feeRequestService.getJson());
-    }
-
-    private static void handleGetVersion(Version version) {
         get("/getVersion", (req, res) -> version.toString());
-    }
-
-    private static void handleGetParams(FeeRequestService feeRequestService) {
         get("/getParams", (req, res) ->
                 feeRequestService.getBtcFeesProvider().getCapacity() + ";" +
                 feeRequestService.getBtcFeesProvider().getMaxBlocks() + ";" +
