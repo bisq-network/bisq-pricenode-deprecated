@@ -52,7 +52,9 @@ public class Main {
         }
 
         Pricenode pricenode = new Pricenode(priceRequestService, feeRequestService);
-        env.doWithOptionalVar("PORT", port -> pricenode.setPort(Integer.valueOf(port)));
+        env.getOptionalVar("PORT").ifPresent(port ->
+                pricenode.setPort(Integer.valueOf(port))
+        );
 
         pricenode.start();
     }
