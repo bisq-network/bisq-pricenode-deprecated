@@ -15,15 +15,15 @@
  * along with Bisq. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package bisq.pricenode.app;
+package bisq.price.app;
 
-import bisq.pricenode.fee.FeeRequestService;
-import bisq.pricenode.fee.providers.BtcFeesProvider;
-import bisq.pricenode.price.PriceRequestService;
-import bisq.pricenode.price.providers.BtcAverageProvider;
-import bisq.pricenode.price.providers.CoinmarketcapProvider;
-import bisq.pricenode.price.providers.PoloniexProvider;
-import bisq.pricenode.util.Environment;
+import bisq.price.fee.FeeRequestService;
+import bisq.price.fee.providers.BtcFeesProvider;
+import bisq.price.price.PriceRequestService;
+import bisq.price.price.providers.BtcAverageProvider;
+import bisq.price.price.providers.CoinmarketcapProvider;
+import bisq.price.price.providers.PoloniexProvider;
+import bisq.price.util.Environment;
 
 import java.util.concurrent.TimeUnit;
 

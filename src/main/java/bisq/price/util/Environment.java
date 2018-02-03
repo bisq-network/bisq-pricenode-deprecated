@@ -15,32 +15,18 @@
  * along with Bisq. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package bisq.pricenode.util;
-
-import bisq.pricenode.app.Pricenode;
+package bisq.price.util;
 
 import java.util.Optional;
 
-public class Version {
+public class Environment {
 
-    public static final String NONE = "0.0.0";
-
-    private final String value;
-
-    public Version(Class<Pricenode> clazz) {
-        this(clazz.getPackage());
+    public Optional<String> getOptionalVar(String name) {
+        return Optional.ofNullable(System.getenv(name));
     }
 
-    public Version(Package pkg) {
-        this(Optional.ofNullable(pkg.getImplementationVersion()).orElse(NONE));
-    }
-
-    public Version(String value) {
-        this.value = value;
-    }
-
-    @Override
-    public String toString() {
-        return value;
+    public String getRequiredVar(String name) {
+        return getOptionalVar(name).orElseThrow(() -> new IllegalArgumentException(
+                        String.format("Error: required environment variable '%s' not found.", name)));
     }
 }

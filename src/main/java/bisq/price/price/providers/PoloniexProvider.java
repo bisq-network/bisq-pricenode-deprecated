@@ -15,10 +15,10 @@
  * along with Bisq. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package bisq.pricenode.price.providers;
+package bisq.price.price.providers;
 
-import bisq.pricenode.price.PriceData;
-import bisq.pricenode.price.PriceRequestService;
+import bisq.price.price.PriceData;
+import bisq.price.price.PriceRequestService;
 
 import io.bisq.network.http.HttpClient;
 

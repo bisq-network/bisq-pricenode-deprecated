@@ -15,9 +15,9 @@
  * along with Bisq. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package bisq.pricenode.fee;
+package bisq.price.fee;
 
-import bisq.pricenode.fee.providers.BtcFeesProvider;
+import bisq.price.fee.providers.BtcFeesProvider;
 
 import io.bisq.common.util.Utilities;
 
