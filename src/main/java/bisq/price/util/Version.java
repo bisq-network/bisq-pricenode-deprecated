@@ -17,7 +17,7 @@
 
 package bisq.price.util;
 
-import bisq.price.app.Pricenode;
+import bisq.price.node.Pricenode;
 
 import java.util.Optional;
 

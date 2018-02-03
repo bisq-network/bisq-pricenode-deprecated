@@ -6,7 +6,7 @@ plugins {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-mainClassName = "bisq.price.app.Main"
+mainClassName = "bisq.price.node.Main"
 version = "0.7.0"
 
 jar.manifest.attributes(
