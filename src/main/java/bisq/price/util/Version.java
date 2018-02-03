@@ -17,8 +17,6 @@
 
 package bisq.price.util;
 
-import bisq.price.node.Pricenode;
-
 import java.util.Optional;
 
 public class Version {
@@ -27,7 +25,7 @@ public class Version {
 
     private final String value;
 
-    public Version(Class<Pricenode> clazz) {
+    public Version(Class<?> clazz) {
         this(clazz.getPackage());
     }
 
