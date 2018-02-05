@@ -18,7 +18,7 @@
 package bisq.price.spot.providers;
 
 import bisq.price.spot.PriceData;
-import bisq.price.spot.PriceRequestService;
+import bisq.price.spot.ExchangeRateService;
 
 import io.bisq.network.http.HttpClient;
 
@@ -68,13 +68,13 @@ public class BtcAverageProvider {
     public Map<String, PriceData> getLocal() throws NoSuchAlgorithmException, InvalidKeyException, IOException {
         return getMap(
                 httpClient.requestWithGETNoProxy("indices/local/ticker/all?crypto=BTC", "X-signature", getHeader()),
-                PriceRequestService.BTCAVERAGE_LOCAL_PROVIDER);
+                ExchangeRateService.BTCAVERAGE_LOCAL_PROVIDER);
     }
 
     public Map<String, PriceData> getGlobal() throws NoSuchAlgorithmException, InvalidKeyException, IOException {
         return getMap(
                 httpClient.requestWithGETNoProxy("indices/global/ticker/all?crypto=BTC", "X-signature", getHeader()),
-                PriceRequestService.BTCAVERAGE_GLOBAL_PROVIDER);
+                ExchangeRateService.BTCAVERAGE_GLOBAL_PROVIDER);
     }
 
     private Map<String, PriceData> getMap(String json, String provider) {

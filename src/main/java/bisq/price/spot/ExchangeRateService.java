@@ -40,9 +40,9 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PriceRequestService {
+public class ExchangeRateService {
 
-    private static final Logger log = LoggerFactory.getLogger(PriceRequestService.class);
+    private static final Logger log = LoggerFactory.getLogger(ExchangeRateService.class);
 
     public static final String POLO_PROVIDER = "POLO";
     public static final String COINMKTC_PROVIDER = "CMC";
@@ -81,7 +81,7 @@ public class PriceRequestService {
 
     private String json;
 
-    public PriceRequestService(BtcAverageProvider btcAverageProvider,
+    public ExchangeRateService(BtcAverageProvider btcAverageProvider,
                                PoloniexProvider poloniexProvider,
                                CoinmarketcapProvider coinmarketcapProvider){
         this.btcAverageProvider = btcAverageProvider;

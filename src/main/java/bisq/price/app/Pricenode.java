@@ -19,7 +19,7 @@ package bisq.price.app;
 
 import bisq.price.mining.FeeEstimationService;
 import bisq.price.mining.providers.BitcoinFees;
-import bisq.price.spot.PriceRequestService;
+import bisq.price.spot.ExchangeRateService;
 import bisq.price.util.Environment;
 import bisq.price.util.Version;
 
@@ -41,14 +41,14 @@ public class Pricenode {
     private static final Logger log = LoggerFactory.getLogger(Pricenode.class);
     private static final int DEFAULT_PORT = 8080;
 
-    private final PriceRequestService priceRequestService;
+    private final ExchangeRateService exchangeRateService;
     private final FeeEstimationService feeEstimationService;
     private final Version version;
 
     private int port = DEFAULT_PORT;
 
-    public Pricenode(PriceRequestService priceRequestService, FeeEstimationService feeEstimationService) {
-        this.priceRequestService = priceRequestService;
+    public Pricenode(ExchangeRateService exchangeRateService, FeeEstimationService feeEstimationService) {
+        this.exchangeRateService = exchangeRateService;
         this.feeEstimationService = feeEstimationService;
         this.version = new Version(Pricenode.class);
     }
@@ -65,7 +65,7 @@ public class Pricenode {
 
     public void start() throws Exception {
         initLogging();
-        priceRequestService.start();
+        exchangeRateService.start();
         feeEstimationService.start();
         mapRoutesAndStart();
     }
@@ -75,7 +75,7 @@ public class Pricenode {
 
         before("/*", (req, res) -> log.info("Incoming {} request from: {}", req.pathInfo(), req.userAgent()));
 
-        get("/getAllMarketPrices", (req, res) -> priceRequestService.getJson());
+        get("/getAllMarketPrices", (req, res) -> exchangeRateService.getJson());
         get("/getFees", (req, res) -> feeEstimationService.getJson());
         get("/getVersion", (req, res) -> version.toString());
         get("/getParams", (req, res) ->

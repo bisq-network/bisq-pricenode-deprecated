@@ -18,7 +18,7 @@
 package bisq.price.spot.providers;
 
 import bisq.price.spot.PriceData;
-import bisq.price.spot.PriceRequestService;
+import bisq.price.spot.ExchangeRateService;
 
 import io.bisq.network.http.HttpClient;
 
@@ -63,7 +63,7 @@ public class CoinmarketcapProvider {
             String code = (String) treeMap.get("symbol");
             if (supportedAltcoins.contains(code)) {
                 double price_btc = parseDouble((String) treeMap.get("price_btc"));
-                marketPriceMap.put(code, new PriceData(code, price_btc, ts, PriceRequestService.COINMKTC_PROVIDER));
+                marketPriceMap.put(code, new PriceData(code, price_btc, ts, ExchangeRateService.COINMKTC_PROVIDER));
             }
         });
         return marketPriceMap;

@@ -18,7 +18,7 @@
 package bisq.price.spot.providers;
 
 import bisq.price.spot.PriceData;
-import bisq.price.spot.PriceRequestService;
+import bisq.price.spot.ExchangeRateService;
 
 import io.bisq.network.http.HttpClient;
 
@@ -79,7 +79,7 @@ public class PoloniexProvider {
                                     new PriceData(altcoinCurrency,
                                             parseDouble((String) data.get("last")),
                                             ts,
-                                            PriceRequestService.POLO_PROVIDER)
+                                            ExchangeRateService.POLO_PROVIDER)
                             );
                         }
                     }
