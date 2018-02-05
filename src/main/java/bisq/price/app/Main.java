@@ -31,12 +31,15 @@ public class Main {
     public static void main(String[] args) throws Exception {
         Environment env = new Environment(args);
 
-        String bitcoinAvgPrivkey = env.getRequiredVar("BITCOIN_AVG_PRIVKEY");
-        String bitcoinAvgPubkey = env.getRequiredVar("BITCOIN_AVG_PUBKEY");
+        BitcoinAverageLocal bitcoinAverageLocal = new BitcoinAverageLocal();
+        BitcoinAverageGlobal bitcoinAverageGlobal = new BitcoinAverageGlobal();
+
+        bitcoinAverageLocal.configure(env);
+        bitcoinAverageGlobal.configure(env);
 
         ExchangeRateService exchangeRateService = new ExchangeRateService(
-                new BitcoinAverageLocal(bitcoinAvgPrivkey, bitcoinAvgPubkey),
-                new BitcoinAverageGlobal(bitcoinAvgPrivkey, bitcoinAvgPubkey),
+                bitcoinAverageLocal,
+                bitcoinAverageGlobal,
                 new PoloniexProvider(),
                 new CoinmarketcapProvider()
         );

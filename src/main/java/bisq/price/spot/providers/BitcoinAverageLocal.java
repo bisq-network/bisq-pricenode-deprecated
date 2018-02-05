@@ -26,10 +26,6 @@ import java.util.Map;
 
 public class BitcoinAverageLocal extends BtcAverageProvider {
 
-    public BitcoinAverageLocal(String privKey, String pubKey) {
-        super(privKey, pubKey);
-    }
-
     @Override
     public Map<String, ExchangeRateData> request() throws IOException {
         return getMap(

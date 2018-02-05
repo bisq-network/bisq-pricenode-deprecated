@@ -20,6 +20,7 @@ package bisq.price.spot.providers;
 import bisq.price.spot.ExchangeRateData;
 import bisq.price.spot.ExchangeRateProvider;
 import bisq.price.spot.ExchangeRateService;
+import bisq.price.util.Environment;
 
 import io.bisq.network.http.HttpClient;
 
@@ -56,6 +57,11 @@ public class PoloniexProvider implements ExchangeRateProvider {
         supportedAltcoins = CurrencyUtil.getAllSortedCryptoCurrencies().stream()
                 .map(TradeCurrency::getCode)
                 .collect(Collectors.toSet());
+    }
+
+    @Override
+    public void configure(Environment env) {
+        // no configuration necessary
     }
 
     public Map<String, ExchangeRateData> request() throws IOException {

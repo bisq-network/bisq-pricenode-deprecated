@@ -19,7 +19,7 @@ package bisq.price.spot.providers;
 
 import bisq.price.spot.ExchangeRateData;
 import bisq.price.spot.ExchangeRateProvider;
-import bisq.price.spot.ExchangeRateService;
+import bisq.price.util.Environment;
 
 import io.bisq.network.http.HttpClient;
 
@@ -50,16 +50,32 @@ public abstract class BtcAverageProvider implements ExchangeRateProvider {
     private static final Logger log = LoggerFactory.getLogger(BtcAverageProvider.class);
 
     protected final HttpClient httpClient;
-    private final String pubKey;
-    private final SecretKey secretKey;
 
-    public BtcAverageProvider(String privKey, String pubKey) {
+    private String pubKey;
+    private SecretKey secretKey;
+    private boolean configured = false;
+
+    public BtcAverageProvider() {
         this.httpClient = new HttpClient("https://apiv2.bitcoinaverage.com/");
+    }
+
+    @Override
+    public void configure(Environment env) {
+        configure(
+                env.getRequiredVar("BITCOIN_AVG_PUBKEY"),
+                env.getRequiredVar("BITCOIN_AVG_PRIVKEY")
+        );
+    }
+
+    public void configure(String pubKey, String privKey) {
         this.pubKey = pubKey;
         this.secretKey = new SecretKeySpec(privKey.getBytes(), "HmacSHA256");
+        this.configured = true;
     }
 
     protected String getHeader() throws IOException {
+        assertConfigured();
+
         try {
             String payload = Instant.now().getEpochSecond() + "." + pubKey;
             Mac mac = Mac.getInstance("HmacSHA256");
@@ -71,6 +87,8 @@ public abstract class BtcAverageProvider implements ExchangeRateProvider {
     }
 
     protected Map<String, ExchangeRateData> getMap(String json, String provider) {
+        assertConfigured();
+
         Map<String, ExchangeRateData> marketPriceMap = new HashMap<>();
         LinkedTreeMap<String, Object> treeMap = new Gson().<LinkedTreeMap<String, Object>>fromJson(json, LinkedTreeMap.class);
         long ts = Instant.now().getEpochSecond();
@@ -103,5 +121,10 @@ public abstract class BtcAverageProvider implements ExchangeRateProvider {
             }
         });
         return marketPriceMap;
+    }
+
+    private void assertConfigured() {
+        if (!configured)
+            throw new IllegalStateException("'configure' method was not called");
     }
 }

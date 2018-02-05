@@ -17,6 +17,8 @@
 
 package bisq.price.spot;
 
+import bisq.price.util.Environment;
+
 import java.io.IOException;
 
 import java.util.Map;
@@ -24,4 +26,6 @@ import java.util.Map;
 public interface ExchangeRateProvider {
 
     Map<String,ExchangeRateData> request() throws IOException;
+
+    void configure(Environment env);
 }
