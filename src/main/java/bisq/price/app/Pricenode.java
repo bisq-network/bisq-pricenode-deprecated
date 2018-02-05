@@ -20,6 +20,7 @@ package bisq.price.app;
 import bisq.price.mining.FeeEstimationService;
 import bisq.price.mining.providers.BitcoinFees;
 import bisq.price.price.PriceRequestService;
+import bisq.price.util.Environment;
 import bisq.price.util.Version;
 
 import io.bisq.common.app.Log;
@@ -50,6 +51,12 @@ public class Pricenode {
         this.priceRequestService = priceRequestService;
         this.feeEstimationService = feeEstimationService;
         this.version = new Version(Pricenode.class);
+    }
+
+    public void configure(Environment env) {
+        env.getOptionalVar("PORT").ifPresent(port ->
+                setPort(Integer.valueOf(port))
+        );
     }
 
     public void setPort(int port) {

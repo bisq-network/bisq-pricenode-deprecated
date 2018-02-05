@@ -42,9 +42,7 @@ public class Main {
         feeEstimationService.configure(env);
 
         Pricenode pricenode = new Pricenode(priceRequestService, feeEstimationService);
-        env.getOptionalVar("PORT").ifPresent(port ->
-                pricenode.setPort(Integer.valueOf(port))
-        );
+        pricenode.configure(env);
 
         pricenode.start();
     }
