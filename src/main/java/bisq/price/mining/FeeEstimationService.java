@@ -17,8 +17,6 @@
 
 package bisq.price.mining;
 
-import bisq.price.mining.providers.BtcFeesProvider;
-
 import io.bisq.common.util.Utilities;
 
 import java.time.Instant;
@@ -44,15 +42,15 @@ public class FeeEstimationService {
     public static final long BTC_MAX_TX_FEE = 1000;
 
     private final Timer timerBitcoinFeesLocal = new Timer();
-    private final BtcFeesProvider btcFeesProvider;
+    private final FeeEstimationProvider feeEstimationProvider;
     private final Map<String, Long> dataMap = new ConcurrentHashMap<>();
 
     private long requestIntervalMs = DEFAULT_REQUEST_INTERVAL_MS;
     private long bitcoinFeesTs;
     private String json;
 
-    public FeeEstimationService(BtcFeesProvider btcFeesProvider) {
-        this.btcFeesProvider = btcFeesProvider;
+    public FeeEstimationService(FeeEstimationProvider feeEstimationProvider) {
+        this.feeEstimationProvider = feeEstimationProvider;
 
         // For now we don't need a fee estimation for LTC so we set it fixed, but we keep it in the provider to
         // be flexible if fee pressure grows on LTC
@@ -63,8 +61,8 @@ public class FeeEstimationService {
         writeToJson();
     }
 
-    public BtcFeesProvider getBtcFeesProvider() {
-        return btcFeesProvider;
+    public FeeEstimationProvider getFeeEstimationProvider() {
+        return feeEstimationProvider;
     }
 
     public long getRequestIntervalMs() {
@@ -94,7 +92,7 @@ public class FeeEstimationService {
 
     private void requestBitcoinFees() throws IOException {
         long ts = System.currentTimeMillis();
-        long btcFee = btcFeesProvider.getFee();
+        long btcFee = feeEstimationProvider.getFee();
         log.info("requestBitcoinFees took {} ms.", (System.currentTimeMillis() - ts));
         if (btcFee < FeeEstimationService.BTC_MIN_TX_FEE) {
             log.warn("Response for fee is lower as min fee. Fee=" + btcFee);

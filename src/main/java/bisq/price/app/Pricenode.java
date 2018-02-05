@@ -18,6 +18,7 @@
 package bisq.price.app;
 
 import bisq.price.mining.FeeEstimationService;
+import bisq.price.mining.providers.BtcFeesProvider;
 import bisq.price.price.PriceRequestService;
 import bisq.price.util.Version;
 
@@ -71,8 +72,8 @@ public class Pricenode {
         get("/getFees", (req, res) -> feeEstimationService.getJson());
         get("/getVersion", (req, res) -> version.toString());
         get("/getParams", (req, res) ->
-                feeEstimationService.getBtcFeesProvider().getCapacity() + ";" +
-                feeEstimationService.getBtcFeesProvider().getMaxBlocks() + ";" +
+                ((BtcFeesProvider) feeEstimationService.getFeeEstimationProvider()).getCapacity() + ";" +
+                ((BtcFeesProvider) feeEstimationService.getFeeEstimationProvider()).getMaxBlocks() + ";" +
                 feeEstimationService.getRequestIntervalMs());
     }
 

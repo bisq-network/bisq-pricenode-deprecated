@@ -17,6 +17,7 @@
 
 package bisq.price.mining.providers;
 
+import bisq.price.mining.FeeEstimationProvider;
 import bisq.price.mining.FeeEstimationService;
 
 import io.bisq.network.http.HttpClient;
@@ -35,7 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 //TODO consider alternative https://www.bitgo.com/api/v1/tx/fee?numBlocks=3
-public class BtcFeesProvider {
+public class BtcFeesProvider implements FeeEstimationProvider {
 
     private static final Logger log = LoggerFactory.getLogger(BtcFeesProvider.class);
 
@@ -69,7 +70,7 @@ public class BtcFeesProvider {
         this.maxBlocks = maxBlocks;
     }
 
-    public Long getFee() throws IOException {
+    public long getFee() throws IOException {
         // prev. used:  https://bitcoinfees.earn.com/api/v1/fees/recommended
         // but was way too high
 
