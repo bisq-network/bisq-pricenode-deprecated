@@ -17,7 +17,7 @@
 
 package bisq.price.mining.providers;
 
-import bisq.price.mining.FeeRequestService;
+import bisq.price.mining.FeeEstimationService;
 
 import io.bisq.network.http.HttpClient;
 
@@ -91,7 +91,7 @@ public class BtcFeesProvider {
                     if (maxDelay <= maxBlocks && fee[0] == 0)
                         fee[0] = MathUtils.roundDoubleToLong(e.get("maxFee"));
                 });
-        fee[0] = Math.min(Math.max(fee[0], FeeRequestService.BTC_MIN_TX_FEE), FeeRequestService.BTC_MAX_TX_FEE);
+        fee[0] = Math.min(Math.max(fee[0], FeeEstimationService.BTC_MIN_TX_FEE), FeeEstimationService.BTC_MAX_TX_FEE);
 
         return getAverage(fee[0]);
     }

@@ -17,7 +17,7 @@
 
 package bisq.price.app;
 
-import bisq.price.mining.FeeRequestService;
+import bisq.price.mining.FeeEstimationService;
 import bisq.price.price.PriceRequestService;
 import bisq.price.util.Version;
 
@@ -40,14 +40,14 @@ public class Pricenode {
     private static final int DEFAULT_PORT = 8080;
 
     private final PriceRequestService priceRequestService;
-    private final FeeRequestService feeRequestService;
+    private final FeeEstimationService feeEstimationService;
     private final Version version;
 
     private int port = DEFAULT_PORT;
 
-    public Pricenode(PriceRequestService priceRequestService, FeeRequestService feeRequestService) {
+    public Pricenode(PriceRequestService priceRequestService, FeeEstimationService feeEstimationService) {
         this.priceRequestService = priceRequestService;
-        this.feeRequestService = feeRequestService;
+        this.feeEstimationService = feeEstimationService;
         this.version = new Version(Pricenode.class);
     }
 
@@ -58,7 +58,7 @@ public class Pricenode {
     public void start() throws Exception {
         initLogging();
         priceRequestService.start();
-        feeRequestService.start();
+        feeEstimationService.start();
         mapRoutesAndStart();
     }
 
@@ -68,12 +68,12 @@ public class Pricenode {
         before("/*", (req, res) -> log.info("Incoming {} request from: {}", req.pathInfo(), req.userAgent()));
 
         get("/getAllMarketPrices", (req, res) -> priceRequestService.getJson());
-        get("/getFees", (req, res) -> feeRequestService.getJson());
+        get("/getFees", (req, res) -> feeEstimationService.getJson());
         get("/getVersion", (req, res) -> version.toString());
         get("/getParams", (req, res) ->
-                feeRequestService.getBtcFeesProvider().getCapacity() + ";" +
-                feeRequestService.getBtcFeesProvider().getMaxBlocks() + ";" +
-                feeRequestService.getRequestIntervalMs());
+                feeEstimationService.getBtcFeesProvider().getCapacity() + ";" +
+                feeEstimationService.getBtcFeesProvider().getMaxBlocks() + ";" +
+                feeEstimationService.getRequestIntervalMs());
     }
 
     private void initLogging() {

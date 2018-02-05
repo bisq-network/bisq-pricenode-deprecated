@@ -34,9 +34,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class FeeRequestService {
+public class FeeEstimationService {
 
-    private static final Logger log = LoggerFactory.getLogger(FeeRequestService.class);
+    private static final Logger log = LoggerFactory.getLogger(FeeEstimationService.class);
 
     public static int DEFAULT_REQUEST_INTERVAL_MS = 300_000; // 5 mins
 
@@ -51,7 +51,7 @@ public class FeeRequestService {
     private long bitcoinFeesTs;
     private String json;
 
-    public FeeRequestService(BtcFeesProvider btcFeesProvider) {
+    public FeeEstimationService(BtcFeesProvider btcFeesProvider) {
         this.btcFeesProvider = btcFeesProvider;
 
         // For now we don't need a fee estimation for LTC so we set it fixed, but we keep it in the provider to
@@ -96,9 +96,9 @@ public class FeeRequestService {
         long ts = System.currentTimeMillis();
         long btcFee = btcFeesProvider.getFee();
         log.info("requestBitcoinFees took {} ms.", (System.currentTimeMillis() - ts));
-        if (btcFee < FeeRequestService.BTC_MIN_TX_FEE) {
+        if (btcFee < FeeEstimationService.BTC_MIN_TX_FEE) {
             log.warn("Response for fee is lower as min fee. Fee=" + btcFee);
-        } else if (btcFee > FeeRequestService.BTC_MAX_TX_FEE) {
+        } else if (btcFee > FeeEstimationService.BTC_MAX_TX_FEE) {
             log.warn("Response for fee is larger as max fee. Fee=" + btcFee);
         } else {
             bitcoinFeesTs = Instant.now().getEpochSecond();

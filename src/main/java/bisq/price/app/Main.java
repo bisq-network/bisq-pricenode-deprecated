@@ -17,7 +17,7 @@
 
 package bisq.price.app;
 
-import bisq.price.mining.FeeRequestService;
+import bisq.price.mining.FeeEstimationService;
 import bisq.price.mining.providers.BtcFeesProvider;
 import bisq.price.price.PriceRequestService;
 import bisq.price.price.providers.BtcAverageProvider;
@@ -46,12 +46,12 @@ public class Main {
             btcFeesProvider.setMaxBlocks(Integer.valueOf(args[1]));
         }
 
-        FeeRequestService feeRequestService = new FeeRequestService(btcFeesProvider);
+        FeeEstimationService feeEstimationService = new FeeEstimationService(btcFeesProvider);
         if (args.length >= 3) {
-            feeRequestService.setRequestIntervalMs(TimeUnit.MINUTES.toMillis(Long.valueOf(args[2])));
+            feeEstimationService.setRequestIntervalMs(TimeUnit.MINUTES.toMillis(Long.valueOf(args[2])));
         }
 
-        Pricenode pricenode = new Pricenode(priceRequestService, feeRequestService);
+        Pricenode pricenode = new Pricenode(priceRequestService, feeEstimationService);
         env.getOptionalVar("PORT").ifPresent(port ->
                 pricenode.setPort(Integer.valueOf(port))
         );
