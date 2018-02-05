@@ -17,7 +17,7 @@
 
 package bisq.price.spot.providers;
 
-import bisq.price.spot.PriceData;
+import bisq.price.spot.ExchangeRateData;
 import bisq.price.spot.ExchangeRateService;
 
 import io.bisq.network.http.HttpClient;
@@ -53,8 +53,8 @@ public class CoinmarketcapProvider {
                 .collect(Collectors.toSet());
     }
 
-    public Map<String, PriceData> request() throws IOException {
-        Map<String, PriceData> marketPriceMap = new HashMap<>();
+    public Map<String, ExchangeRateData> request() throws IOException {
+        Map<String, ExchangeRateData> marketPriceMap = new HashMap<>();
         String response = httpClient.requestWithGET("v1/ticker/?limit=200", "User-Agent", "");
         //noinspection unchecked
         List<LinkedTreeMap<String, Object>> list = new Gson().fromJson(response, ArrayList.class);
@@ -63,7 +63,7 @@ public class CoinmarketcapProvider {
             String code = (String) treeMap.get("symbol");
             if (supportedAltcoins.contains(code)) {
                 double price_btc = parseDouble((String) treeMap.get("price_btc"));
-                marketPriceMap.put(code, new PriceData(code, price_btc, ts, ExchangeRateService.COINMKTC_PROVIDER));
+                marketPriceMap.put(code, new ExchangeRateData(code, price_btc, ts, ExchangeRateService.COINMKTC_PROVIDER));
             }
         });
         return marketPriceMap;

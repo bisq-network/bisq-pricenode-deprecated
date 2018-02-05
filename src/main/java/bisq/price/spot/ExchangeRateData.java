@@ -19,14 +19,14 @@ package bisq.price.spot;
 
 import java.util.Objects;
 
-public class PriceData {
+public class ExchangeRateData {
 
     private final String currencyCode;
     private final double price;
     private final long timestampSec;
     private final String provider;
 
-    public PriceData(String currencyCode, double price, long timestampSec, String provider) {
+    public ExchangeRateData(String currencyCode, double price, long timestampSec, String provider) {
         this.currencyCode = currencyCode;
         this.price = price;
         this.timestampSec = timestampSec;
@@ -45,11 +45,11 @@ public class PriceData {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        PriceData priceData = (PriceData) o;
-        return Double.compare(priceData.price, price) == 0 &&
-                timestampSec == priceData.timestampSec &&
-                Objects.equals(currencyCode, priceData.currencyCode) &&
-                Objects.equals(provider, priceData.provider);
+        ExchangeRateData exchangeRateData = (ExchangeRateData) o;
+        return Double.compare(exchangeRateData.price, price) == 0 &&
+                timestampSec == exchangeRateData.timestampSec &&
+                Objects.equals(currencyCode, exchangeRateData.currencyCode) &&
+                Objects.equals(provider, exchangeRateData.provider);
     }
 
     @Override
@@ -59,7 +59,7 @@ public class PriceData {
 
     @Override
     public String toString() {
-        return "PriceData{" +
+        return "ExchangeRateData{" +
                 "currencyCode='" + currencyCode + '\'' +
                 ", price=" + price +
                 ", timestampSec=" + timestampSec +

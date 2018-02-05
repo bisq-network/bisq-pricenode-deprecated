@@ -17,7 +17,7 @@
 
 package bisq.price.spot.providers;
 
-import bisq.price.spot.PriceData;
+import bisq.price.spot.ExchangeRateData;
 import bisq.price.spot.ExchangeRateService;
 
 import io.bisq.network.http.HttpClient;
@@ -57,8 +57,8 @@ public class PoloniexProvider {
                 .collect(Collectors.toSet());
     }
 
-    public Map<String, PriceData> request() throws IOException {
-        Map<String, PriceData> marketPriceMap = new HashMap<>();
+    public Map<String, ExchangeRateData> request() throws IOException {
+        Map<String, ExchangeRateData> marketPriceMap = new HashMap<>();
         String response = httpClient.requestWithGET("?command=returnTicker", "User-Agent", "");
         //noinspection unchecked
         LinkedTreeMap<String, Object> treeMap = new Gson().fromJson(response, LinkedTreeMap.class);
@@ -76,7 +76,7 @@ public class PoloniexProvider {
                             //noinspection unchecked
                             LinkedTreeMap<String, Object> data = (LinkedTreeMap) value;
                             marketPriceMap.put(altcoinCurrency,
-                                    new PriceData(altcoinCurrency,
+                                    new ExchangeRateData(altcoinCurrency,
                                             parseDouble((String) data.get("last")),
                                             ts,
                                             ExchangeRateService.POLO_PROVIDER)

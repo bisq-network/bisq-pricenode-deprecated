@@ -67,9 +67,9 @@ public class ExchangeRateService {
     private final PoloniexProvider poloniexProvider;
     private final CoinmarketcapProvider coinmarketcapProvider;
 
-    private final Map<String, PriceData> allPricesMap = new ConcurrentHashMap<>();
-    private Map<String, PriceData> btcAverageLocalMap;
-    private Map<String, PriceData> poloniexMap;
+    private final Map<String, ExchangeRateData> allPricesMap = new ConcurrentHashMap<>();
+    private Map<String, ExchangeRateData> btcAverageLocalMap;
+    private Map<String, ExchangeRateData> poloniexMap;
 
     private long btcAverageTs;
     private long poloniexTs;
@@ -154,7 +154,7 @@ public class ExchangeRateService {
 
     private void requestCoinmarketcapPrices() throws IOException {
         long ts = System.currentTimeMillis();
-        Map<String, PriceData> map = coinmarketcapProvider.request();
+        Map<String, ExchangeRateData> map = coinmarketcapProvider.request();
         log.info("requestCoinmarketcapPrices took {} ms.", (System.currentTimeMillis() - ts));
         removeOutdatedPrices(poloniexMap);
         removeOutdatedPrices(allPricesMap);
@@ -205,7 +205,7 @@ public class ExchangeRateService {
 
     private void requestBtcAverageGlobalPrices() throws NoSuchAlgorithmException, InvalidKeyException, IOException {
         long ts = System.currentTimeMillis();
-        Map<String, PriceData> map = btcAverageProvider.getGlobal();
+        Map<String, ExchangeRateData> map = btcAverageProvider.getGlobal();
 
         if (map.get("USD") != null)
             log.info("BTCAverage global USD (last):" + map.get("USD").getPrice());
@@ -236,10 +236,10 @@ public class ExchangeRateService {
         json = Utilities.objectToJson(map);
     }
 
-    private void removeOutdatedPrices(Map<String, PriceData> map) {
+    private void removeOutdatedPrices(Map<String, ExchangeRateData> map) {
         long now = Instant.now().getEpochSecond();
         long limit = now - MARKET_PRICE_TTL_SEC;
-        Map<String, PriceData> filtered = map.entrySet().stream()
+        Map<String, ExchangeRateData> filtered = map.entrySet().stream()
                 .filter(e -> e.getValue().getTimestampSec() > limit)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         map.clear();

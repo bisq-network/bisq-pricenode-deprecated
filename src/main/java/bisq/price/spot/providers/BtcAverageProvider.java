@@ -17,7 +17,7 @@
 
 package bisq.price.spot.providers;
 
-import bisq.price.spot.PriceData;
+import bisq.price.spot.ExchangeRateData;
 import bisq.price.spot.ExchangeRateService;
 
 import io.bisq.network.http.HttpClient;
@@ -65,20 +65,20 @@ public class BtcAverageProvider {
         return payload + "." + Hex.toHexString(mac.doFinal(payload.getBytes()));
     }
 
-    public Map<String, PriceData> getLocal() throws NoSuchAlgorithmException, InvalidKeyException, IOException {
+    public Map<String, ExchangeRateData> getLocal() throws NoSuchAlgorithmException, InvalidKeyException, IOException {
         return getMap(
                 httpClient.requestWithGETNoProxy("indices/local/ticker/all?crypto=BTC", "X-signature", getHeader()),
                 ExchangeRateService.BTCAVERAGE_LOCAL_PROVIDER);
     }
 
-    public Map<String, PriceData> getGlobal() throws NoSuchAlgorithmException, InvalidKeyException, IOException {
+    public Map<String, ExchangeRateData> getGlobal() throws NoSuchAlgorithmException, InvalidKeyException, IOException {
         return getMap(
                 httpClient.requestWithGETNoProxy("indices/global/ticker/all?crypto=BTC", "X-signature", getHeader()),
                 ExchangeRateService.BTCAVERAGE_GLOBAL_PROVIDER);
     }
 
-    private Map<String, PriceData> getMap(String json, String provider) {
-        Map<String, PriceData> marketPriceMap = new HashMap<>();
+    private Map<String, ExchangeRateData> getMap(String json, String provider) {
+        Map<String, ExchangeRateData> marketPriceMap = new HashMap<>();
         LinkedTreeMap<String, Object> treeMap = new Gson().<LinkedTreeMap<String, Object>>fromJson(json, LinkedTreeMap.class);
         long ts = Instant.now().getEpochSecond();
         treeMap.entrySet().stream().forEach(e -> {
@@ -102,7 +102,7 @@ public class BtcAverageProvider {
                             log.warn("Unexpected data type: lastAsObject=" + lastAsObject);
 
                         marketPriceMap.put(currencyCode,
-                                new PriceData(currencyCode, last, ts, provider));
+                                new ExchangeRateData(currencyCode, last, ts, provider));
                     } catch (Throwable exception) {
                         log.error("Error converting btcaverage data: " + currencyCode, exception);
                     }
