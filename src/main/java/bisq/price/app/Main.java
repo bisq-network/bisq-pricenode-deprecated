@@ -20,7 +20,8 @@ package bisq.price.app;
 import bisq.price.mining.FeeEstimationProvider;
 import bisq.price.mining.FeeEstimationService;
 import bisq.price.spot.ExchangeRateService;
-import bisq.price.spot.providers.BtcAverageProvider;
+import bisq.price.spot.providers.BitcoinAverageGlobal;
+import bisq.price.spot.providers.BitcoinAverageLocal;
 import bisq.price.spot.providers.CoinmarketcapProvider;
 import bisq.price.spot.providers.PoloniexProvider;
 import bisq.price.util.Environment;
@@ -30,10 +31,12 @@ public class Main {
     public static void main(String[] args) throws Exception {
         Environment env = new Environment(args);
 
+        String bitcoinAvgPrivkey = env.getRequiredVar("BITCOIN_AVG_PRIVKEY");
+        String bitcoinAvgPubkey = env.getRequiredVar("BITCOIN_AVG_PUBKEY");
+
         ExchangeRateService exchangeRateService = new ExchangeRateService(
-                new BtcAverageProvider(
-                        env.getRequiredVar("BITCOIN_AVG_PRIVKEY"),
-                        env.getRequiredVar("BITCOIN_AVG_PUBKEY")),
+                new BitcoinAverageLocal(bitcoinAvgPrivkey, bitcoinAvgPubkey),
+                new BitcoinAverageGlobal(bitcoinAvgPrivkey, bitcoinAvgPubkey),
                 new PoloniexProvider(),
                 new CoinmarketcapProvider()
         );

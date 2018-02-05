@@ -18,6 +18,7 @@
 package bisq.price.spot.providers;
 
 import bisq.price.spot.ExchangeRateData;
+import bisq.price.spot.ExchangeRateProvider;
 import bisq.price.spot.ExchangeRateService;
 
 import io.bisq.network.http.HttpClient;
@@ -41,7 +42,7 @@ import java.util.stream.Collectors;
 
 import static java.lang.Double.parseDouble;
 
-public class CoinmarketcapProvider {
+public class CoinmarketcapProvider implements ExchangeRateProvider {
 
     private final Set<String> supportedAltcoins;
     private final HttpClient httpClient;

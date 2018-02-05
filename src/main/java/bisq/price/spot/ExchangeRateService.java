@@ -17,7 +17,8 @@
 
 package bisq.price.spot;
 
-import bisq.price.spot.providers.BtcAverageProvider;
+import bisq.price.spot.providers.BitcoinAverageGlobal;
+import bisq.price.spot.providers.BitcoinAverageLocal;
 import bisq.price.spot.providers.CoinmarketcapProvider;
 import bisq.price.spot.providers.PoloniexProvider;
 
@@ -63,9 +64,10 @@ public class ExchangeRateService {
     private final Timer timerPoloniex = new Timer();
     private final Timer timerCoinmarketcap = new Timer();
 
-    private final BtcAverageProvider btcAverageProvider;
-    private final PoloniexProvider poloniexProvider;
-    private final CoinmarketcapProvider coinmarketcapProvider;
+    private final ExchangeRateProvider bitcoinAverageLocal;
+    private final ExchangeRateProvider bitcoinAverageGlobal;
+    private final ExchangeRateProvider poloniexProvider;
+    private final ExchangeRateProvider coinmarketcapProvider;
 
     private final Map<String, ExchangeRateData> allPricesMap = new ConcurrentHashMap<>();
     private Map<String, ExchangeRateData> btcAverageLocalMap;
@@ -81,10 +83,12 @@ public class ExchangeRateService {
 
     private String json;
 
-    public ExchangeRateService(BtcAverageProvider btcAverageProvider,
+    public ExchangeRateService(BitcoinAverageLocal bitcoinAverageLocal,
+                               BitcoinAverageGlobal bitcoinAverageGlobal,
                                PoloniexProvider poloniexProvider,
                                CoinmarketcapProvider coinmarketcapProvider){
-        this.btcAverageProvider = btcAverageProvider;
+        this.bitcoinAverageLocal = bitcoinAverageLocal;
+        this.bitcoinAverageGlobal = bitcoinAverageGlobal;
         this.poloniexProvider = poloniexProvider;
         this.coinmarketcapProvider = coinmarketcapProvider;
     }
@@ -111,9 +115,6 @@ public class ExchangeRateService {
             public void run() {
                 try {
                     requestBtcAverageGlobalPrices();
-                } catch (NoSuchAlgorithmException | InvalidKeyException e) {
-                    log.error(e.toString());
-                    e.printStackTrace();
                 } catch (IOException e) {
                     log.warn(e.toString());
                     e.printStackTrace();
@@ -188,9 +189,9 @@ public class ExchangeRateService {
         writeToJson();
     }
 
-    private void requestBtcAverageLocalPrices() throws NoSuchAlgorithmException, InvalidKeyException, IOException {
+    private void requestBtcAverageLocalPrices() throws IOException {
         long ts = System.currentTimeMillis();
-        btcAverageLocalMap = btcAverageProvider.getLocal();
+        btcAverageLocalMap = bitcoinAverageLocal.request();
 
         if (btcAverageLocalMap.get("USD") != null)
             log.info("BTCAverage local USD (last):" + btcAverageLocalMap.get("USD").getPrice());
@@ -203,9 +204,9 @@ public class ExchangeRateService {
         writeToJson();
     }
 
-    private void requestBtcAverageGlobalPrices() throws NoSuchAlgorithmException, InvalidKeyException, IOException {
+    private void requestBtcAverageGlobalPrices() throws IOException {
         long ts = System.currentTimeMillis();
-        Map<String, ExchangeRateData> map = btcAverageProvider.getGlobal();
+        Map<String, ExchangeRateData> map = bitcoinAverageGlobal.request();
 
         if (map.get("USD") != null)
             log.info("BTCAverage global USD (last):" + map.get("USD").getPrice());

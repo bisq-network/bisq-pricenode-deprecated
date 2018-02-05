@@ -18,6 +18,7 @@
 package bisq.price.spot.providers;
 
 import bisq.price.spot.ExchangeRateData;
+import bisq.price.spot.ExchangeRateProvider;
 import bisq.price.spot.ExchangeRateService;
 
 import io.bisq.network.http.HttpClient;
@@ -42,7 +43,7 @@ import org.slf4j.LoggerFactory;
 
 import static java.lang.Double.parseDouble;
 
-public class PoloniexProvider {
+public class PoloniexProvider implements ExchangeRateProvider {
 
     private static final Logger log = LoggerFactory.getLogger(PoloniexProvider.class);
 

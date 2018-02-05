@@ -18,6 +18,7 @@
 package bisq.price.spot.providers;
 
 import bisq.price.spot.ExchangeRateData;
+import bisq.price.spot.ExchangeRateProvider;
 import bisq.price.spot.ExchangeRateService;
 
 import io.bisq.network.http.HttpClient;
@@ -44,11 +45,11 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BtcAverageProvider {
+public abstract class BtcAverageProvider implements ExchangeRateProvider {
 
     private static final Logger log = LoggerFactory.getLogger(BtcAverageProvider.class);
 
-    private final HttpClient httpClient;
+    protected final HttpClient httpClient;
     private final String pubKey;
     private final SecretKey secretKey;
 
@@ -58,26 +59,18 @@ public class BtcAverageProvider {
         this.secretKey = new SecretKeySpec(privKey.getBytes(), "HmacSHA256");
     }
 
-    private String getHeader() throws NoSuchAlgorithmException, InvalidKeyException {
-        String payload = Instant.now().getEpochSecond() + "." + pubKey;
-        Mac mac = Mac.getInstance("HmacSHA256");
-        mac.init(secretKey);
-        return payload + "." + Hex.toHexString(mac.doFinal(payload.getBytes()));
+    protected String getHeader() throws IOException {
+        try {
+            String payload = Instant.now().getEpochSecond() + "." + pubKey;
+            Mac mac = Mac.getInstance("HmacSHA256");
+            mac.init(secretKey);
+            return payload + "." + Hex.toHexString(mac.doFinal(payload.getBytes()));
+        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+            throw new IOException(e);
+        }
     }
 
-    public Map<String, ExchangeRateData> getLocal() throws NoSuchAlgorithmException, InvalidKeyException, IOException {
-        return getMap(
-                httpClient.requestWithGETNoProxy("indices/local/ticker/all?crypto=BTC", "X-signature", getHeader()),
-                ExchangeRateService.BTCAVERAGE_LOCAL_PROVIDER);
-    }
-
-    public Map<String, ExchangeRateData> getGlobal() throws NoSuchAlgorithmException, InvalidKeyException, IOException {
-        return getMap(
-                httpClient.requestWithGETNoProxy("indices/global/ticker/all?crypto=BTC", "X-signature", getHeader()),
-                ExchangeRateService.BTCAVERAGE_GLOBAL_PROVIDER);
-    }
-
-    private Map<String, ExchangeRateData> getMap(String json, String provider) {
+    protected Map<String, ExchangeRateData> getMap(String json, String provider) {
         Map<String, ExchangeRateData> marketPriceMap = new HashMap<>();
         LinkedTreeMap<String, Object> treeMap = new Gson().<LinkedTreeMap<String, Object>>fromJson(json, LinkedTreeMap.class);
         long ts = Instant.now().getEpochSecond();
