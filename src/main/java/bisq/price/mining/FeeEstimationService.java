@@ -17,6 +17,8 @@
 
 package bisq.price.mining;
 
+import bisq.price.util.Environment;
+
 import io.bisq.common.util.Utilities;
 
 import java.time.Instant;
@@ -28,6 +30,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +62,14 @@ public class FeeEstimationService {
         dataMap.put("dashTxFee", 50L /*FeeService.DASH_DEFAULT_TX_FEE*/);
 
         writeToJson();
+    }
+
+    public void configure(Environment env) {
+        String[] args = env.getArgs();
+
+        if (args.length >= 3) {
+            setRequestIntervalMs(TimeUnit.MINUTES.toMillis(Long.valueOf(args[2])));
+        }
     }
 
     public FeeEstimationProvider getFeeEstimationProvider() {

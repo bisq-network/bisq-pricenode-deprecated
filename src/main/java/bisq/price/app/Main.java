@@ -25,8 +25,6 @@ import bisq.price.price.providers.CoinmarketcapProvider;
 import bisq.price.price.providers.PoloniexProvider;
 import bisq.price.util.Environment;
 
-import java.util.concurrent.TimeUnit;
-
 public class Main {
 
     public static void main(String[] args) throws Exception {
@@ -41,9 +39,7 @@ public class Main {
         );
 
         FeeEstimationService feeEstimationService = new FeeEstimationService(FeeEstimationProvider.load(env));
-        if (args.length >= 3) {
-            feeEstimationService.setRequestIntervalMs(TimeUnit.MINUTES.toMillis(Long.valueOf(args[2])));
-        }
+        feeEstimationService.configure(env);
 
         Pricenode pricenode = new Pricenode(priceRequestService, feeEstimationService);
         env.getOptionalVar("PORT").ifPresent(port ->
