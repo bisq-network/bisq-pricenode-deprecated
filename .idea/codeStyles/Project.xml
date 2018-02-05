@@ -13,7 +13,7 @@
       </option>
       <option name="IMPORT_LAYOUT_TABLE">
         <value>
-          <package name="bisq.pricenode" withSubpackages="true" static="false" />
+          <package name="bisq.price" withSubpackages="true" static="false" />
           <emptyLine />
           <package name="io.bisq.provider" withSubpackages="true" static="false" />
           <emptyLine />
