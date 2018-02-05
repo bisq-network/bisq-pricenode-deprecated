@@ -36,9 +36,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 //TODO consider alternative https://www.bitgo.com/api/v1/tx/fee?numBlocks=3
-public class BtcFeesProvider implements FeeEstimationProvider {
+public class BitcoinFees implements FeeEstimationProvider {
 
-    private static final Logger log = LoggerFactory.getLogger(BtcFeesProvider.class);
+    private static final Logger log = LoggerFactory.getLogger(BitcoinFees.class);
 
     public static int DEFAULT_CAPACITY = 4; // if we request each 5 min. we take average of last 20 min.
     public static int DEFAULT_MAX_BLOCKS = 10;
@@ -50,7 +50,7 @@ public class BtcFeesProvider implements FeeEstimationProvider {
     private int maxBlocks = DEFAULT_MAX_BLOCKS;
 
     // other: https://estimatefee.com/n/2
-    public BtcFeesProvider() {
+    public BitcoinFees() {
         this.httpClient = new HttpClient("https://bitcoinfees.earn.com/api/v1/fees/");
     }
 
