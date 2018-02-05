@@ -21,6 +21,16 @@ import java.util.Optional;
 
 public class Environment {
 
+    private final String[] args;
+
+    public Environment(String[] args) {
+        this.args = args;
+    }
+
+    public String[] getArgs() {
+        return args;
+    }
+
     public Optional<String> getOptionalVar(String name) {
         return Optional.ofNullable(System.getenv(name));
     }

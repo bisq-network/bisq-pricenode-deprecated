@@ -17,9 +17,22 @@
 
 package bisq.price.mining;
 
+import bisq.price.util.Environment;
+
 import java.io.IOException;
+
+import java.util.ServiceLoader;
 
 public interface FeeEstimationProvider {
 
+    void configure(Environment env);
+
     long getFee() throws IOException;
+
+    static FeeEstimationProvider load(Environment env) {
+        ServiceLoader<FeeEstimationProvider> allProviders = ServiceLoader.load(FeeEstimationProvider.class);
+        FeeEstimationProvider defaultProvider = allProviders.iterator().next();
+        defaultProvider.configure(env);
+        return defaultProvider;
+    }
 }

@@ -17,8 +17,8 @@
 
 package bisq.price.app;
 
+import bisq.price.mining.FeeEstimationProvider;
 import bisq.price.mining.FeeEstimationService;
-import bisq.price.mining.providers.BitcoinFees;
 import bisq.price.price.PriceRequestService;
 import bisq.price.price.providers.BtcAverageProvider;
 import bisq.price.price.providers.CoinmarketcapProvider;
@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        Environment env = new Environment();
+        Environment env = new Environment(args);
 
         PriceRequestService priceRequestService = new PriceRequestService(
                 new BtcAverageProvider(
@@ -40,13 +40,7 @@ public class Main {
                 new CoinmarketcapProvider()
         );
 
-        BitcoinFees bitcoinFees = new BitcoinFees();
-        if (args.length >= 2) {
-            bitcoinFees.setCapacity(Integer.valueOf(args[0]));
-            bitcoinFees.setMaxBlocks(Integer.valueOf(args[1]));
-        }
-
-        FeeEstimationService feeEstimationService = new FeeEstimationService(bitcoinFees);
+        FeeEstimationService feeEstimationService = new FeeEstimationService(FeeEstimationProvider.load(env));
         if (args.length >= 3) {
             feeEstimationService.setRequestIntervalMs(TimeUnit.MINUTES.toMillis(Long.valueOf(args[2])));
         }

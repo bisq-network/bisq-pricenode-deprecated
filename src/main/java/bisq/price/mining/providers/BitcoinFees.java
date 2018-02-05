@@ -19,6 +19,7 @@ package bisq.price.mining.providers;
 
 import bisq.price.mining.FeeEstimationProvider;
 import bisq.price.mining.FeeEstimationService;
+import bisq.price.util.Environment;
 
 import io.bisq.network.http.HttpClient;
 
@@ -52,6 +53,15 @@ public class BitcoinFees implements FeeEstimationProvider {
     // other: https://estimatefee.com/n/2
     public BitcoinFees() {
         this.httpClient = new HttpClient("https://bitcoinfees.earn.com/api/v1/fees/");
+    }
+
+    public void configure(Environment env) {
+        String[] args = env.getArgs();
+
+        if (args.length >= 2) {
+            setCapacity(Integer.valueOf(args[0]));
+            setMaxBlocks(Integer.valueOf(args[1]));
+        }
     }
 
     public int getCapacity() {
