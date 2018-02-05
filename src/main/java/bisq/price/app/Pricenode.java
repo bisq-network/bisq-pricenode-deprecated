@@ -19,7 +19,7 @@ package bisq.price.app;
 
 import bisq.price.mining.FeeEstimationService;
 import bisq.price.mining.providers.BitcoinFees;
-import bisq.price.price.PriceRequestService;
+import bisq.price.spot.PriceRequestService;
 import bisq.price.util.Environment;
 import bisq.price.util.Version;
 

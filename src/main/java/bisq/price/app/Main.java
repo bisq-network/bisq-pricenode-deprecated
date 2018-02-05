@@ -19,10 +19,10 @@ package bisq.price.app;
 
 import bisq.price.mining.FeeEstimationProvider;
 import bisq.price.mining.FeeEstimationService;
-import bisq.price.price.PriceRequestService;
-import bisq.price.price.providers.BtcAverageProvider;
-import bisq.price.price.providers.CoinmarketcapProvider;
-import bisq.price.price.providers.PoloniexProvider;
+import bisq.price.spot.PriceRequestService;
+import bisq.price.spot.providers.BtcAverageProvider;
+import bisq.price.spot.providers.CoinmarketcapProvider;
+import bisq.price.spot.providers.PoloniexProvider;
 import bisq.price.util.Environment;
 
 public class Main {
