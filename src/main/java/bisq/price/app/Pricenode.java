@@ -17,7 +17,7 @@
 
 package bisq.price.app;
 
-import bisq.price.fee.FeeRequestService;
+import bisq.price.mining.FeeRequestService;
 import bisq.price.price.PriceRequestService;
 import bisq.price.util.Version;
 

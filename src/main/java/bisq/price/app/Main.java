@@ -17,8 +17,8 @@
 
 package bisq.price.app;
 
-import bisq.price.fee.FeeRequestService;
-import bisq.price.fee.providers.BtcFeesProvider;
+import bisq.price.mining.FeeRequestService;
+import bisq.price.mining.providers.BtcFeesProvider;
 import bisq.price.price.PriceRequestService;
 import bisq.price.price.providers.BtcAverageProvider;
 import bisq.price.price.providers.CoinmarketcapProvider;
