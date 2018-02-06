@@ -65,8 +65,7 @@ public class ExchangeRateService {
         Map<String, ExchangeRateData> allData = new HashMap<>();
 
         for (ExchangeRateProvider provider : providers) {
-            Map<? extends String, ? extends ExchangeRateData> data = provider.getData();
-            Collection<? extends ExchangeRateData> prices = data.values();
+            Collection<? extends ExchangeRateData> prices = provider.getData().values();
 
             String debugPrefix = provider.getDebugPrefix();
             long count = prices.size();
@@ -86,7 +85,7 @@ public class ExchangeRateService {
             allMarketPrices.put(debugPrefix + "Ts", timestamp);
             allMarketPrices.put(debugPrefix + "Count", count);
 
-            allData.putAll(data);
+            allData.putAll(provider.getData());
         }
 
         allMarketPrices.put("data", removeOutdatedPrices(allData).values().toArray());
