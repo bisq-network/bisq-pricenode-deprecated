@@ -79,6 +79,7 @@ public class ExchangeRateService {
                     .getTimestampSec();
 
             if (provider instanceof BitcoinAverage.Local) {
+                // `git log --grep btcAverageTs` for details on this special case
                 allMarketPrices.put("btcAverageTs", timestamp);
             }
 
