@@ -25,9 +25,9 @@ import io.bisq.common.util.Utilities;
 
 import java.time.Instant;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class ExchangeRateService {
@@ -39,10 +39,6 @@ public class ExchangeRateService {
     private final Poloniex poloniex;
     private final CoinMarketCap coinMarketCap;
 
-    private final Map<String, ExchangeRateData> allPricesMap = new ConcurrentHashMap<>();
-
-    private String json;
-
     public ExchangeRateService(BitcoinAverage.Local bitcoinAverageLocal,
                                BitcoinAverage.Global bitcoinAverageGlobal,
                                Poloniex poloniex,
@@ -53,11 +49,6 @@ public class ExchangeRateService {
         this.coinMarketCap = coinMarketCap;
     }
 
-    public String getJson() {
-        writeToJson();
-        return json;
-    }
-
     public void start() throws Exception {
         bitcoinAverageLocal.start();
         bitcoinAverageGlobal.start();
@@ -65,7 +56,7 @@ public class ExchangeRateService {
         coinMarketCap.start();
     }
 
-    private void writeToJson() {
+    public String getJson() {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("btcAverageTs", bitcoinAverageLocal.getTimestamp()); // FIXME
         map.put("poloniexTs", poloniex.getTimestamp());
@@ -75,16 +66,18 @@ public class ExchangeRateService {
         map.put("poloniexCount", poloniex.getCount());
         map.put("coinmarketcapCount", coinMarketCap.getCount());
 
+        Map<String, ExchangeRateData> data = new HashMap<>();
+
         // the order of the following two calls matters; we allow Global data to get overwritten by Local
-        allPricesMap.putAll(bitcoinAverageGlobal.getData());
-        allPricesMap.putAll(bitcoinAverageLocal.getData());
+        data.putAll(bitcoinAverageGlobal.getData());
+        data.putAll(bitcoinAverageLocal.getData());
 
         // the order of the following two calls matters; we allow CoinMarketCap data to get overwritten by Poloniex
-        allPricesMap.putAll(coinMarketCap.getData());
-        allPricesMap.putAll(poloniex.getData());
+        data.putAll(coinMarketCap.getData());
+        data.putAll(poloniex.getData());
 
-        map.put("data", allPricesMap.values().toArray());
-        json = Utilities.objectToJson(map);
+        map.put("data", data.values().toArray());
+        return Utilities.objectToJson(map);
     }
 
     private void removeOutdatedPrices(Map<String, ExchangeRateData> map) {
