@@ -19,8 +19,6 @@ package bisq.price.mining;
 
 import bisq.price.util.Environment;
 
-import io.bisq.common.util.Utilities;
-
 import java.time.Instant;
 
 import java.io.IOException;
@@ -50,9 +48,8 @@ public class FeeEstimationService {
 
     private long requestIntervalMs = DEFAULT_REQUEST_INTERVAL_MS;
     private long bitcoinFeesTs;
-    private String json;
 
-    public FeeEstimationService(FeeEstimationProvider feeEstimationProvider) {
+    public FeeEstimationService(FeeEstimationProvider feeEstimationProvider) throws IOException {
         this.feeEstimationProvider = feeEstimationProvider;
 
         // For now we don't need a fee estimation for LTC so we set it fixed, but we keep it in the provider to
@@ -61,7 +58,7 @@ public class FeeEstimationService {
         dataMap.put("dogeTxFee", 5_000_000L /*FeeService.DOGE_DEFAULT_TX_FEE*/);
         dataMap.put("dashTxFee", 50L /*FeeService.DASH_DEFAULT_TX_FEE*/);
 
-        writeToJson();
+        requestBitcoinFees();
     }
 
     public void configure(Environment env) {
@@ -97,7 +94,6 @@ public class FeeEstimationService {
             }
         }, requestIntervalMs, requestIntervalMs);
 
-
         requestBitcoinFees();
     }
 
@@ -112,18 +108,13 @@ public class FeeEstimationService {
         } else {
             bitcoinFeesTs = Instant.now().getEpochSecond();
             dataMap.put("btcTxFee", btcFee);
-            writeToJson();
         }
     }
 
-    private void writeToJson() {
+    public Map<String, Object> getFees() {
         Map<String, Object> map = new HashMap<>();
         map.put("bitcoinFeesTs", bitcoinFeesTs);
         map.put("dataMap", dataMap);
-        json = Utilities.objectToJson(map);
-    }
-
-    public String getJson() {
-        return json;
+        return map;
     }
 }

@@ -75,8 +75,8 @@ public class Pricenode {
 
         before("/*", (req, res) -> log.info("Incoming {} request from: {}", req.pathInfo(), req.userAgent()));
 
-        get("/getAllMarketPrices", (req, res) -> exchangeRateService.getJson());
-        get("/getFees", (req, res) -> feeEstimationService.getJson());
+        get("/getAllMarketPrices", (req, res) -> toJson(exchangeRateService.getAllMarketPrices()));
+        get("/getFees", (req, res) -> toJson(feeEstimationService.getFees()));
         get("/getVersion", (req, res) -> version.toString());
         get("/getParams", (req, res) ->
                 ((BitcoinFees) feeEstimationService.getFeeEstimationProvider()).getCapacity() + ";" +
@@ -91,5 +91,9 @@ public class Pricenode {
         log.info("Log files under: " + logPath);
         log.info("bisq-pricenode version: " + version);
         Utilities.printSysInfo();
+    }
+
+    private static Object toJson(Object data) {
+        return Utilities.objectToJson(data);
     }
 }

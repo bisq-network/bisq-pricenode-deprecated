@@ -21,8 +21,6 @@ import bisq.price.spot.providers.BitcoinAverage;
 import bisq.price.spot.providers.CoinMarketCap;
 import bisq.price.spot.providers.Poloniex;
 
-import io.bisq.common.util.Utilities;
-
 import java.time.Instant;
 
 import java.util.HashMap;
@@ -56,7 +54,7 @@ public class ExchangeRateService {
         coinMarketCap.start();
     }
 
-    public String getJson() {
+    public Map<String, Object> getAllMarketPrices() {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("btcAverageTs", bitcoinAverageLocal.getTimestamp());
         map.put("poloniexTs", poloniex.getTimestamp());
@@ -77,7 +75,8 @@ public class ExchangeRateService {
         data.putAll(poloniex.getData());
 
         map.put("data", removeOutdatedPrices(data).values().toArray());
-        return Utilities.objectToJson(map);
+
+        return map;
     }
 
     private Map<String, ExchangeRateData> removeOutdatedPrices(Map<String, ExchangeRateData> map) {
