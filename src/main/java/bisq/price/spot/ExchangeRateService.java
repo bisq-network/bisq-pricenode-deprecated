@@ -58,11 +58,11 @@ public class ExchangeRateService {
 
     public String getJson() {
         Map<String, Object> map = new LinkedHashMap<>();
-        map.put("btcAverageTs", bitcoinAverageLocal.getTimestamp()); // FIXME
+        map.put("btcAverageTs", bitcoinAverageLocal.getTimestamp());
         map.put("poloniexTs", poloniex.getTimestamp());
         map.put("coinmarketcapTs", coinMarketCap.getTimestamp());
-        map.put("btcAverageLCount", bitcoinAverageLocal.getCount()); // FIXME
-        map.put("btcAverageGCount", bitcoinAverageGlobal.getCount()); // FIXME
+        map.put("btcAverageLCount", bitcoinAverageLocal.getCount());
+        map.put("btcAverageGCount", bitcoinAverageGlobal.getCount());
         map.put("poloniexCount", poloniex.getCount());
         map.put("coinmarketcapCount", coinMarketCap.getCount());
 
