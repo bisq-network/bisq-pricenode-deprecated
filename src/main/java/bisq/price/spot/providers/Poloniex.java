@@ -18,7 +18,6 @@
 package bisq.price.spot.providers;
 
 import bisq.price.spot.ExchangeRateData;
-import bisq.price.spot.ExchangeRateProvider;
 import bisq.price.util.Environment;
 
 import io.bisq.network.http.HttpClient;
@@ -36,22 +35,15 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.stream.Collectors;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static java.lang.Double.parseDouble;
 
-public class Poloniex implements ExchangeRateProvider {
+public class Poloniex extends AbstractExchangeRateProvider {
 
-    private static final Logger log = LoggerFactory.getLogger(Poloniex.class);
     private static final long REQUEST_INTERVAL_MS = 60_000; // 1 min
     private static final String PROVIDER_SYMBOL = "POLO";
 
-    private final Timer timer = new Timer();
     private final Set<String> supportedAltcoins;
     private final HttpClient httpClient;
 
@@ -71,23 +63,13 @@ public class Poloniex implements ExchangeRateProvider {
         // no configuration necessary
     }
 
-    public void start() throws IOException {
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                try {
-                    requestAndCache();
-                } catch (IOException e) {
-                    log.warn(e.toString());
-                    e.printStackTrace();
-                }
-            }
-        }, REQUEST_INTERVAL_MS, REQUEST_INTERVAL_MS);
-
-        requestAndCache();
+    @Override
+    protected long getRequestIntervalMs() {
+        return REQUEST_INTERVAL_MS;
     }
 
-    private void requestAndCache() throws IOException {
+    @Override
+    protected void requestAndCache() throws IOException {
         long ts = System.currentTimeMillis();
         data = request();
         log.info("requestAndCache took {} ms.", (System.currentTimeMillis() - ts));

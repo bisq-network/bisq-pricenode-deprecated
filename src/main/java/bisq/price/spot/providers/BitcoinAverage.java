@@ -18,7 +18,6 @@
 package bisq.price.spot.providers;
 
 import bisq.price.spot.ExchangeRateData;
-import bisq.price.spot.ExchangeRateProvider;
 import bisq.price.util.Environment;
 
 import io.bisq.network.http.HttpClient;
@@ -41,13 +40,11 @@ import java.io.IOException;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class BitcoinAverage implements ExchangeRateProvider {
+public abstract class BitcoinAverage extends AbstractExchangeRateProvider {
 
     private static final Logger log = LoggerFactory.getLogger(BitcoinAverage.class);
 
@@ -138,29 +135,16 @@ public abstract class BitcoinAverage implements ExchangeRateProvider {
         // We get 42514 (29760+12754) request with below numbers.
         private static final long REQUEST_INTERVAL_MS = 210_000;    // 3.5 min; 12754 requests for 31 days
 
-        private final Timer timer = new Timer();
-
         private long timestamp;
         private Map<String, ExchangeRateData> data;
 
-        public void start() throws Exception {
-
-            timer.scheduleAtFixedRate(new TimerTask() {
-                @Override
-                public void run() {
-                    try {
-                        requestAndCache();
-                    } catch (Throwable e) {
-                        log.warn(e.toString());
-                        e.printStackTrace();
-                    }
-                }
-            }, REQUEST_INTERVAL_MS, REQUEST_INTERVAL_MS);
-
-            requestAndCache();
+        @Override
+        protected long getRequestIntervalMs() {
+            return REQUEST_INTERVAL_MS;
         }
 
-        private void requestAndCache() throws IOException {
+        @Override
+        protected void requestAndCache() throws IOException {
             long ts = System.currentTimeMillis();
             data = request();
 
@@ -199,29 +183,16 @@ public abstract class BitcoinAverage implements ExchangeRateProvider {
         // We get 42514 (29760+12754) request with below numbers.
         private static final long REQUEST_INTERVAL_MS = 90_000;      // 90 sec; 29760 requests for 31 days
 
-        private final Timer timer = new Timer();
-
         private long timestamp;
         private Map<String, ExchangeRateData> data;
 
-        public void start() throws Exception {
-
-            timer.scheduleAtFixedRate(new TimerTask() {
-                @Override
-                public void run() {
-                    try {
-                        requestAndCache();
-                    } catch (Throwable e) {
-                        log.warn(e.toString());
-                        e.printStackTrace();
-                    }
-                }
-            }, REQUEST_INTERVAL_MS, REQUEST_INTERVAL_MS);
-
-            requestAndCache();
+        @Override
+        protected long getRequestIntervalMs() {
+            return REQUEST_INTERVAL_MS;
         }
 
-        private void requestAndCache() throws IOException {
+        @Override
+        protected void requestAndCache() throws IOException {
             long ts = System.currentTimeMillis();
             data = request();
 
