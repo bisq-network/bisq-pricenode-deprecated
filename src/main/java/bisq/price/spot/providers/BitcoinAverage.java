@@ -215,5 +215,9 @@ public abstract class BitcoinAverage extends AbstractExchangeRateProvider {
         public String getProviderSymbol() {
             return PROVIDER_SYMBOL;
         }
+
+        public String getDebugPrefix() {
+            return "btcAverageL";
+        }
     }
 }

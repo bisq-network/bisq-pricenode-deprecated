@@ -62,6 +62,7 @@ public class ExchangeRateService {
         Map<? extends String, ? extends ExchangeRateData> providerData = exchangeRateProvider.getData();
         Collection<? extends ExchangeRateData> prices = providerData.values();
 
+        String debugPrefix = exchangeRateProvider.getDebugPrefix();
         long count = prices.size();
         long timestamp = prices.stream()
                 .filter(e -> exchangeRateProvider.getProviderSymbol().equals(e.getProvider()))
@@ -73,9 +74,10 @@ public class ExchangeRateService {
 
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("btcAverageTs", timestamp);
+        map.put(debugPrefix + "Ts", timestamp);
         map.put("poloniexTs", poloniex.getTimestamp());
         map.put("coinmarketcapTs", coinMarketCap.getTimestamp());
-        map.put("btcAverageLCount", count);
+        map.put(debugPrefix + "Count", count);
         map.put("btcAverageGCount", bitcoinAverageGlobal.getCount());
         map.put("poloniexCount", poloniex.getCount());
         map.put("coinmarketcapCount", coinMarketCap.getCount());
