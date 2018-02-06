@@ -20,8 +20,7 @@ package bisq.price.app;
 import bisq.price.mining.FeeEstimationProvider;
 import bisq.price.mining.FeeEstimationService;
 import bisq.price.spot.ExchangeRateService;
-import bisq.price.spot.providers.BitcoinAverageGlobal;
-import bisq.price.spot.providers.BitcoinAverageLocal;
+import bisq.price.spot.providers.BitcoinAverage;
 import bisq.price.spot.providers.CoinMarketCap;
 import bisq.price.spot.providers.Poloniex;
 import bisq.price.util.Environment;
@@ -31,8 +30,8 @@ public class Main {
     public static void main(String[] args) throws Exception {
         Environment env = new Environment(args);
 
-        BitcoinAverageLocal bitcoinAverageLocal = new BitcoinAverageLocal();
-        BitcoinAverageGlobal bitcoinAverageGlobal = new BitcoinAverageGlobal();
+        BitcoinAverage.Local bitcoinAverageLocal = new BitcoinAverage.Local();
+        BitcoinAverage.Global bitcoinAverageGlobal = new BitcoinAverage.Global();
 
         bitcoinAverageLocal.configure(env);
         bitcoinAverageGlobal.configure(env);

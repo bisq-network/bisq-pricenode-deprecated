@@ -17,8 +17,7 @@
 
 package bisq.price.spot;
 
-import bisq.price.spot.providers.BitcoinAverageGlobal;
-import bisq.price.spot.providers.BitcoinAverageLocal;
+import bisq.price.spot.providers.BitcoinAverage;
 import bisq.price.spot.providers.CoinMarketCap;
 import bisq.price.spot.providers.Poloniex;
 
@@ -80,8 +79,8 @@ public class ExchangeRateService {
 
     private String json;
 
-    public ExchangeRateService(BitcoinAverageLocal bitcoinAverageLocal,
-                               BitcoinAverageGlobal bitcoinAverageGlobal,
+    public ExchangeRateService(BitcoinAverage.Local bitcoinAverageLocal,
+                               BitcoinAverage.Global bitcoinAverageGlobal,
                                Poloniex poloniex,
                                CoinMarketCap coinMarketCap){
         this.bitcoinAverageLocal = bitcoinAverageLocal;

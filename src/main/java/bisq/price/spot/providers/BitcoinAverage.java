@@ -19,6 +19,7 @@ package bisq.price.spot.providers;
 
 import bisq.price.spot.ExchangeRateData;
 import bisq.price.spot.ExchangeRateProvider;
+import bisq.price.spot.ExchangeRateService;
 import bisq.price.util.Environment;
 
 import io.bisq.network.http.HttpClient;
@@ -45,9 +46,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractBitcoinAverage implements ExchangeRateProvider {
+public abstract class BitcoinAverage implements ExchangeRateProvider {
 
-    private static final Logger log = LoggerFactory.getLogger(AbstractBitcoinAverage.class);
+    private static final Logger log = LoggerFactory.getLogger(BitcoinAverage.class);
 
     protected final HttpClient httpClient;
 
@@ -55,7 +56,7 @@ public abstract class AbstractBitcoinAverage implements ExchangeRateProvider {
     private SecretKey secretKey;
     private boolean configured = false;
 
-    public AbstractBitcoinAverage() {
+    public BitcoinAverage() {
         this.httpClient = new HttpClient("https://apiv2.bitcoinaverage.com/");
     }
 
@@ -126,5 +127,27 @@ public abstract class AbstractBitcoinAverage implements ExchangeRateProvider {
     private void assertConfigured() {
         if (!configured)
             throw new IllegalStateException("'configure' method was not called");
+    }
+
+
+    public static class Global extends BitcoinAverage {
+
+        @Override
+        public Map<String, ExchangeRateData> request() throws IOException {
+            return getMap(
+                    httpClient.requestWithGETNoProxy("indices/global/ticker/all?crypto=BTC", "X-signature", getHeader()),
+                    ExchangeRateService.BTCAVERAGE_GLOBAL_PROVIDER);
+        }
+    }
+
+
+    public static class Local extends BitcoinAverage {
+
+        @Override
+        public Map<String, ExchangeRateData> request() throws IOException {
+            return getMap(
+                    httpClient.requestWithGETNoProxy("indices/local/ticker/all?crypto=BTC", "X-signature", getHeader()),
+                    ExchangeRateService.BTCAVERAGE_LOCAL_PROVIDER);
+        }
     }
 }
