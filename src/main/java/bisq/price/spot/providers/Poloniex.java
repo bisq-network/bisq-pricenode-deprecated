@@ -19,7 +19,6 @@ package bisq.price.spot.providers;
 
 import bisq.price.spot.ExchangeRateData;
 import bisq.price.spot.ExchangeRateProvider;
-import bisq.price.spot.ExchangeRateService;
 import bisq.price.util.Environment;
 
 import io.bisq.network.http.HttpClient;
@@ -37,6 +36,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -47,9 +48,15 @@ import static java.lang.Double.parseDouble;
 public class Poloniex implements ExchangeRateProvider {
 
     private static final Logger log = LoggerFactory.getLogger(Poloniex.class);
+    private static final long REQUEST_INTERVAL_MS = 60_000; // 1 min
+    private static final String PROVIDER_SYMBOL = "POLO";
 
+    private final Timer timer = new Timer();
     private final Set<String> supportedAltcoins;
     private final HttpClient httpClient;
+
+    private Map<String, ExchangeRateData> data;
+    private long timestamp;
 
     public Poloniex() {
         this.httpClient = new HttpClient("https://poloniex.com/public");
@@ -62,6 +69,33 @@ public class Poloniex implements ExchangeRateProvider {
     @Override
     public void configure(Environment env) {
         // no configuration necessary
+    }
+
+    public void start() throws IOException {
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    requestAndCache();
+                } catch (IOException e) {
+                    log.warn(e.toString());
+                    e.printStackTrace();
+                }
+            }
+        }, REQUEST_INTERVAL_MS, REQUEST_INTERVAL_MS);
+
+        requestAndCache();
+    }
+
+    private void requestAndCache() throws IOException {
+        long ts = System.currentTimeMillis();
+        data = request();
+        log.info("requestAndCache took {} ms.", (System.currentTimeMillis() - ts));
+        //removeOutdatedPrices(allPricesMap); // FIXME
+        timestamp = Instant.now().getEpochSecond();
+
+        if (data.get("LTC") != null)
+            log.info("Poloniex LTC (last): " + data.get("LTC").getPrice());
     }
 
     public Map<String, ExchangeRateData> request() throws IOException {
@@ -86,7 +120,7 @@ public class Poloniex implements ExchangeRateProvider {
                                     new ExchangeRateData(altcoinCurrency,
                                             parseDouble((String) data.get("last")),
                                             ts,
-                                            ExchangeRateService.POLO_PROVIDER)
+                                            PROVIDER_SYMBOL)
                             );
                         }
                     }
@@ -96,5 +130,17 @@ public class Poloniex implements ExchangeRateProvider {
             }
         });
         return marketPriceMap;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public long getCount() {
+        return data.size();
+    }
+
+    public Map<? extends String, ? extends ExchangeRateData> getData() {
+        return data;
     }
 }
