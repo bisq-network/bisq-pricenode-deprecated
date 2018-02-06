@@ -48,7 +48,6 @@ public class Poloniex extends AbstractExchangeRateProvider {
     private final HttpClient httpClient;
 
     private Map<String, ExchangeRateData> data;
-    private long timestamp;
 
     public Poloniex() {
         this.httpClient = new HttpClient("https://poloniex.com/public");
@@ -73,8 +72,6 @@ public class Poloniex extends AbstractExchangeRateProvider {
         long ts = System.currentTimeMillis();
         data = request();
         log.info("requestAndCache took {} ms.", (System.currentTimeMillis() - ts));
-
-        timestamp = Instant.now().getEpochSecond();
 
         if (data.get("LTC") != null)
             log.info("Poloniex LTC (last): " + data.get("LTC").getPrice());
@@ -112,14 +109,6 @@ public class Poloniex extends AbstractExchangeRateProvider {
             }
         });
         return marketPriceMap;
-    }
-
-    public long getTimestamp() {
-        return timestamp;
-    }
-
-    public long getCount() {
-        return data.size();
     }
 
     @Override

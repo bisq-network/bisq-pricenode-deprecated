@@ -27,7 +27,7 @@ import java.util.TimerTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-abstract class AbstractExchangeRateProvider implements ExchangeRateProvider {
+public abstract class AbstractExchangeRateProvider implements ExchangeRateProvider {
 
     protected static final Logger log = LoggerFactory.getLogger(Poloniex.class);
 

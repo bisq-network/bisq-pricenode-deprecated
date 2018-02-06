@@ -54,7 +54,6 @@ public class CoinMarketCap extends AbstractExchangeRateProvider {
     private final HttpClient httpClient;
 
     private Map<String, ExchangeRateData> data;
-    private long timestamp;
 
     public CoinMarketCap() {
         this.httpClient = new HttpClient("https://api.coinmarketcap.com/");
@@ -79,8 +78,6 @@ public class CoinMarketCap extends AbstractExchangeRateProvider {
         data = request();
         log.info("requestAndCache took {} ms.", (System.currentTimeMillis() - ts));
 
-        timestamp = Instant.now().getEpochSecond();
-
         if (data.get("LTC") != null)
             log.info("Coinmarketcap LTC (last): " + data.get("LTC").getPrice());
     }
@@ -99,14 +96,6 @@ public class CoinMarketCap extends AbstractExchangeRateProvider {
             }
         });
         return marketPriceMap;
-    }
-
-    public long getTimestamp() {
-        return timestamp;
-    }
-
-    public long getCount() {
-        return data.size();
     }
 
     @Override

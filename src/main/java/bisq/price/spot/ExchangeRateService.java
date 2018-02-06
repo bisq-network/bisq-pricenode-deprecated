@@ -17,6 +17,7 @@
 
 package bisq.price.spot;
 
+import bisq.price.spot.providers.AbstractExchangeRateProvider;
 import bisq.price.spot.providers.BitcoinAverage;
 import bisq.price.spot.providers.CoinMarketCap;
 import bisq.price.spot.providers.Poloniex;
@@ -26,71 +27,66 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ExchangeRateService {
 
     private static final long MARKET_PRICE_TTL_SEC = 1800; // 30 min
 
-    private final BitcoinAverage.Local bitcoinAverageLocal;
-    private final BitcoinAverage.Global bitcoinAverageGlobal;
-    private final Poloniex poloniex;
-    private final CoinMarketCap coinMarketCap;
+    private final Set<ExchangeRateProvider> providers;
 
     public ExchangeRateService(BitcoinAverage.Local bitcoinAverageLocal,
                                BitcoinAverage.Global bitcoinAverageGlobal,
                                Poloniex poloniex,
-                               CoinMarketCap coinMarketCap){
-        this.bitcoinAverageLocal = bitcoinAverageLocal;
-        this.bitcoinAverageGlobal = bitcoinAverageGlobal;
-        this.poloniex = poloniex;
-        this.coinMarketCap = coinMarketCap;
+                               CoinMarketCap coinMarketCap) {
+
+        this.providers = new LinkedHashSet<ExchangeRateProvider>() {{
+            add(bitcoinAverageGlobal);
+            add(bitcoinAverageLocal);
+            add(coinMarketCap);
+            add(poloniex);
+        }};
     }
 
     public void start() throws Exception {
-        bitcoinAverageLocal.start();
-        bitcoinAverageGlobal.start();
-        poloniex.start();
-        coinMarketCap.start();
+        for (ExchangeRateProvider provider : providers) {
+            if (provider instanceof AbstractExchangeRateProvider) {
+                ((AbstractExchangeRateProvider) provider).start();
+            }
+        }
     }
 
     public Map<String, Object> getAllMarketPrices() {
 
-        ExchangeRateProvider exchangeRateProvider = bitcoinAverageLocal;
-
-        Map<? extends String, ? extends ExchangeRateData> data = exchangeRateProvider.getData();
-        Collection<? extends ExchangeRateData> prices = data.values();
-
-        String debugPrefix = exchangeRateProvider.getDebugPrefix();
-        long count = prices.size();
-        long timestamp = prices.stream()
-                .filter(e -> exchangeRateProvider.getProviderSymbol().equals(e.getProvider()))
-                .findFirst()
-                .orElseThrow(() ->
-                        new IllegalStateException(
-                                "No exchange rate data found for " + exchangeRateProvider))
-                .getTimestampSec();
-
         Map<String, Object> allMarketPrices = new LinkedHashMap<>();
-        allMarketPrices.put("btcAverageTs", timestamp);
-        allMarketPrices.put(debugPrefix + "Ts", timestamp);
-        allMarketPrices.put("poloniexTs", poloniex.getTimestamp());
-        allMarketPrices.put("coinmarketcapTs", coinMarketCap.getTimestamp());
-        allMarketPrices.put(debugPrefix + "Count", count);
-        allMarketPrices.put("btcAverageGCount", bitcoinAverageGlobal.getCount());
-        allMarketPrices.put("poloniexCount", poloniex.getCount());
-        allMarketPrices.put("coinmarketcapCount", coinMarketCap.getCount());
-
         Map<String, ExchangeRateData> allData = new HashMap<>();
 
-        // the order of the following two calls matters; we allow Global data to get overwritten by Local
-        allData.putAll(bitcoinAverageGlobal.getData());
-        allData.putAll(data);
+        for (ExchangeRateProvider exchangeRateProvider : providers) {
+            Map<? extends String, ? extends ExchangeRateData> data = exchangeRateProvider.getData();
+            Collection<? extends ExchangeRateData> prices = data.values();
 
-        // the order of the following two calls matters; we allow CoinMarketCap data to get overwritten by Poloniex
-        allData.putAll(coinMarketCap.getData());
-        allData.putAll(poloniex.getData());
+            String debugPrefix = exchangeRateProvider.getDebugPrefix();
+            long count = prices.size();
+            long timestamp = prices.stream()
+                    .filter(e -> exchangeRateProvider.getProviderSymbol().equals(e.getProvider()))
+                    .findFirst()
+                    .orElseThrow(() ->
+                            new IllegalStateException(
+                                    "No exchange rate data found for " + exchangeRateProvider))
+                    .getTimestampSec();
+
+            if (exchangeRateProvider instanceof BitcoinAverage.Local) {
+                allMarketPrices.put("btcAverageTs", timestamp);
+            }
+
+            allMarketPrices.put(debugPrefix + "Ts", timestamp);
+            allMarketPrices.put(debugPrefix + "Count", count);
+
+            allData.putAll(data);
+        }
 
         allMarketPrices.put("data", removeOutdatedPrices(allData).values().toArray());
 

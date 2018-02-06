@@ -135,7 +135,6 @@ public abstract class BitcoinAverage extends AbstractExchangeRateProvider {
         // We get 42514 (29760+12754) request with below numbers.
         private static final long REQUEST_INTERVAL_MS = 210_000;    // 3.5 min; 12754 requests for 31 days
 
-        private long timestamp;
         private Map<String, ExchangeRateData> data;
 
         @Override
@@ -151,8 +150,6 @@ public abstract class BitcoinAverage extends AbstractExchangeRateProvider {
             if (data.get("USD") != null)
                 log.info("BTCAverage global USD (last):" + data.get("USD").getPrice());
             log.info("requestBtcAverageGlobalPrices took {} ms.", (System.currentTimeMillis() - ts));
-
-            timestamp = Instant.now().getEpochSecond();
         }
 
         @Override
@@ -160,14 +157,6 @@ public abstract class BitcoinAverage extends AbstractExchangeRateProvider {
             return getMap(
                     httpClient.requestWithGETNoProxy("indices/global/ticker/all?crypto=BTC", "X-signature", getHeader()),
                     PROVIDER_SYMBOL);
-        }
-
-        public long getTimestamp() {
-            return timestamp;
-        }
-
-        public long getCount() {
-            return data.size();
         }
 
         @Override
