@@ -60,22 +60,21 @@ public class ExchangeRateService {
     }
 
     public Map<String, Object> getAllMarketPrices() {
-
         Map<String, Object> allMarketPrices = new LinkedHashMap<>();
-        Map<String, ExchangeRateData> allData = new HashMap<>();
 
+        addMetadata(allMarketPrices);
+        addData(allMarketPrices);
+
+        return allMarketPrices;
+    }
+
+    private void addMetadata(Map<String, Object> allMarketPrices) {
         for (ExchangeRateProvider provider : providers) {
             Collection<? extends ExchangeRateData> prices = provider.getData().values();
 
             String debugPrefix = provider.getDebugPrefix();
             long count = prices.size();
-            long timestamp = prices.stream()
-                    .filter(e -> provider.getProviderSymbol().equals(e.getProvider()))
-                    .findFirst()
-                    .orElseThrow(() ->
-                            new IllegalStateException(
-                                    "No exchange rate data found for " + provider))
-                    .getTimestampSec();
+            long timestamp = findFirstTimestampForProvider(prices, provider.getProviderSymbol());
 
             if (provider instanceof BitcoinAverage.Local) {
                 // `git log --grep btcAverageTs` for details on this special case
@@ -84,13 +83,25 @@ public class ExchangeRateService {
 
             allMarketPrices.put(debugPrefix + "Ts", timestamp);
             allMarketPrices.put(debugPrefix + "Count", count);
+        }
+    }
 
+    private void addData(Map<String, Object> allMarketPrices) {
+        Map<String, ExchangeRateData> allData = new HashMap<>();
+
+        for (ExchangeRateProvider provider : providers) {
             allData.putAll(provider.getData());
         }
 
         allMarketPrices.put("data", removeOutdatedPrices(allData).values().toArray());
+    }
 
-        return allMarketPrices;
+    private long findFirstTimestampForProvider(Collection<? extends ExchangeRateData> prices, String providerSymbol) {
+        return prices.stream()
+                .filter(e -> providerSymbol.equals(e.getProvider()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No exchange rate data found for " + providerSymbol))
+                .getTimestampSec();
     }
 
     private Map<String, ExchangeRateData> removeOutdatedPrices(Map<String, ExchangeRateData> map) {
