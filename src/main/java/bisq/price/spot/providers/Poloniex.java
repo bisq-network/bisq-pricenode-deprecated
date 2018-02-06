@@ -44,14 +44,14 @@ import org.slf4j.LoggerFactory;
 
 import static java.lang.Double.parseDouble;
 
-public class PoloniexProvider implements ExchangeRateProvider {
+public class Poloniex implements ExchangeRateProvider {
 
-    private static final Logger log = LoggerFactory.getLogger(PoloniexProvider.class);
+    private static final Logger log = LoggerFactory.getLogger(Poloniex.class);
 
     private final Set<String> supportedAltcoins;
     private final HttpClient httpClient;
 
-    public PoloniexProvider() {
+    public Poloniex() {
         this.httpClient = new HttpClient("https://poloniex.com/public");
 
         supportedAltcoins = CurrencyUtil.getAllSortedCryptoCurrencies().stream()

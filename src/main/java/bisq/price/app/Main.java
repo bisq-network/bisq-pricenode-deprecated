@@ -23,7 +23,7 @@ import bisq.price.spot.ExchangeRateService;
 import bisq.price.spot.providers.BitcoinAverageGlobal;
 import bisq.price.spot.providers.BitcoinAverageLocal;
 import bisq.price.spot.providers.CoinMarketCap;
-import bisq.price.spot.providers.PoloniexProvider;
+import bisq.price.spot.providers.Poloniex;
 import bisq.price.util.Environment;
 
 public class Main {
@@ -40,7 +40,7 @@ public class Main {
         ExchangeRateService exchangeRateService = new ExchangeRateService(
                 bitcoinAverageLocal,
                 bitcoinAverageGlobal,
-                new PoloniexProvider(),
+                new Poloniex(),
                 new CoinMarketCap()
         );
 
