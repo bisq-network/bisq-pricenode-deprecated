@@ -64,21 +64,21 @@ public class ExchangeRateService {
         Map<String, Object> allMarketPrices = new LinkedHashMap<>();
         Map<String, ExchangeRateData> allData = new HashMap<>();
 
-        for (ExchangeRateProvider exchangeRateProvider : providers) {
-            Map<? extends String, ? extends ExchangeRateData> data = exchangeRateProvider.getData();
+        for (ExchangeRateProvider provider : providers) {
+            Map<? extends String, ? extends ExchangeRateData> data = provider.getData();
             Collection<? extends ExchangeRateData> prices = data.values();
 
-            String debugPrefix = exchangeRateProvider.getDebugPrefix();
+            String debugPrefix = provider.getDebugPrefix();
             long count = prices.size();
             long timestamp = prices.stream()
-                    .filter(e -> exchangeRateProvider.getProviderSymbol().equals(e.getProvider()))
+                    .filter(e -> provider.getProviderSymbol().equals(e.getProvider()))
                     .findFirst()
                     .orElseThrow(() ->
                             new IllegalStateException(
-                                    "No exchange rate data found for " + exchangeRateProvider))
+                                    "No exchange rate data found for " + provider))
                     .getTimestampSec();
 
-            if (exchangeRateProvider instanceof BitcoinAverage.Local) {
+            if (provider instanceof BitcoinAverage.Local) {
                 allMarketPrices.put("btcAverageTs", timestamp);
             }
 
