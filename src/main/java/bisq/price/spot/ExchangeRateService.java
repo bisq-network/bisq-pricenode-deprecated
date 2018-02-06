@@ -51,10 +51,10 @@ public class ExchangeRateService {
     private final Timer timerPoloniex = new Timer();
     private final Timer timerCoinmarketcap = new Timer();
 
-    private final ExchangeRateProvider bitcoinAverageLocal;
-    private final ExchangeRateProvider bitcoinAverageGlobal;
-    private final ExchangeRateProvider poloniexProvider;
-    private final ExchangeRateProvider coinmarketcapProvider;
+    private final BitcoinAverage.Local bitcoinAverageLocal;
+    private final BitcoinAverage.Global bitcoinAverageGlobal;
+    private final Poloniex poloniex;
+    private final CoinMarketCap coinMarketCap;
 
     private final Map<String, ExchangeRateData> allPricesMap = new ConcurrentHashMap<>();
     private Map<String, ExchangeRateData> poloniexMap;
@@ -72,8 +72,8 @@ public class ExchangeRateService {
                                CoinMarketCap coinMarketCap){
         this.bitcoinAverageLocal = bitcoinAverageLocal;
         this.bitcoinAverageGlobal = bitcoinAverageGlobal;
-        this.poloniexProvider = poloniex;
-        this.coinmarketcapProvider = coinMarketCap;
+        this.poloniex = poloniex;
+        this.coinMarketCap = coinMarketCap;
     }
 
     public String getJson() {
@@ -83,8 +83,8 @@ public class ExchangeRateService {
 
     public void start() throws Exception {
 
-        ((BitcoinAverage.Local)bitcoinAverageLocal).start();
-        ((BitcoinAverage.Global)bitcoinAverageGlobal).start();
+        bitcoinAverageLocal.start();
+        bitcoinAverageGlobal.start();
 
         timerPoloniex.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -117,7 +117,7 @@ public class ExchangeRateService {
 
     private void requestCoinmarketcapPrices() throws IOException {
         long ts = System.currentTimeMillis();
-        Map<String, ExchangeRateData> map = coinmarketcapProvider.request();
+        Map<String, ExchangeRateData> map = coinMarketCap.request();
         log.info("requestCoinmarketcapPrices took {} ms.", (System.currentTimeMillis() - ts));
         removeOutdatedPrices(poloniexMap);
         removeOutdatedPrices(allPricesMap);
@@ -138,7 +138,7 @@ public class ExchangeRateService {
 
     private void requestPoloniexPrices() throws IOException {
         long ts = System.currentTimeMillis();
-        poloniexMap = poloniexProvider.request();
+        poloniexMap = poloniex.request();
         log.info("requestPoloniexPrices took {} ms.", (System.currentTimeMillis() - ts));
         removeOutdatedPrices(allPricesMap);
         allPricesMap.putAll(poloniexMap);
@@ -153,16 +153,16 @@ public class ExchangeRateService {
 
     private void writeToJson() {
         Map<String, Object> map = new LinkedHashMap<>();
-        map.put("btcAverageTs", ((BitcoinAverage.Local)bitcoinAverageLocal).getTimestamp()); // FIXME
+        map.put("btcAverageTs", bitcoinAverageLocal.getTimestamp()); // FIXME
         map.put("poloniexTs", poloniexTs);
         map.put("coinmarketcapTs", coinmarketcapTs);
-        map.put("btcAverageLCount", ((BitcoinAverage.Local)bitcoinAverageLocal).getCount()); // FIXME
-        map.put("btcAverageGCount", ((BitcoinAverage.Global)bitcoinAverageGlobal).getCount()); // FIXME
+        map.put("btcAverageLCount", bitcoinAverageLocal.getCount()); // FIXME
+        map.put("btcAverageGCount", bitcoinAverageGlobal.getCount()); // FIXME
         map.put("poloniexCount", poloniexCount);
         map.put("coinmarketcapCount", coinmarketcapCount);
         // the order of the following two calls matters; if reversed, Local entries are overwritten by Global entries
-        allPricesMap.putAll(((BitcoinAverage.Global)bitcoinAverageGlobal).getData());
-        allPricesMap.putAll(((BitcoinAverage.Local)bitcoinAverageLocal).getData());
+        allPricesMap.putAll(bitcoinAverageGlobal.getData());
+        allPricesMap.putAll(bitcoinAverageLocal.getData());
         map.put("data", allPricesMap.values().toArray());
         json = Utilities.objectToJson(map);
     }
