@@ -43,7 +43,6 @@ public class ExchangeRateService {
 
     public static final String POLO_PROVIDER = "POLO";
     public static final String COINMKTC_PROVIDER = "CMC";
-    public static final String BTCAVERAGE_LOCAL_PROVIDER = "BTCA_L";
     public static final String BTCAVERAGE_GLOBAL_PROVIDER = "BTCA_G";
 
     // We adjust request time to fit into BitcoinAverage developer plan (45k request per month).

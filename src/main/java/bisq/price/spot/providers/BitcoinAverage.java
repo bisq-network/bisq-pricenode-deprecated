@@ -145,6 +145,7 @@ public abstract class BitcoinAverage implements ExchangeRateProvider {
 
     public static class Local extends BitcoinAverage {
 
+        private static final String PROVIDER_SYMBOL = "BTCA_L";
         private static final long REQUEST_INTERVAL_MS = 90_000;      // 90 sec; 29760 requests for 31 days
 
         private final Timer timer = new Timer();
@@ -191,7 +192,7 @@ public abstract class BitcoinAverage implements ExchangeRateProvider {
         public Map<String, ExchangeRateData> request() throws IOException {
             return getMap(
                     httpClient.requestWithGETNoProxy("indices/local/ticker/all?crypto=BTC", "X-signature", getHeader()),
-                    ExchangeRateService.BTCAVERAGE_LOCAL_PROVIDER);
+                    PROVIDER_SYMBOL);
         }
 
         public long getTimestamp() {
