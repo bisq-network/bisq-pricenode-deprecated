@@ -43,17 +43,11 @@ public class ExchangeRateService {
 
     public static final String POLO_PROVIDER = "POLO";
     public static final String COINMKTC_PROVIDER = "CMC";
-    public static final String BTCAVERAGE_GLOBAL_PROVIDER = "BTCA_G";
-
-    // We adjust request time to fit into BitcoinAverage developer plan (45k request per month).
-    // We get 42514 (29760+12754) request with below numbers.
-    private static final long INTERVAL_BTC_AV_GLOBAL_MS = 210_000;    // 3.5 min; 12754 requests for 31 days
 
     private static final long INTERVAL_POLONIEX_MS = 60_000;          // 1 min
     private static final long INTERVAL_COIN_MARKET_CAP_MS = 300_000;  // 5 min that data structure is quite heavy so we don't request too often.
     private static final long MARKET_PRICE_TTL_SEC = 1800;            // 30 min
 
-    private final Timer timerBtcAverageGlobal = new Timer();
     private final Timer timerPoloniex = new Timer();
     private final Timer timerCoinmarketcap = new Timer();
 
@@ -65,10 +59,8 @@ public class ExchangeRateService {
     private final Map<String, ExchangeRateData> allPricesMap = new ConcurrentHashMap<>();
     private Map<String, ExchangeRateData> poloniexMap;
 
-    private long btcAverageTs;
     private long poloniexTs;
     private long coinmarketcapTs;
-    private long btcAverageGCount;
     private long poloniexCount;
     private long coinmarketcapCount;
 
@@ -92,18 +84,7 @@ public class ExchangeRateService {
     public void start() throws Exception {
 
         ((BitcoinAverage.Local)bitcoinAverageLocal).start();
-
-        timerBtcAverageGlobal.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                try {
-                    requestBtcAverageGlobalPrices();
-                } catch (IOException e) {
-                    log.warn(e.toString());
-                    e.printStackTrace();
-                }
-            }
-        }, INTERVAL_BTC_AV_GLOBAL_MS, INTERVAL_BTC_AV_GLOBAL_MS);
+        ((BitcoinAverage.Global)bitcoinAverageGlobal).start();
 
         timerPoloniex.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -129,7 +110,6 @@ public class ExchangeRateService {
             }
         }, INTERVAL_COIN_MARKET_CAP_MS, INTERVAL_COIN_MARKET_CAP_MS);
 
-        requestBtcAverageGlobalPrices();
         requestPoloniexPrices();
         requestCoinmarketcapPrices();
     }
@@ -171,35 +151,17 @@ public class ExchangeRateService {
         writeToJson();
     }
 
-    private void requestBtcAverageGlobalPrices() throws IOException {
-        long ts = System.currentTimeMillis();
-        Map<String, ExchangeRateData> map = bitcoinAverageGlobal.request();
-
-        if (map.get("USD") != null)
-            log.info("BTCAverage global USD (last):" + map.get("USD").getPrice());
-        log.info("requestBtcAverageGlobalPrices took {} ms.", (System.currentTimeMillis() - ts));
-
-        // removeOutdatedPrices(btcAverageLocalMap); // FIXME
-        removeOutdatedPrices(allPricesMap);
-        // we don't replace prices which we got form the local request, just in case the global data are received
-        // earlier at startup we allow them but the local request will overwrite them.
-        map.entrySet().stream()
-                // .filter(e -> btcAverageLocalMap == null || !btcAverageLocalMap.containsKey(e.getKey())) // FIXME
-                .forEach(e -> allPricesMap.put(e.getKey(), e.getValue()));
-        btcAverageTs = Instant.now().getEpochSecond();
-        btcAverageGCount = map.size();
-        writeToJson();
-    }
-
     private void writeToJson() {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("btcAverageTs", ((BitcoinAverage.Local)bitcoinAverageLocal).getTimestamp()); // FIXME
         map.put("poloniexTs", poloniexTs);
         map.put("coinmarketcapTs", coinmarketcapTs);
         map.put("btcAverageLCount", ((BitcoinAverage.Local)bitcoinAverageLocal).getCount()); // FIXME
-        map.put("btcAverageGCount", btcAverageGCount);
+        map.put("btcAverageGCount", ((BitcoinAverage.Global)bitcoinAverageGlobal).getCount()); // FIXME
         map.put("poloniexCount", poloniexCount);
         map.put("coinmarketcapCount", coinmarketcapCount);
+        // the order of the following two calls matters; if reversed, Local entries are overwritten by Global entries
+        allPricesMap.putAll(((BitcoinAverage.Global)bitcoinAverageGlobal).getData());
         allPricesMap.putAll(((BitcoinAverage.Local)bitcoinAverageLocal).getData());
         map.put("data", allPricesMap.values().toArray());
         json = Utilities.objectToJson(map);
