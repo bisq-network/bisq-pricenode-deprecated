@@ -160,7 +160,7 @@ public abstract class BitcoinAverage implements ExchangeRateProvider {
                 @Override
                 public void run() {
                     try {
-                        requestBtcAverageLocalPrices();
+                        requestAndCache();
                     } catch (Throwable e) {
                         log.warn(e.toString());
                         e.printStackTrace();
@@ -168,16 +168,16 @@ public abstract class BitcoinAverage implements ExchangeRateProvider {
                 }
             }, REQUEST_INTERVAL_MS, REQUEST_INTERVAL_MS);
 
-            requestBtcAverageLocalPrices();
+            requestAndCache();
         }
 
-        private void requestBtcAverageLocalPrices() throws IOException {
+        private void requestAndCache() throws IOException {
             long ts = System.currentTimeMillis();
             data = request();
 
             if (data.get("USD") != null)
                 log.info("BTCAverage local USD (last):" + data.get("USD").getPrice());
-            log.info("requestBtcAverageLocalPrices took {} ms.", (System.currentTimeMillis() - ts));
+            log.info("requestAndCache took {} ms.", (System.currentTimeMillis() - ts));
 
             // removeOutdatedPrices(allPricesMap); // FIXME
             // allPricesMap.putAll(data);
