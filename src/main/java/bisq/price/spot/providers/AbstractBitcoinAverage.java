@@ -45,9 +45,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class BtcAverageProvider implements ExchangeRateProvider {
+public abstract class AbstractBitcoinAverage implements ExchangeRateProvider {
 
-    private static final Logger log = LoggerFactory.getLogger(BtcAverageProvider.class);
+    private static final Logger log = LoggerFactory.getLogger(AbstractBitcoinAverage.class);
 
     protected final HttpClient httpClient;
 
@@ -55,7 +55,7 @@ public abstract class BtcAverageProvider implements ExchangeRateProvider {
     private SecretKey secretKey;
     private boolean configured = false;
 
-    public BtcAverageProvider() {
+    public AbstractBitcoinAverage() {
         this.httpClient = new HttpClient("https://apiv2.bitcoinaverage.com/");
     }
 

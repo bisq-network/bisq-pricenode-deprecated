@@ -24,7 +24,7 @@ import java.io.IOException;
 
 import java.util.Map;
 
-public class BitcoinAverageGlobal extends BtcAverageProvider {
+public class BitcoinAverageGlobal extends AbstractBitcoinAverage {
 
     @Override
     public Map<String, ExchangeRateData> request() throws IOException {
