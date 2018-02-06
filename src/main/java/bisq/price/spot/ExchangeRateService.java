@@ -59,8 +59,8 @@ public class ExchangeRateService {
 
         BitcoinAverage.Local exchangeRateProvider = bitcoinAverageLocal;
 
-        Map<? extends String, ? extends ExchangeRateData> providerData = exchangeRateProvider.getData();
-        Collection<? extends ExchangeRateData> prices = providerData.values();
+        Map<? extends String, ? extends ExchangeRateData> data = exchangeRateProvider.getData();
+        Collection<? extends ExchangeRateData> prices = data.values();
 
         String debugPrefix = exchangeRateProvider.getDebugPrefix();
         long count = prices.size();
@@ -72,29 +72,29 @@ public class ExchangeRateService {
                                 "No exchange rate data found for " + exchangeRateProvider))
                 .getTimestampSec();
 
-        Map<String, Object> map = new LinkedHashMap<>();
-        map.put("btcAverageTs", timestamp);
-        map.put(debugPrefix + "Ts", timestamp);
-        map.put("poloniexTs", poloniex.getTimestamp());
-        map.put("coinmarketcapTs", coinMarketCap.getTimestamp());
-        map.put(debugPrefix + "Count", count);
-        map.put("btcAverageGCount", bitcoinAverageGlobal.getCount());
-        map.put("poloniexCount", poloniex.getCount());
-        map.put("coinmarketcapCount", coinMarketCap.getCount());
+        Map<String, Object> allMarketPrices = new LinkedHashMap<>();
+        allMarketPrices.put("btcAverageTs", timestamp);
+        allMarketPrices.put(debugPrefix + "Ts", timestamp);
+        allMarketPrices.put("poloniexTs", poloniex.getTimestamp());
+        allMarketPrices.put("coinmarketcapTs", coinMarketCap.getTimestamp());
+        allMarketPrices.put(debugPrefix + "Count", count);
+        allMarketPrices.put("btcAverageGCount", bitcoinAverageGlobal.getCount());
+        allMarketPrices.put("poloniexCount", poloniex.getCount());
+        allMarketPrices.put("coinmarketcapCount", coinMarketCap.getCount());
 
-        Map<String, ExchangeRateData> data = new HashMap<>();
+        Map<String, ExchangeRateData> allData = new HashMap<>();
 
         // the order of the following two calls matters; we allow Global data to get overwritten by Local
-        data.putAll(bitcoinAverageGlobal.getData());
-        data.putAll(providerData);
+        allData.putAll(bitcoinAverageGlobal.getData());
+        allData.putAll(data);
 
         // the order of the following two calls matters; we allow CoinMarketCap data to get overwritten by Poloniex
-        data.putAll(coinMarketCap.getData());
-        data.putAll(poloniex.getData());
+        allData.putAll(coinMarketCap.getData());
+        allData.putAll(poloniex.getData());
 
-        map.put("data", removeOutdatedPrices(data).values().toArray());
+        allMarketPrices.put("data", removeOutdatedPrices(allData).values().toArray());
 
-        return map;
+        return allMarketPrices;
     }
 
     private Map<String, ExchangeRateData> removeOutdatedPrices(Map<String, ExchangeRateData> map) {
