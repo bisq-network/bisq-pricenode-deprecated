@@ -43,12 +43,12 @@ import java.util.stream.Collectors;
 
 import static java.lang.Double.parseDouble;
 
-public class CoinmarketcapProvider implements ExchangeRateProvider {
+public class CoinMarketCap implements ExchangeRateProvider {
 
     private final Set<String> supportedAltcoins;
     private final HttpClient httpClient;
 
-    public CoinmarketcapProvider() {
+    public CoinMarketCap() {
         this.httpClient = new HttpClient("https://api.coinmarketcap.com/");
         supportedAltcoins = CurrencyUtil.getAllSortedCryptoCurrencies().stream()
                 .map(TradeCurrency::getCode)

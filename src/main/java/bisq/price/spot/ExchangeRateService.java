@@ -19,15 +19,12 @@ package bisq.price.spot;
 
 import bisq.price.spot.providers.BitcoinAverageGlobal;
 import bisq.price.spot.providers.BitcoinAverageLocal;
-import bisq.price.spot.providers.CoinmarketcapProvider;
+import bisq.price.spot.providers.CoinMarketCap;
 import bisq.price.spot.providers.PoloniexProvider;
 
 import io.bisq.common.util.Utilities;
 
 import java.time.Instant;
-
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 
 import java.io.IOException;
 
@@ -86,11 +83,11 @@ public class ExchangeRateService {
     public ExchangeRateService(BitcoinAverageLocal bitcoinAverageLocal,
                                BitcoinAverageGlobal bitcoinAverageGlobal,
                                PoloniexProvider poloniexProvider,
-                               CoinmarketcapProvider coinmarketcapProvider){
+                               CoinMarketCap coinMarketCap){
         this.bitcoinAverageLocal = bitcoinAverageLocal;
         this.bitcoinAverageGlobal = bitcoinAverageGlobal;
         this.poloniexProvider = poloniexProvider;
-        this.coinmarketcapProvider = coinmarketcapProvider;
+        this.coinmarketcapProvider = coinMarketCap;
     }
 
     public String getJson() {

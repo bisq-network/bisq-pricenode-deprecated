@@ -22,7 +22,7 @@ import bisq.price.mining.FeeEstimationService;
 import bisq.price.spot.ExchangeRateService;
 import bisq.price.spot.providers.BitcoinAverageGlobal;
 import bisq.price.spot.providers.BitcoinAverageLocal;
-import bisq.price.spot.providers.CoinmarketcapProvider;
+import bisq.price.spot.providers.CoinMarketCap;
 import bisq.price.spot.providers.PoloniexProvider;
 import bisq.price.util.Environment;
 
@@ -41,7 +41,7 @@ public class Main {
                 bitcoinAverageLocal,
                 bitcoinAverageGlobal,
                 new PoloniexProvider(),
-                new CoinmarketcapProvider()
+                new CoinMarketCap()
         );
 
         FeeEstimationService feeEstimationService = new FeeEstimationService(FeeEstimationProvider.load(env));
