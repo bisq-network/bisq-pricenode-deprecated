@@ -42,6 +42,8 @@ import java.io.IOException;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -143,11 +145,65 @@ public abstract class BitcoinAverage implements ExchangeRateProvider {
 
     public static class Local extends BitcoinAverage {
 
+        private static final long INTERVAL_BTC_AV_LOCAL_MS = 90_000;      // 90 sec; 29760 requests for 31 days
+        private final Timer timerBtcAverageLocal = new Timer();
+        private long btcAverageTs;
+
+        private Map<String, ExchangeRateData> btcAverageLocalMap;
+        private long btcAverageLCount;
+        private Map<? extends String, ? extends ExchangeRateData> data;
+
+        //@Override // FIXME
+        public void start() throws Exception {
+
+            timerBtcAverageLocal.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    try {
+                        requestBtcAverageLocalPrices();
+                    } catch (Throwable e) {
+                        log.warn(e.toString());
+                        e.printStackTrace();
+                    }
+                }
+            }, INTERVAL_BTC_AV_LOCAL_MS, INTERVAL_BTC_AV_LOCAL_MS);
+
+            requestBtcAverageLocalPrices();
+        }
+
+        private void requestBtcAverageLocalPrices() throws IOException {
+            long ts = System.currentTimeMillis();
+            btcAverageLocalMap = request();
+
+            if (btcAverageLocalMap.get("USD") != null)
+                log.info("BTCAverage local USD (last):" + btcAverageLocalMap.get("USD").getPrice());
+            log.info("requestBtcAverageLocalPrices took {} ms.", (System.currentTimeMillis() - ts));
+
+            // removeOutdatedPrices(allPricesMap); // FIXME
+            // allPricesMap.putAll(btcAverageLocalMap);
+            btcAverageTs = Instant.now().getEpochSecond();
+            btcAverageLCount = btcAverageLocalMap.size();
+            // writeToJson();
+        }
+
+
         @Override
         public Map<String, ExchangeRateData> request() throws IOException {
             return getMap(
                     httpClient.requestWithGETNoProxy("indices/local/ticker/all?crypto=BTC", "X-signature", getHeader()),
                     ExchangeRateService.BTCAVERAGE_LOCAL_PROVIDER);
+        }
+
+        public long getTimestamp() {
+            return btcAverageTs;
+        }
+
+        public long getCount() {
+            return btcAverageLCount;
+        }
+
+        public Map<? extends String, ? extends ExchangeRateData> getData() {
+            return btcAverageLocalMap;
         }
     }
 }

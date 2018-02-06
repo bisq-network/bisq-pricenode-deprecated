@@ -33,7 +33,7 @@ public class ExchangeRateData {
         this.provider = provider;
     }
 
-    double getPrice() {
+    public double getPrice() {
         return this.price;
     }
 
