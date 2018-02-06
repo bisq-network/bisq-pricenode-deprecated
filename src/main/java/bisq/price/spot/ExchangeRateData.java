@@ -41,6 +41,10 @@ public class ExchangeRateData {
         return this.timestampSec;
     }
 
+    public String getProvider() {
+        return provider;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

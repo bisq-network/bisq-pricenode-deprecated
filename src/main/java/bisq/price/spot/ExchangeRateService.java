@@ -23,6 +23,7 @@ import bisq.price.spot.providers.Poloniex;
 
 import java.time.Instant;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -55,11 +56,26 @@ public class ExchangeRateService {
     }
 
     public Map<String, Object> getAllMarketPrices() {
+
+        BitcoinAverage.Local exchangeRateProvider = bitcoinAverageLocal;
+
+        Map<? extends String, ? extends ExchangeRateData> providerData = exchangeRateProvider.getData();
+        Collection<? extends ExchangeRateData> prices = providerData.values();
+
+        long count = prices.size();
+        long timestamp = prices.stream()
+                .filter(e -> exchangeRateProvider.getProviderSymbol().equals(e.getProvider()))
+                .findFirst()
+                .orElseThrow(() ->
+                        new IllegalStateException(
+                                "No exchange rate data found for " + exchangeRateProvider))
+                .getTimestampSec();
+
         Map<String, Object> map = new LinkedHashMap<>();
-        map.put("btcAverageTs", bitcoinAverageLocal.getTimestamp());
+        map.put("btcAverageTs", timestamp);
         map.put("poloniexTs", poloniex.getTimestamp());
         map.put("coinmarketcapTs", coinMarketCap.getTimestamp());
-        map.put("btcAverageLCount", bitcoinAverageLocal.getCount());
+        map.put("btcAverageLCount", count);
         map.put("btcAverageGCount", bitcoinAverageGlobal.getCount());
         map.put("poloniexCount", poloniex.getCount());
         map.put("coinmarketcapCount", coinMarketCap.getCount());
@@ -68,7 +84,7 @@ public class ExchangeRateService {
 
         // the order of the following two calls matters; we allow Global data to get overwritten by Local
         data.putAll(bitcoinAverageGlobal.getData());
-        data.putAll(bitcoinAverageLocal.getData());
+        data.putAll(providerData);
 
         // the order of the following two calls matters; we allow CoinMarketCap data to get overwritten by Poloniex
         data.putAll(coinMarketCap.getData());
