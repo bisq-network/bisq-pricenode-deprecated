@@ -76,17 +76,15 @@ public class ExchangeRateService {
         data.putAll(coinMarketCap.getData());
         data.putAll(poloniex.getData());
 
-        map.put("data", data.values().toArray());
+        map.put("data", removeOutdatedPrices(data).values().toArray());
         return Utilities.objectToJson(map);
     }
 
-    private void removeOutdatedPrices(Map<String, ExchangeRateData> map) {
+    private Map<String, ExchangeRateData> removeOutdatedPrices(Map<String, ExchangeRateData> map) {
         long now = Instant.now().getEpochSecond();
         long limit = now - MARKET_PRICE_TTL_SEC;
-        Map<String, ExchangeRateData> filtered = map.entrySet().stream()
+        return map.entrySet().stream()
                 .filter(e -> e.getValue().getTimestampSec() > limit)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        map.clear();
-        map.putAll(filtered);
     }
 }

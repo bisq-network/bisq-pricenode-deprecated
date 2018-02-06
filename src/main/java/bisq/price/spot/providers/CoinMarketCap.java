@@ -92,13 +92,7 @@ public class CoinMarketCap implements ExchangeRateProvider {
         long ts = System.currentTimeMillis();
         data = request();
         log.info("requestAndCache took {} ms.", (System.currentTimeMillis() - ts));
-        //removeOutdatedPrices(poloniexMap); // FIXME
-        //removeOutdatedPrices(allPricesMap); // FIXME
-        // we don't replace prices which we got form the Poloniex request, just in case the Coinmarketcap data are
-        // received earlier at startup we allow them but Poloniex will overwrite them.
-        // map.entrySet().stream()
-                //.filter(e -> poloniexMap == null || !poloniexMap.containsKey(e.getKey())) // FIXME
-                // .forEach(e -> allPricesMap.put(e.getKey(), e.getValue()));
+
         timestamp = Instant.now().getEpochSecond();
 
         if (data.get("LTC") != null)

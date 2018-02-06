@@ -168,7 +168,6 @@ public abstract class BitcoinAverage implements ExchangeRateProvider {
                 log.info("BTCAverage global USD (last):" + data.get("USD").getPrice());
             log.info("requestBtcAverageGlobalPrices took {} ms.", (System.currentTimeMillis() - ts));
 
-            // removeOutdatedPrices(allPricesMap); // FIXME
             timestamp = Instant.now().getEpochSecond();
         }
 
@@ -230,7 +229,6 @@ public abstract class BitcoinAverage implements ExchangeRateProvider {
                 log.info("BTCAverage local USD (last):" + data.get("USD").getPrice());
             log.info("requestAndCache took {} ms.", (System.currentTimeMillis() - ts));
 
-            // removeOutdatedPrices(allPricesMap); // FIXME
             timestamp = Instant.now().getEpochSecond();
         }
 

@@ -91,7 +91,7 @@ public class Poloniex implements ExchangeRateProvider {
         long ts = System.currentTimeMillis();
         data = request();
         log.info("requestAndCache took {} ms.", (System.currentTimeMillis() - ts));
-        //removeOutdatedPrices(allPricesMap); // FIXME
+
         timestamp = Instant.now().getEpochSecond();
 
         if (data.get("LTC") != null)
