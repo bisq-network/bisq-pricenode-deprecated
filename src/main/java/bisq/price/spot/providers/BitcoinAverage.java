@@ -145,18 +145,18 @@ public abstract class BitcoinAverage implements ExchangeRateProvider {
 
     public static class Local extends BitcoinAverage {
 
-        private static final long INTERVAL_BTC_AV_LOCAL_MS = 90_000;      // 90 sec; 29760 requests for 31 days
-        private final Timer timerBtcAverageLocal = new Timer();
-        private long btcAverageTs;
+        private static final long REQUEST_INTERVAL_MS = 90_000;      // 90 sec; 29760 requests for 31 days
 
-        private Map<String, ExchangeRateData> btcAverageLocalMap;
-        private long btcAverageLCount;
-        private Map<? extends String, ? extends ExchangeRateData> data;
+        private final Timer timer = new Timer();
+
+        private long timestamp;
+        private long count;
+        private Map<String, ExchangeRateData> data;
 
         //@Override // FIXME
         public void start() throws Exception {
 
-            timerBtcAverageLocal.scheduleAtFixedRate(new TimerTask() {
+            timer.scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {
                     try {
@@ -166,23 +166,23 @@ public abstract class BitcoinAverage implements ExchangeRateProvider {
                         e.printStackTrace();
                     }
                 }
-            }, INTERVAL_BTC_AV_LOCAL_MS, INTERVAL_BTC_AV_LOCAL_MS);
+            }, REQUEST_INTERVAL_MS, REQUEST_INTERVAL_MS);
 
             requestBtcAverageLocalPrices();
         }
 
         private void requestBtcAverageLocalPrices() throws IOException {
             long ts = System.currentTimeMillis();
-            btcAverageLocalMap = request();
+            data = request();
 
-            if (btcAverageLocalMap.get("USD") != null)
-                log.info("BTCAverage local USD (last):" + btcAverageLocalMap.get("USD").getPrice());
+            if (data.get("USD") != null)
+                log.info("BTCAverage local USD (last):" + data.get("USD").getPrice());
             log.info("requestBtcAverageLocalPrices took {} ms.", (System.currentTimeMillis() - ts));
 
             // removeOutdatedPrices(allPricesMap); // FIXME
-            // allPricesMap.putAll(btcAverageLocalMap);
-            btcAverageTs = Instant.now().getEpochSecond();
-            btcAverageLCount = btcAverageLocalMap.size();
+            // allPricesMap.putAll(data);
+            timestamp = Instant.now().getEpochSecond();
+            count = data.size();
             // writeToJson();
         }
 
@@ -195,15 +195,15 @@ public abstract class BitcoinAverage implements ExchangeRateProvider {
         }
 
         public long getTimestamp() {
-            return btcAverageTs;
+            return timestamp;
         }
 
         public long getCount() {
-            return btcAverageLCount;
+            return count;
         }
 
         public Map<? extends String, ? extends ExchangeRateData> getData() {
-            return btcAverageLocalMap;
+            return data;
         }
     }
 }
