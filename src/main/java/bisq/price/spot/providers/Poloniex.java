@@ -125,4 +125,9 @@ public class Poloniex extends AbstractExchangeRateProvider {
     public String getMetadataPrefix() {
         return "poloniex";
     }
+
+    @Override
+    public int getOrder() {
+        return 4;
+    }
 }

@@ -173,6 +173,11 @@ public abstract class BitcoinAverage extends AbstractExchangeRateProvider {
         public String getMetadataPrefix() {
             return "btcAverageG";
         }
+
+        @Override
+        public int getOrder() {
+            return 1;
+        }
     }
 
 
@@ -221,6 +226,11 @@ public abstract class BitcoinAverage extends AbstractExchangeRateProvider {
         @Override
         public String getMetadataPrefix() {
             return "btcAverageL";
+        }
+
+        @Override
+        public int getOrder() {
+            return 2;
         }
     }
 }

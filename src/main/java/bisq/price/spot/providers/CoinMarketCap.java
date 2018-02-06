@@ -112,4 +112,9 @@ public class CoinMarketCap extends AbstractExchangeRateProvider {
     public String getMetadataPrefix() {
         return "coinmarketcap";
     }
+
+    @Override
+    public int getOrder() {
+        return 3;
+    }
 }

@@ -19,10 +19,8 @@ package bisq.price.app;
 
 import bisq.price.mining.FeeEstimationProvider;
 import bisq.price.mining.FeeEstimationService;
+import bisq.price.spot.ExchangeRateProvider;
 import bisq.price.spot.ExchangeRateService;
-import bisq.price.spot.providers.BitcoinAverage;
-import bisq.price.spot.providers.CoinMarketCap;
-import bisq.price.spot.providers.Poloniex;
 import bisq.price.util.Environment;
 
 public class Main {
@@ -30,19 +28,7 @@ public class Main {
     public static void main(String[] args) throws Exception {
         Environment env = new Environment(args);
 
-        BitcoinAverage.Local bitcoinAverageLocal = new BitcoinAverage.Local();
-        BitcoinAverage.Global bitcoinAverageGlobal = new BitcoinAverage.Global();
-
-        bitcoinAverageLocal.configure(env);
-        bitcoinAverageGlobal.configure(env);
-
-        ExchangeRateService exchangeRateService = new ExchangeRateService(
-                bitcoinAverageLocal,
-                bitcoinAverageGlobal,
-                new Poloniex(),
-                new CoinMarketCap()
-        );
-
+        ExchangeRateService exchangeRateService = new ExchangeRateService(ExchangeRateProvider.loadAll(env));
         FeeEstimationService feeEstimationService = new FeeEstimationService(FeeEstimationProvider.load(env));
         feeEstimationService.configure(env);
 

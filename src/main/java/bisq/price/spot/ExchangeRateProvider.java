@@ -21,11 +21,15 @@ import bisq.price.util.Environment;
 
 import java.io.IOException;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 
 public interface ExchangeRateProvider {
 
-    Map<String,ExchangeRateData> request() throws IOException;
+    Map<String, ExchangeRateData> request() throws IOException;
 
     void configure(Environment env);
 
@@ -34,4 +38,23 @@ public interface ExchangeRateProvider {
     String getProviderSymbol();
 
     String getMetadataPrefix();
+
+    int getOrder();
+
+    static List<ExchangeRateProvider> loadAll(Environment env) {
+        ServiceLoader<ExchangeRateProvider> allProviders = ServiceLoader.load(ExchangeRateProvider.class);
+
+        ArrayList<ExchangeRateProvider> orderedProviders = new ArrayList<>();
+        for (ExchangeRateProvider provider : allProviders) {
+            orderedProviders.add(provider);
+        }
+
+        orderedProviders.sort(Comparator.comparingInt(ExchangeRateProvider::getOrder));
+
+        for (ExchangeRateProvider provider : orderedProviders) {
+            provider.configure(env);
+        }
+
+        return orderedProviders;
+    }
 }

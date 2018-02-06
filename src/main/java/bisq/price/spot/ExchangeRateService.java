@@ -19,36 +19,24 @@ package bisq.price.spot;
 
 import bisq.price.spot.providers.AbstractExchangeRateProvider;
 import bisq.price.spot.providers.BitcoinAverage;
-import bisq.price.spot.providers.CoinMarketCap;
-import bisq.price.spot.providers.Poloniex;
 
 import java.time.Instant;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ExchangeRateService {
 
     private static final long MARKET_PRICE_TTL_SEC = 1800; // 30 min
 
-    private final Set<ExchangeRateProvider> providers;
+    private final List<ExchangeRateProvider> providers;
 
-    public ExchangeRateService(BitcoinAverage.Local bitcoinAverageLocal,
-                               BitcoinAverage.Global bitcoinAverageGlobal,
-                               Poloniex poloniex,
-                               CoinMarketCap coinMarketCap) {
-
-        this.providers = new LinkedHashSet<ExchangeRateProvider>() {{
-            add(bitcoinAverageGlobal);
-            add(bitcoinAverageLocal);
-            add(coinMarketCap);
-            add(poloniex);
-        }};
+    public ExchangeRateService(List<ExchangeRateProvider> providers) {
+        this.providers = providers;
     }
 
     public void start() throws Exception {
