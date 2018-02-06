@@ -28,4 +28,10 @@ public interface ExchangeRateProvider {
     Map<String,ExchangeRateData> request() throws IOException;
 
     void configure(Environment env);
+
+    Map<? extends String, ? extends ExchangeRateData> getData();
+
+    String getProviderSymbol();
+
+    String getDebugPrefix();
 }

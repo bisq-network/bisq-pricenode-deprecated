@@ -170,8 +170,19 @@ public abstract class BitcoinAverage extends AbstractExchangeRateProvider {
             return data.size();
         }
 
+        @Override
         public Map<? extends String, ? extends ExchangeRateData> getData() {
             return data;
+        }
+
+        @Override
+        public String getProviderSymbol() {
+            return PROVIDER_SYMBOL;
+        }
+
+        @Override
+        public String getDebugPrefix() {
+            return "btcAverageG";
         }
     }
 
@@ -208,14 +219,17 @@ public abstract class BitcoinAverage extends AbstractExchangeRateProvider {
                     PROVIDER_SYMBOL);
         }
 
+        @Override
         public Map<? extends String, ? extends ExchangeRateData> getData() {
             return data;
         }
 
+        @Override
         public String getProviderSymbol() {
             return PROVIDER_SYMBOL;
         }
 
+        @Override
         public String getDebugPrefix() {
             return "btcAverageL";
         }

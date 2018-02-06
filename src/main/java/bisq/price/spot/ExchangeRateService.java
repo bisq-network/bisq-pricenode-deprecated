@@ -57,7 +57,7 @@ public class ExchangeRateService {
 
     public Map<String, Object> getAllMarketPrices() {
 
-        BitcoinAverage.Local exchangeRateProvider = bitcoinAverageLocal;
+        ExchangeRateProvider exchangeRateProvider = bitcoinAverageLocal;
 
         Map<? extends String, ? extends ExchangeRateData> data = exchangeRateProvider.getData();
         Collection<? extends ExchangeRateData> prices = data.values();

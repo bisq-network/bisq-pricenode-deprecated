@@ -109,7 +109,18 @@ public class CoinMarketCap extends AbstractExchangeRateProvider {
         return data.size();
     }
 
+    @Override
     public Map<? extends String, ? extends ExchangeRateData> getData() {
         return data;
+    }
+
+    @Override
+    public String getProviderSymbol() {
+        return PROVIDER_SYMBOL;
+    }
+
+    @Override
+    public String getDebugPrefix() {
+        return "coinmarketcap";
     }
 }
