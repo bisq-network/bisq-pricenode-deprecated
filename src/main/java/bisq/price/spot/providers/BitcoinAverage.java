@@ -153,7 +153,6 @@ public abstract class BitcoinAverage implements ExchangeRateProvider {
         private long timestamp;
         private Map<String, ExchangeRateData> data;
 
-        //@Override // FIXME
         public void start() throws Exception {
 
             timer.scheduleAtFixedRate(new TimerTask() {
@@ -180,9 +179,7 @@ public abstract class BitcoinAverage implements ExchangeRateProvider {
             log.info("requestAndCache took {} ms.", (System.currentTimeMillis() - ts));
 
             // removeOutdatedPrices(allPricesMap); // FIXME
-            // allPricesMap.putAll(data);
             timestamp = Instant.now().getEpochSecond();
-            // writeToJson();
         }
 
 
