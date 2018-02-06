@@ -25,28 +25,14 @@ import io.bisq.common.util.Utilities;
 
 import java.time.Instant;
 
-import java.io.IOException;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class ExchangeRateService {
 
-    private static final Logger log = LoggerFactory.getLogger(ExchangeRateService.class);
-
-    public static final String COINMKTC_PROVIDER = "CMC";
-
-    private static final long INTERVAL_COIN_MARKET_CAP_MS = 300_000;  // 5 min that data structure is quite heavy so we don't request too often.
-    private static final long MARKET_PRICE_TTL_SEC = 1800;            // 30 min
-
-    private final Timer timerCoinmarketcap = new Timer();
+    private static final long MARKET_PRICE_TTL_SEC = 1800; // 30 min
 
     private final BitcoinAverage.Local bitcoinAverageLocal;
     private final BitcoinAverage.Global bitcoinAverageGlobal;
@@ -54,9 +40,6 @@ public class ExchangeRateService {
     private final CoinMarketCap coinMarketCap;
 
     private final Map<String, ExchangeRateData> allPricesMap = new ConcurrentHashMap<>();
-
-    private long coinmarketcapTs;
-    private long coinmarketcapCount;
 
     private String json;
 
@@ -76,60 +59,30 @@ public class ExchangeRateService {
     }
 
     public void start() throws Exception {
-
         bitcoinAverageLocal.start();
         bitcoinAverageGlobal.start();
         poloniex.start();
-
-        timerCoinmarketcap.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                try {
-                    requestCoinmarketcapPrices();
-                } catch (IOException e) {
-                    log.warn(e.toString());
-                    e.printStackTrace();
-                }
-            }
-        }, INTERVAL_COIN_MARKET_CAP_MS, INTERVAL_COIN_MARKET_CAP_MS);
-
-        requestCoinmarketcapPrices();
-    }
-
-
-    private void requestCoinmarketcapPrices() throws IOException {
-        long ts = System.currentTimeMillis();
-        Map<String, ExchangeRateData> map = coinMarketCap.request();
-        log.info("requestCoinmarketcapPrices took {} ms.", (System.currentTimeMillis() - ts));
-        //removeOutdatedPrices(poloniexMap); // FIXME
-        removeOutdatedPrices(allPricesMap);
-        // we don't replace prices which we got form the Poloniex request, just in case the Coinmarketcap data are
-        // received earlier at startup we allow them but Poloniex will overwrite them.
-        map.entrySet().stream()
-                //.filter(e -> poloniexMap == null || !poloniexMap.containsKey(e.getKey())) // FIXME
-                .forEach(e -> allPricesMap.put(e.getKey(), e.getValue()));
-        coinmarketcapTs = Instant.now().getEpochSecond();
-        coinmarketcapCount = map.size();
-
-        if (map.get("LTC") != null)
-            log.info("Coinmarketcap LTC (last): " + map.get("LTC").getPrice());
-
-        writeToJson();
+        coinMarketCap.start();
     }
 
     private void writeToJson() {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("btcAverageTs", bitcoinAverageLocal.getTimestamp()); // FIXME
         map.put("poloniexTs", poloniex.getTimestamp());
-        map.put("coinmarketcapTs", coinmarketcapTs);
+        map.put("coinmarketcapTs", coinMarketCap.getTimestamp());
         map.put("btcAverageLCount", bitcoinAverageLocal.getCount()); // FIXME
         map.put("btcAverageGCount", bitcoinAverageGlobal.getCount()); // FIXME
         map.put("poloniexCount", poloniex.getCount());
-        map.put("coinmarketcapCount", coinmarketcapCount);
-        // the order of the following two calls matters; if reversed, Local entries are overwritten by Global entries
+        map.put("coinmarketcapCount", coinMarketCap.getCount());
+
+        // the order of the following two calls matters; we allow Global data to get overwritten by Local
         allPricesMap.putAll(bitcoinAverageGlobal.getData());
         allPricesMap.putAll(bitcoinAverageLocal.getData());
+
+        // the order of the following two calls matters; we allow CoinMarketCap data to get overwritten by Poloniex
+        allPricesMap.putAll(coinMarketCap.getData());
         allPricesMap.putAll(poloniex.getData());
+
         map.put("data", allPricesMap.values().toArray());
         json = Utilities.objectToJson(map);
     }
