@@ -170,7 +170,7 @@ public abstract class BitcoinAverage extends AbstractExchangeRateProvider {
         }
 
         @Override
-        public String getDebugPrefix() {
+        public String getMetadataPrefix() {
             return "btcAverageG";
         }
     }
@@ -219,7 +219,7 @@ public abstract class BitcoinAverage extends AbstractExchangeRateProvider {
         }
 
         @Override
-        public String getDebugPrefix() {
+        public String getMetadataPrefix() {
             return "btcAverageL";
         }
     }

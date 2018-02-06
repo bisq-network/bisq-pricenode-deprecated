@@ -72,7 +72,7 @@ public class ExchangeRateService {
         for (ExchangeRateProvider provider : providers) {
             Collection<? extends ExchangeRateData> prices = provider.getData().values();
 
-            String debugPrefix = provider.getDebugPrefix();
+            String debugPrefix = provider.getMetadataPrefix();
             long count = prices.size();
             long timestamp = findFirstTimestampForProvider(prices, provider.getProviderSymbol());
 

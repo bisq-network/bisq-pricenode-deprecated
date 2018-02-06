@@ -33,5 +33,5 @@ public interface ExchangeRateProvider {
 
     String getProviderSymbol();
 
-    String getDebugPrefix();
+    String getMetadataPrefix();
 }
