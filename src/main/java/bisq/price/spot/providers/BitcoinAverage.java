@@ -51,11 +51,11 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
 
     public BitcoinAverage(String symbol,
                           String metadataPrefix,
-                          long requestIntervalMs) {
+                          long ttl) {
         super(
                 symbol,
                 metadataPrefix,
-                requestIntervalMs
+                ttl
         );
         this.httpClient = new HttpClient("https://apiv2.bitcoinaverage.com/");
     }

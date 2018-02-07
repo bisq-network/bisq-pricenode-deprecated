@@ -28,13 +28,13 @@ import java.util.TimerTask;
 public abstract class CachingExchangeRateProvider extends AbstractExchangeRateProvider {
 
     private final Timer timer = new Timer();
-    private final long requestIntervalMs;
+    private final long ttl;
 
     protected Map<String, ExchangeRateData> data;
 
-    public CachingExchangeRateProvider(String symbol, String metadataPrefix, long requestIntervalMs) {
+    public CachingExchangeRateProvider(String symbol, String metadataPrefix, long ttl) {
         super(symbol, metadataPrefix);
-        this.requestIntervalMs = requestIntervalMs;
+        this.ttl = ttl;
     }
 
     public final void start() throws IOException {
@@ -48,7 +48,7 @@ public abstract class CachingExchangeRateProvider extends AbstractExchangeRatePr
                     e.printStackTrace();
                 }
             }
-        }, requestIntervalMs, requestIntervalMs);
+        }, ttl, ttl);
 
         requestAndCache();
     }
