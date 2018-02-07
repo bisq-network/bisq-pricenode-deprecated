@@ -82,21 +82,6 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
         this.privKey = env.getRequiredVar("BITCOIN_AVG_PRIVKEY");
     }
 
-    protected String getHeader() throws IOException {
-
-        String algorithm = "HmacSHA256";
-        SecretKey secretKey = new SecretKeySpec(privKey.getBytes(), algorithm);
-
-        try {
-            String payload = Instant.now().getEpochSecond() + "." + pubKey;
-            Mac mac = Mac.getInstance(algorithm);
-            mac.init(secretKey);
-            return payload + "." + Hex.toHexString(mac.doFinal(payload.getBytes()));
-        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
-            throw new IOException(e);
-        }
-    }
-
     @Override
     public Map<String, ExchangeRateData> doRequestForCaching() throws IOException {
         Map<String, ExchangeRateData> marketPriceMap = new HashMap<>();
@@ -132,6 +117,20 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
             }
         });
         return marketPriceMap;
+    }
+
+    protected String getHeader() throws IOException {
+        String algorithm = "HmacSHA256";
+        SecretKey secretKey = new SecretKeySpec(privKey.getBytes(), algorithm);
+
+        try {
+            String payload = Instant.now().getEpochSecond() + "." + pubKey;
+            Mac mac = Mac.getInstance(algorithm);
+            mac.init(secretKey);
+            return payload + "." + Hex.toHexString(mac.doFinal(payload.getBytes()));
+        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+            throw new IOException(e);
+        }
     }
 
 
