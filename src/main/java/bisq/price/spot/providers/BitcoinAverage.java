@@ -61,16 +61,8 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
     private String pubKey;
     private String privKey;
 
-    public BitcoinAverage(String symbol,
-                          String metadataPrefix,
-                          double pctMaxRequests,
-                          String uriPath) {
-        super(
-                symbol,
-                metadataPrefix,
-                ttlFor(pctMaxRequests)
-        );
-
+    public BitcoinAverage(String symbol, String metadataPrefix, double pctMaxRequests, String uriPath) {
+        super(symbol, metadataPrefix, ttlFor(pctMaxRequests));
         this.uriPath = uriPath;
     }
 
@@ -144,7 +136,7 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
     private Long getTimestampFromAllTickerData(Map<String, Object> allTickerData) {
         return allTickerData.entrySet().stream()
                 .filter(e -> "timestamp".equals(e.getKey()))
-                .map(e -> Long.valueOf((String)e.getValue()))
+                .map(e -> Long.valueOf((String) e.getValue()))
                 .findFirst()
                 .orElse(Instant.now().getEpochSecond());
     }
