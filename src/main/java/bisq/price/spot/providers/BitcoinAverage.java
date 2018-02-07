@@ -41,7 +41,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class BitcoinAverage extends AbstractExchangeRateProvider {
+public abstract class BitcoinAverage extends CachingExchangeRateProvider {
 
     protected final HttpClient httpClient;
 

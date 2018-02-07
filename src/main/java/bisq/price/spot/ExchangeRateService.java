@@ -17,8 +17,8 @@
 
 package bisq.price.spot;
 
-import bisq.price.spot.providers.AbstractExchangeRateProvider;
 import bisq.price.spot.providers.BitcoinAverage;
+import bisq.price.spot.providers.CachingExchangeRateProvider;
 
 import java.time.Instant;
 
@@ -41,8 +41,8 @@ public class ExchangeRateService {
 
     public void start() throws Exception {
         for (ExchangeRateProvider provider : providers) {
-            if (provider instanceof AbstractExchangeRateProvider) {
-                ((AbstractExchangeRateProvider) provider).start();
+            if (provider instanceof CachingExchangeRateProvider) {
+                ((CachingExchangeRateProvider) provider).start();
             }
         }
     }

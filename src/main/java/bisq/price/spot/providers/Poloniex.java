@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 
 import static java.lang.Double.parseDouble;
 
-public class Poloniex extends AbstractExchangeRateProvider {
+public class Poloniex extends CachingExchangeRateProvider {
 
     private final Set<String> supportedAltcoins;
     private final HttpClient httpClient;
