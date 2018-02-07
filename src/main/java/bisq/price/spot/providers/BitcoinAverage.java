@@ -146,7 +146,7 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
         }
 
         @Override
-        public Map<String, ExchangeRateData> request() throws IOException {
+        public Map<String, ExchangeRateData> doRequest() throws IOException {
             return getMap(
                     httpClient.requestWithGETNoProxy("indices/global/ticker/all?crypto=BTC", "X-signature", getHeader()),
                     getProviderSymbol());
@@ -168,7 +168,7 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
         }
 
         @Override
-        public Map<String, ExchangeRateData> request() throws IOException {
+        public Map<String, ExchangeRateData> doRequest() throws IOException {
             return getMap(
                     httpClient.requestWithGETNoProxy("indices/local/ticker/all?crypto=BTC", "X-signature", getHeader()),
                     getProviderSymbol());

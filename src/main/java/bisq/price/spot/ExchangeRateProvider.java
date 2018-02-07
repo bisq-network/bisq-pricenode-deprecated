@@ -33,8 +33,6 @@ public interface ExchangeRateProvider {
 
     void configure(Environment env);
 
-    Map<String, ExchangeRateData> getData();
-
     String getProviderSymbol();
 
     String getMetadataPrefix();

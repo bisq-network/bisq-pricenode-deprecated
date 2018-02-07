@@ -58,7 +58,8 @@ public class CoinMarketCap extends CachingExchangeRateProvider {
                 .collect(Collectors.toSet());
     }
 
-    public Map<String, ExchangeRateData> request() throws IOException {
+    @Override
+    public Map<String, ExchangeRateData> doRequest() throws IOException {
         Map<String, ExchangeRateData> marketPriceMap = new HashMap<>();
         String response = httpClient.requestWithGET("v1/ticker/?limit=200", "User-Agent", "");
         //noinspection unchecked

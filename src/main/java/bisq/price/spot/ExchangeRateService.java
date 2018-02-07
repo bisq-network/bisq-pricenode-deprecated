@@ -22,6 +22,8 @@ import bisq.price.spot.providers.CachingExchangeRateProvider;
 
 import java.time.Instant;
 
+import java.io.IOException;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -47,7 +49,7 @@ public class ExchangeRateService {
         }
     }
 
-    public Map<String, Object> getAllMarketPrices() {
+    public Map<String, Object> getAllMarketPrices() throws IOException {
         Map<String, Object> allMarketPrices = new LinkedHashMap<>();
 
         addMetadata(allMarketPrices);
@@ -56,9 +58,9 @@ public class ExchangeRateService {
         return allMarketPrices;
     }
 
-    private void addMetadata(Map<String, Object> allMarketPrices) {
+    private void addMetadata(Map<String, Object> allMarketPrices) throws IOException {
         for (ExchangeRateProvider provider : providers) {
-            Collection<ExchangeRateData> prices = provider.getData().values();
+            Collection<ExchangeRateData> prices = provider.request().values();
 
             String debugPrefix = provider.getMetadataPrefix();
             long count = prices.size();
@@ -74,11 +76,11 @@ public class ExchangeRateService {
         }
     }
 
-    private void addData(Map<String, Object> allMarketPrices) {
+    private void addData(Map<String, Object> allMarketPrices) throws IOException {
         Map<String, ExchangeRateData> allData = new HashMap<>();
 
         for (ExchangeRateProvider provider : providers) {
-            allData.putAll(provider.getData());
+            allData.putAll(provider.request());
         }
 
         allMarketPrices.put("data", removeOutdatedPrices(allData).values().toArray());

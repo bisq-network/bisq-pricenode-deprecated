@@ -56,7 +56,7 @@ public abstract class CachingExchangeRateProvider extends AbstractExchangeRatePr
     public void requestAndCache() throws IOException {
         long ts = System.currentTimeMillis();
 
-        data = request();
+        data = doRequest();
 
         if (data.get("USD") != null) {
             log.info("BTC/USD: {}", data.get("USD").getPrice());
@@ -68,8 +68,10 @@ public abstract class CachingExchangeRateProvider extends AbstractExchangeRatePr
         log.info("requestAndCache took {} ms.", (System.currentTimeMillis() - ts));
     }
 
+    protected abstract Map<String, ExchangeRateData> doRequest() throws IOException;
+
     @Override
-    public Map<String, ExchangeRateData> getData() {
+    public final Map<String, ExchangeRateData> request() {
         return data;
     }
 }
