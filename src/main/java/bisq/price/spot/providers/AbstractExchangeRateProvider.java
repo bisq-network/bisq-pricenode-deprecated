@@ -17,8 +17,13 @@
 
 package bisq.price.spot.providers;
 
+import bisq.price.spot.ExchangeRateData;
 import bisq.price.spot.ExchangeRateProvider;
 import bisq.price.util.Environment;
+
+import java.io.IOException;
+
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +31,8 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractExchangeRateProvider implements ExchangeRateProvider {
 
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
+
+    private boolean configured;
 
     private final String symbol;
     private final String metadataPrefix;
@@ -37,9 +44,24 @@ public abstract class AbstractExchangeRateProvider implements ExchangeRateProvid
     }
 
     @Override
-    public void configure(Environment env) {
-        // no-op at this level; subclasses can override as necessary.
+    public final void configure(Environment env) {
+        doConfigure(env);
+        configured = true;
     }
+
+    protected void doConfigure(Environment env) {
+        // no-op by default; subclasses can override as necessary
+    }
+
+    @Override
+    public final Map<String, ExchangeRateData> request() throws IOException {
+        if (!configured) {
+            throw new IllegalStateException("'configure' method was not called");
+        }
+        return doRequest();
+    }
+
+    protected abstract Map<String, ExchangeRateData> doRequest() throws IOException;
 
     @Override
     public String getProviderSymbol() {

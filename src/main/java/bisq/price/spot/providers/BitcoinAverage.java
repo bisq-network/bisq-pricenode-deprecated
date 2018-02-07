@@ -55,7 +55,6 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
 
     private String pubKey;
     private String privKey;
-    private boolean configured = false;
 
     public BitcoinAverage(String symbol,
                           String metadataPrefix,
@@ -75,14 +74,12 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
     }
 
     @Override
-    public void configure(Environment env) {
+    public void doConfigure(Environment env) {
         this.pubKey = env.getRequiredVar("BITCOIN_AVG_PUBKEY");
         this.privKey = env.getRequiredVar("BITCOIN_AVG_PRIVKEY");
-        this.configured = true;
     }
 
     protected String getHeader() throws IOException {
-        assertConfigured();
 
         String algorithm = "HmacSHA256";
         SecretKey secretKey = new SecretKeySpec(privKey.getBytes(), algorithm);
@@ -98,7 +95,6 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
     }
 
     protected Map<String, ExchangeRateData> getMap(String json, String provider) {
-        assertConfigured();
 
         Map<String, ExchangeRateData> marketPriceMap = new HashMap<>();
         LinkedTreeMap<String, Object> treeMap = new Gson().<LinkedTreeMap<String, Object>>fromJson(json, LinkedTreeMap.class);
@@ -134,11 +130,6 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
         return marketPriceMap;
     }
 
-    private void assertConfigured() {
-        if (!configured)
-            throw new IllegalStateException("'configure' method was not called");
-    }
-
 
     public static class Global extends BitcoinAverage {
 
@@ -157,7 +148,7 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
         }
 
         @Override
-        public Map<String, ExchangeRateData> doRequest() throws IOException {
+        public Map<String, ExchangeRateData> doRequestForCaching() throws IOException {
             return getMap(
                     httpClient.requestWithGETNoProxy("indices/global/ticker/all?crypto=BTC", "X-signature", getHeader()),
                     getProviderSymbol());
@@ -182,7 +173,7 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
         }
 
         @Override
-        public Map<String, ExchangeRateData> doRequest() throws IOException {
+        public Map<String, ExchangeRateData> doRequestForCaching() throws IOException {
             return getMap(
                     httpClient.requestWithGETNoProxy("indices/local/ticker/all?crypto=BTC", "X-signature", getHeader()),
                     getProviderSymbol());

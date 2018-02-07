@@ -58,7 +58,7 @@ public class Poloniex extends CachingExchangeRateProvider {
     }
 
     @Override
-    public Map<String, ExchangeRateData> doRequest() throws IOException {
+    public Map<String, ExchangeRateData> doRequestForCaching() throws IOException {
         Map<String, ExchangeRateData> marketPriceMap = new HashMap<>();
         String response = httpClient.requestWithGET("?command=returnTicker", "User-Agent", "");
         //noinspection unchecked
