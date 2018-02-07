@@ -54,7 +54,7 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
     protected final HttpClient httpClient;
 
     private String pubKey;
-    private SecretKey secretKey;
+    private String privKey;
     private boolean configured = false;
 
     public BitcoinAverage(String symbol,
@@ -76,24 +76,20 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
 
     @Override
     public void configure(Environment env) {
-        configure(
-                env.getRequiredVar("BITCOIN_AVG_PUBKEY"),
-                env.getRequiredVar("BITCOIN_AVG_PRIVKEY")
-        );
-    }
-
-    public void configure(String pubKey, String privKey) {
-        this.pubKey = pubKey;
-        this.secretKey = new SecretKeySpec(privKey.getBytes(), "HmacSHA256");
+        this.pubKey = env.getRequiredVar("BITCOIN_AVG_PUBKEY");
+        this.privKey = env.getRequiredVar("BITCOIN_AVG_PRIVKEY");
         this.configured = true;
     }
 
     protected String getHeader() throws IOException {
         assertConfigured();
 
+        String algorithm = "HmacSHA256";
+        SecretKey secretKey = new SecretKeySpec(privKey.getBytes(), algorithm);
+
         try {
             String payload = Instant.now().getEpochSecond() + "." + pubKey;
-            Mac mac = Mac.getInstance("HmacSHA256");
+            Mac mac = Mac.getInstance(algorithm);
             mac.init(secretKey);
             return payload + "." + Hex.toHexString(mac.doFinal(payload.getBytes()));
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
