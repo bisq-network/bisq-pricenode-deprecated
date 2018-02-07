@@ -19,6 +19,8 @@ package bisq.price.spot.providers;
 
 import bisq.price.spot.ExchangeRateData;
 
+import java.time.Duration;
+
 import java.io.IOException;
 
 import java.util.Map;
@@ -28,13 +30,14 @@ import java.util.TimerTask;
 public abstract class CachingExchangeRateProvider extends AbstractExchangeRateProvider {
 
     private final Timer timer = new Timer();
-    private final long ttl;
+    private final Duration ttl;
 
     protected Map<String, ExchangeRateData> data;
 
-    public CachingExchangeRateProvider(String symbol, String metadataPrefix, long ttl) {
+    public CachingExchangeRateProvider(String symbol, String metadataPrefix, Duration ttl) {
         super(symbol, metadataPrefix);
         this.ttl = ttl;
+        log.info("will refresh exchange rate data every {}", ttl);
     }
 
     public final void start() throws IOException {
@@ -48,7 +51,7 @@ public abstract class CachingExchangeRateProvider extends AbstractExchangeRatePr
                     e.printStackTrace();
                 }
             }
-        }, ttl, ttl);
+        }, ttl.toMillis(), ttl.toMillis());
 
         requestAndCache();
     }

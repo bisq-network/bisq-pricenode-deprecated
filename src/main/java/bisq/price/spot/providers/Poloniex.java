@@ -27,6 +27,7 @@ import io.bisq.common.locale.TradeCurrency;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 
+import java.time.Duration;
 import java.time.Instant;
 
 import java.io.IOException;
@@ -47,7 +48,7 @@ public class Poloniex extends CachingExchangeRateProvider {
         super(
                 "POLO",
                 "poloniex",
-                60_000 // 1 min
+                Duration.ofMinutes(1)
         );
         this.httpClient = new HttpClient("https://poloniex.com/public");
 

@@ -27,6 +27,7 @@ import io.bisq.common.locale.TradeCurrency;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 
+import java.time.Duration;
 import java.time.Instant;
 
 import java.io.IOException;
@@ -49,7 +50,7 @@ public class CoinMarketCap extends CachingExchangeRateProvider {
         super(
                 "CMC",
                 "coinmarketcap",
-                300_000  // 5 min: large data structure; don't request too often
+                Duration.ofMinutes(5) // large data structure, so don't request it too often
         );
         this.httpClient = new HttpClient("https://api.coinmarketcap.com/");
         supportedAltcoins = CurrencyUtil.getAllSortedCryptoCurrencies().stream()

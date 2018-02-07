@@ -31,6 +31,7 @@ import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import java.time.Duration;
 import java.time.Instant;
 
 import java.security.InvalidKeyException;
@@ -43,6 +44,13 @@ import java.util.Map;
 
 public abstract class BitcoinAverage extends CachingExchangeRateProvider {
 
+    /**
+     * Max number of requests allowed per month on the BitcoinAverage developer plan.
+     * Note the actual max value is 45,000; we use the more conservative value below to
+     * ensure we do not exceed it. See https://bitcoinaverage.com/en/plans.
+     */
+    private static final double MAX_REQUESTS_PER_MONTH = 42_514;
+
     protected final HttpClient httpClient;
 
     private String pubKey;
@@ -51,12 +59,13 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
 
     public BitcoinAverage(String symbol,
                           String metadataPrefix,
-                          long ttl) {
+                          double pctMaxRequests) {
         super(
                 symbol,
                 metadataPrefix,
-                ttl
+                Duration.ofDays(31).dividedBy((long) (MAX_REQUESTS_PER_MONTH * pctMaxRequests))
         );
+
         this.httpClient = new HttpClient("https://apiv2.bitcoinaverage.com/");
     }
 
@@ -132,13 +141,17 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
 
     public static class Global extends BitcoinAverage {
 
+        /**
+         * The percentage of {@link BitcoinAverage#MAX_REQUESTS_PER_MONTH} this
+         * provider should consume.
+         */
+        static double PCT_MAX_REQUESTS = 0.3;
+
         public Global() {
-            // We adjust the request interval to fit into BitcoinAverage developer plan (45k request per month).
-            // We get 42514 (29760+12754) request with below numbers. See Local numbers as well.
             super(
                     "BTCA_G",
                     "btcAverageG",
-                    210_000 // 3.5 min; 12754 req/mo;
+                    PCT_MAX_REQUESTS
             );
         }
 
@@ -153,13 +166,17 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
 
     public static class Local extends BitcoinAverage {
 
+        /**
+         * The percentage of {@link BitcoinAverage#MAX_REQUESTS_PER_MONTH} this
+         * provider should consume.
+         */
+        static double PCT_MAX_REQUESTS = 1 - Global.PCT_MAX_REQUESTS;
+
         public Local() {
-            // We adjust the request interval to fit into BitcoinAverage developer plan (45k request per month).
-            // We get 42514 (29760+12754) request with below numbers. See Global numbers as well.
             super(
                     "BTCA_L",
                     "btcAverageL",
-                    90_000 // 90 sec; 29760 requests per month
+                    PCT_MAX_REQUESTS
             );
         }
 
