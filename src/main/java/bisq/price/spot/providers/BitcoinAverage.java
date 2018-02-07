@@ -52,21 +52,23 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
      */
     private static final double MAX_REQUESTS_PER_MONTH = 42_514;
 
-    protected final HttpClient httpClient;
+    private final HttpClient httpClient = new HttpClient("https://apiv2.bitcoinaverage.com/");
+    private final String uriPath;
 
     private String pubKey;
     private String privKey;
 
     public BitcoinAverage(String symbol,
                           String metadataPrefix,
-                          double pctMaxRequests) {
+                          double pctMaxRequests,
+                          String uriPath) {
         super(
                 symbol,
                 metadataPrefix,
                 ttlFor(pctMaxRequests)
         );
 
-        this.httpClient = new HttpClient("https://apiv2.bitcoinaverage.com/");
+        this.uriPath = uriPath;
     }
 
     private static Duration ttlFor(double pctMaxRequests) {
@@ -78,6 +80,13 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
     public void doConfigure(Environment env) {
         this.pubKey = env.getRequiredVar("BITCOIN_AVG_PUBKEY");
         this.privKey = env.getRequiredVar("BITCOIN_AVG_PRIVKEY");
+    }
+
+    @Override
+    public Map<String, ExchangeRateData> doRequestForCaching() throws IOException {
+        return getMap(
+                httpClient.requestWithGETNoProxy(uriPath, "X-signature", getHeader()),
+                getProviderSymbol());
     }
 
     protected String getHeader() throws IOException {
@@ -144,15 +153,9 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
             super(
                     "BTCA_G",
                     "btcAverageG",
-                    PCT_MAX_REQUESTS
+                    PCT_MAX_REQUESTS,
+                   "indices/global/ticker/all?crypto=BTC"
             );
-        }
-
-        @Override
-        public Map<String, ExchangeRateData> doRequestForCaching() throws IOException {
-            return getMap(
-                    httpClient.requestWithGETNoProxy("indices/global/ticker/all?crypto=BTC", "X-signature", getHeader()),
-                    getProviderSymbol());
         }
     }
 
@@ -169,15 +172,9 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
             super(
                     "BTCA_L",
                     "btcAverageL",
-                    PCT_MAX_REQUESTS
+                    PCT_MAX_REQUESTS,
+                    "indices/local/ticker/all?crypto=BTC"
             );
-        }
-
-        @Override
-        public Map<String, ExchangeRateData> doRequestForCaching() throws IOException {
-            return getMap(
-                    httpClient.requestWithGETNoProxy("indices/local/ticker/all?crypto=BTC", "X-signature", getHeader()),
-                    getProviderSymbol());
         }
     }
 }
