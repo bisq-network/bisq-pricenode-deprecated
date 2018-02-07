@@ -23,8 +23,10 @@ import bisq.price.util.Environment;
 
 import io.bisq.network.http.HttpClient;
 
-import com.google.gson.Gson;
-import com.google.gson.internal.LinkedTreeMap;
+import org.knowm.xchange.bitcoinaverage.dto.marketdata.BitcoinAverageTicker;
+import org.knowm.xchange.bitcoinaverage.dto.marketdata.BitcoinAverageTickers;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.bouncycastle.util.encoders.Hex;
 
@@ -55,12 +57,16 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
      */
     private static final double MAX_REQUESTS_PER_MONTH = 42_514;
 
+    private final ObjectMapper mapper = new ObjectMapper();
     private final HttpClient httpClient = new HttpClient("https://apiv2.bitcoinaverage.com/");
     private final String symbolSet;
 
     private String pubKey;
     private String privKey;
 
+    /**
+     * @param symbolSet "global" or "local"; see https://apiv2.bitcoinaverage.com/#supported-currencies
+     */
     public BitcoinAverage(String symbol, String metadataPrefix, double pctMaxRequests, String symbolSet) {
         super(symbol, metadataPrefix, ttlFor(pctMaxRequests));
         this.symbolSet = symbolSet;
@@ -79,43 +85,12 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
 
     @Override
     public Map<String, ExchangeRateData> doRequestForCaching() throws IOException {
-        return getExchangeRatesFrom(getAllTickerData());
-    }
-
-    /**
-     * Returns original JSON data converted to a nested map structure
-     */
-    private LinkedTreeMap<String, Object> getAllTickerData() throws IOException {
-        String json = getAllTickerDataAsJson();
-        return new Gson().<LinkedTreeMap<String, Object>>fromJson(json, LinkedTreeMap.class);
-    }
-
-    /**
-     * Returns raw JSON string from request to BitcoinAverage API. For an example, run:
-     * curl -H "X-testing: testing" https://apiv2.bitcoinaverage.com/indices/global/ticker/all?crypto=BTC
-     */
-    private String getAllTickerDataAsJson() throws IOException {
-        String path = String.format("indices/%s/ticker/all?crypto=BTC", symbolSet);
-        return httpClient.requestWithGETNoProxy(path, "X-signature", getHeader());
-
-    }
-
-    private Map<String, ExchangeRateData> getExchangeRatesFrom(Map<String, Object> allTickerData) {
-
         Map<String, ExchangeRateData> allExchangeRates = new HashMap<>();
 
-        long timestamp = getTimestampFromAllTickerData(allTickerData);
-
-        allTickerData.forEach((tickerSymbol, tickerData) -> {
-            // where `tickerSymbol` is like 'BTCUSD', 'BTCEUR'
-            // and `tickerData` is a map of all info about that symbol unless
-            if (!(tickerData instanceof LinkedTreeMap)) {
-                // in which case we short circuit to skip a non-map "timestamp" object at the end
-                return;
-            }
+        getTickers().forEach((symbol, ticker) -> {
 
             // strip leading 'BTC' from the ticker symbol
-            String currencyCode = tickerSymbol.substring(3); // leaving 'USD', 'EUR' currency code
+            String currencyCode = symbol.substring(3); // leaving 'USD', 'EUR' currency code
 
             if ("VEF".equals(currencyCode)) {
                 // ignore Venezuelan currency as the "official" exchange rate is just wishful thinking
@@ -123,8 +98,8 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
                 return;
             }
 
-            // find the last price for this currency code
-            double lastPrice = lastPriceFrom((LinkedTreeMap) tickerData);
+            double lastPrice = ticker.getLast().doubleValue();
+            long timestamp = ticker.getTimestamp().getTime();
 
             // and populate our own map with, e.g. {'USD' => ExchangeRateData} entries
             allExchangeRates.put(
@@ -135,25 +110,11 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
         return allExchangeRates;
     }
 
-    private Long getTimestampFromAllTickerData(Map<String, Object> allTickerData) {
-        return allTickerData.entrySet().stream()
-                .filter(e -> "timestamp".equals(e.getKey()))
-                .map(e -> Long.valueOf((String) e.getValue()))
-                .findFirst()
-                .orElse(Instant.now().getEpochSecond());
-    }
-
-    private double lastPriceFrom(LinkedTreeMap<String, Object> tickerData) {
-        Object lastPrice = tickerData.get("last");
-
-        if (lastPrice instanceof String)
-            return Double.valueOf((String) lastPrice);
-
-        if (lastPrice instanceof Double)
-            return (double) lastPrice;
-
-        log.warn("Unexpected type for lastPrice: {}", lastPrice);
-        return 0;
+    private Map<String, BitcoinAverageTicker> getTickers() throws IOException {
+        String path = String.format("indices/%s/ticker/all?crypto=BTC", symbolSet);
+        String json = httpClient.requestWithGETNoProxy(path, "X-signature", getHeader());
+        BitcoinAverageTickers value = mapper.readValue(json, BitcoinAverageTickers.class);
+        return value.getTickers();
     }
 
     protected String getHeader() throws IOException {

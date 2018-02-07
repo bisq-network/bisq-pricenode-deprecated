@@ -22,6 +22,7 @@ repositories {
 dependencies {
     compile("com.github.bisq-network.bisq-exchange:core:v0.6.4")
     compile("com.sparkjava:spark-core:2.5.2")
+    compile("org.knowm.xchange:xchange-bitcoinaverage:4.3.3")
 }
 
 task stage {
