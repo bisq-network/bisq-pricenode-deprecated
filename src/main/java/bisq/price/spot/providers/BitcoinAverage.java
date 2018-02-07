@@ -43,6 +43,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * See the BitcoinAverage API documentation at https://apiv2.bitcoinaverage.com/#ticker-data-all
+ */
 public abstract class BitcoinAverage extends CachingExchangeRateProvider {
 
     /**
@@ -84,39 +87,71 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
 
     @Override
     public Map<String, ExchangeRateData> doRequestForCaching() throws IOException {
-        Map<String, ExchangeRateData> marketPriceMap = new HashMap<>();
-        String json = httpClient.requestWithGETNoProxy(uriPath, "X-signature", getHeader());
-        LinkedTreeMap<String, Object> treeMap = new Gson().<LinkedTreeMap<String, Object>>fromJson(json, LinkedTreeMap.class);
-        long ts = Instant.now().getEpochSecond();
-        treeMap.entrySet().stream().forEach(e -> {
-            Object value = e.getValue();
-            // We need to check the type as we get an unexpected "timestamp" object at the end:
-            if (value instanceof LinkedTreeMap) {
-                //noinspection unchecked
-                LinkedTreeMap<String, Object> data = (LinkedTreeMap) value;
-                String currencyCode = e.getKey().substring(3);
-                // We ignore venezuelan currency as the official exchange rate is wishful thinking only....
-                // We should use that api with a custom provider: http://api.bitcoinvenezuela.com/1
-                if (!("VEF".equals(currencyCode))) {
-                    try {
-                        final Object lastAsObject = data.get("last");
-                        double last = 0;
-                        if (lastAsObject instanceof String)
-                            last = Double.valueOf((String) lastAsObject);
-                        else if (lastAsObject instanceof Double)
-                            last = (double) lastAsObject;
-                        else
-                            log.warn("Unexpected data type: lastAsObject=" + lastAsObject);
+        return getExchangeRatesFrom(getAllTickerData());
+    }
 
-                        marketPriceMap.put(currencyCode,
-                                new ExchangeRateData(currencyCode, last, ts, getProviderSymbol()));
-                    } catch (Throwable exception) {
-                        log.error("Error converting btcaverage data: " + currencyCode, exception);
-                    }
-                }
+    /**
+     * Returns original JSON data converted to a nested map structure
+     */
+    private LinkedTreeMap<String, Object> getAllTickerData() throws IOException {
+        String json = getAllTickerDataAsJson();
+        return new Gson().<LinkedTreeMap<String, Object>>fromJson(json, LinkedTreeMap.class);
+    }
+
+    /**
+     * Returns raw JSON string from request to BitcoinAverage API. For an example, run:
+     * curl -H "X-testing: testing" https://apiv2.bitcoinaverage.com/indices/global/ticker/all?crypto=BTC
+     */
+    private String getAllTickerDataAsJson() throws IOException {
+        return httpClient.requestWithGETNoProxy(uriPath, "X-signature", getHeader());
+    }
+
+
+    private Map<String, ExchangeRateData> getExchangeRatesFrom(Map<String, Object> allTickerData) {
+
+        Map<String, ExchangeRateData> allExchangeRates = new HashMap<>();
+        long timestamp = Instant.now().getEpochSecond();
+
+        allTickerData.forEach((tickerSymbol, tickerData) -> {
+            // where `tickerSymbol` is like 'BTCUSD', 'BTCEUR'
+            // and `tickerData` is a map of all info about that symbol unless
+            if (!(tickerData instanceof LinkedTreeMap)) {
+                // in which case we short circuit to skip a non-map "timestamp" object at the end
+                return;
             }
+
+            // strip leading 'BTC' from the ticker symbol
+            String currencyCode = tickerSymbol.substring(3); // leaving 'USD', 'EUR' currency code
+
+            if ("VEF".equals(currencyCode)) {
+                // ignore Venezuelan currency as the "official" exchange rate is just wishful thinking
+                // we should use this api with a custom provider instead: http://api.bitcoinvenezuela.com/1
+                return;
+            }
+
+            // find the last price for this currency code
+            double lastPrice = lastPriceFrom((LinkedTreeMap) tickerData);
+
+            // and populate our own map with, e.g. {'USD' => ExchangeRateData} entries
+            allExchangeRates.put(
+                    currencyCode,
+                    new ExchangeRateData(currencyCode, lastPrice, timestamp, getProviderSymbol()));
         });
-        return marketPriceMap;
+
+        return allExchangeRates;
+    }
+
+    private double lastPriceFrom(LinkedTreeMap<String, Object> tickerData) {
+        Object lastPrice = tickerData.get("last");
+
+        if (lastPrice instanceof String)
+            return Double.valueOf((String) lastPrice);
+
+        if (lastPrice instanceof Double)
+            return (double) lastPrice;
+
+        log.warn("Unexpected type for lastPrice: {}", lastPrice);
+        return 0;
     }
 
     protected String getHeader() throws IOException {
