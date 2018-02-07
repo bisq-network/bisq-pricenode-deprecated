@@ -29,7 +29,6 @@ import java.util.TimerTask;
 
 public abstract class CachingExchangeRateProvider extends AbstractExchangeRateProvider {
 
-    private final Timer timer = new Timer();
     private final Duration ttl;
 
     protected Map<String, ExchangeRateData> data;
@@ -41,7 +40,7 @@ public abstract class CachingExchangeRateProvider extends AbstractExchangeRatePr
     }
 
     public final void start() throws IOException {
-        timer.scheduleAtFixedRate(new TimerTask() {
+        new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 try {
