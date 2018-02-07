@@ -18,6 +18,7 @@
 package bisq.price.spot.providers;
 
 import bisq.price.spot.ExchangeRateData;
+import bisq.price.spot.support.CachingExchangeRateProvider;
 import bisq.price.util.Environment;
 
 import io.bisq.network.http.HttpClient;

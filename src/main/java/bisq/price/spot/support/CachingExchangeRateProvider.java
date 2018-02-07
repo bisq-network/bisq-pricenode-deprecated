@@ -15,7 +15,7 @@
  * along with Bisq. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package bisq.price.spot.providers;
+package bisq.price.spot.support;
 
 import bisq.price.spot.ExchangeRateData;
 

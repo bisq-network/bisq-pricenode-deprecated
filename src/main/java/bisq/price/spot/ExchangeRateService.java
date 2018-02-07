@@ -18,7 +18,7 @@
 package bisq.price.spot;
 
 import bisq.price.spot.providers.BitcoinAverage;
-import bisq.price.spot.providers.CachingExchangeRateProvider;
+import bisq.price.spot.support.CachingExchangeRateProvider;
 
 import java.time.Instant;
 
