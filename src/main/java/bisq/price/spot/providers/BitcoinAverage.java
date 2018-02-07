@@ -63,10 +63,15 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
         super(
                 symbol,
                 metadataPrefix,
-                Duration.ofDays(31).dividedBy((long) (MAX_REQUESTS_PER_MONTH * pctMaxRequests))
+                ttlFor(pctMaxRequests)
         );
 
         this.httpClient = new HttpClient("https://apiv2.bitcoinaverage.com/");
+    }
+
+    private static Duration ttlFor(double pctMaxRequests) {
+        long requestsPerMonth = (long) (MAX_REQUESTS_PER_MONTH * pctMaxRequests);
+        return Duration.ofDays(31).dividedBy(requestsPerMonth);
     }
 
     @Override
