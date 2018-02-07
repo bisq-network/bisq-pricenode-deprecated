@@ -51,13 +51,11 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
 
     public BitcoinAverage(String symbol,
                           String metadataPrefix,
-                          long requestIntervalMs,
-                          int order) {
+                          long requestIntervalMs) {
         super(
                 symbol,
                 metadataPrefix,
-                requestIntervalMs,
-                order
+                requestIntervalMs
         );
         this.httpClient = new HttpClient("https://apiv2.bitcoinaverage.com/");
     }
@@ -140,8 +138,7 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
             super(
                     "BTCA_G",
                     "btcAverageG",
-                    210_000, // 3.5 min; 12754 req/mo;
-                    1
+                    210_000 // 3.5 min; 12754 req/mo;
             );
         }
 
@@ -162,8 +159,7 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
             super(
                     "BTCA_L",
                     "btcAverageL",
-                    90_000, // 90 sec; 29760 requests per month
-                    2
+                    90_000 // 90 sec; 29760 requests per month
             );
         }
 

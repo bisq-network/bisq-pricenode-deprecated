@@ -49,8 +49,7 @@ public class CoinMarketCap extends CachingExchangeRateProvider {
         super(
                 "CMC",
                 "coinmarketcap",
-                300_000,  // 5 min: large data structure; don't request too often
-                3
+                300_000  // 5 min: large data structure; don't request too often
         );
         this.httpClient = new HttpClient("https://api.coinmarketcap.com/");
         supportedAltcoins = CurrencyUtil.getAllSortedCryptoCurrencies().stream()

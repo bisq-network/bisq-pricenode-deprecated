@@ -22,7 +22,6 @@ import bisq.price.util.Environment;
 import java.io.IOException;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
@@ -37,22 +36,30 @@ public interface ExchangeRateProvider {
 
     String getMetadataPrefix();
 
-    int getOrder();
-
+    /**
+     * Load, configure and return a list of {@link ExchangeRateProvider} implementations
+     * ordered according to their position in the {@code META-INF/services}
+     * provider-configuration file.
+     * <p>
+     * Ordering is significant because more than one provider may return exchange rate
+     * data about a given currency, and it is important that precedence is predictable.
+     * Wherever this list is iterated through, it is assumed that the last provider wins.
+     * For example, if {@link bisq.price.spot.providers.CoinMarketCap} is ordered before
+     * {@link bisq.price.spot.providers.Poloniex}, and both providers return exchange rate
+     * data about Litecoin (LTC), then the Poloniex data will overwrite the CoinMarketCap
+     * data.
+     *
+     * @param env for configuring each provider, e.g. for accessing environment variables
+     * @see ServiceLoader
+     */
     static List<ExchangeRateProvider> loadAll(Environment env) {
-        ServiceLoader<ExchangeRateProvider> allProviders = ServiceLoader.load(ExchangeRateProvider.class);
+        List<ExchangeRateProvider> providers = new ArrayList<>();
 
-        ArrayList<ExchangeRateProvider> orderedProviders = new ArrayList<>();
-        for (ExchangeRateProvider provider : allProviders) {
-            orderedProviders.add(provider);
-        }
-
-        orderedProviders.sort(Comparator.comparingInt(ExchangeRateProvider::getOrder));
-
-        for (ExchangeRateProvider provider : orderedProviders) {
+        for (ExchangeRateProvider provider : ServiceLoader.load(ExchangeRateProvider.class)) {
             provider.configure(env);
+            providers.add(provider);
         }
 
-        return orderedProviders;
+        return providers;
     }
 }

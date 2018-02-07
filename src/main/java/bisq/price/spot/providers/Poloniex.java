@@ -47,8 +47,8 @@ public class Poloniex extends CachingExchangeRateProvider {
         super(
                 "POLO",
                 "poloniex",
-                60_000, // 1 min
-                4);
+                60_000 // 1 min
+        );
         this.httpClient = new HttpClient("https://poloniex.com/public");
 
         supportedAltcoins = CurrencyUtil.getAllSortedCryptoCurrencies().stream()

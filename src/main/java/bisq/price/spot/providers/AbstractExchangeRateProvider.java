@@ -29,14 +29,11 @@ public abstract class AbstractExchangeRateProvider implements ExchangeRateProvid
 
     private final String symbol;
     private final String metadataPrefix;
-    private final int order;
 
     public AbstractExchangeRateProvider(String symbol,
-                                        String metadataPrefix,
-                                        int order) {
+                                        String metadataPrefix) {
         this.symbol = symbol;
         this.metadataPrefix = metadataPrefix;
-        this.order = order;
     }
 
     @Override
@@ -52,10 +49,5 @@ public abstract class AbstractExchangeRateProvider implements ExchangeRateProvid
     @Override
     public String getMetadataPrefix() {
         return metadataPrefix;
-    }
-
-    @Override
-    public int getOrder() {
-        return order;
     }
 }

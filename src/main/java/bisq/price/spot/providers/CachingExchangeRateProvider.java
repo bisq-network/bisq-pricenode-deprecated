@@ -32,8 +32,8 @@ public abstract class CachingExchangeRateProvider extends AbstractExchangeRatePr
 
     protected Map<String, ExchangeRateData> data;
 
-    public CachingExchangeRateProvider(String symbol, String metadataPrefix, long requestIntervalMs, int order) {
-        super(symbol, metadataPrefix, order);
+    public CachingExchangeRateProvider(String symbol, String metadataPrefix, long requestIntervalMs) {
+        super(symbol, metadataPrefix);
         this.requestIntervalMs = requestIntervalMs;
     }
 
