@@ -106,11 +106,11 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
         return httpClient.requestWithGETNoProxy(uriPath, "X-signature", getHeader());
     }
 
-
     private Map<String, ExchangeRateData> getExchangeRatesFrom(Map<String, Object> allTickerData) {
 
         Map<String, ExchangeRateData> allExchangeRates = new HashMap<>();
-        long timestamp = Instant.now().getEpochSecond();
+
+        long timestamp = getTimestampFromAllTickerData(allTickerData);
 
         allTickerData.forEach((tickerSymbol, tickerData) -> {
             // where `tickerSymbol` is like 'BTCUSD', 'BTCEUR'
@@ -139,6 +139,14 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
         });
 
         return allExchangeRates;
+    }
+
+    private Long getTimestampFromAllTickerData(Map<String, Object> allTickerData) {
+        return allTickerData.entrySet().stream()
+                .filter(e -> "timestamp".equals(e.getKey()))
+                .map(e -> Long.valueOf((String)e.getValue()))
+                .findFirst()
+                .orElse(Instant.now().getEpochSecond());
     }
 
     private double lastPriceFrom(LinkedTreeMap<String, Object> tickerData) {
