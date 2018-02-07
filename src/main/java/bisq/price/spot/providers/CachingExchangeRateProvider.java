@@ -29,9 +29,9 @@ import java.util.TimerTask;
 
 public abstract class CachingExchangeRateProvider extends AbstractExchangeRateProvider {
 
-    private final Duration ttl;
-
     protected Map<String, ExchangeRateData> data;
+
+    private final Duration ttl;
 
     public CachingExchangeRateProvider(String symbol, String metadataPrefix, Duration ttl) {
         super(symbol, metadataPrefix);
