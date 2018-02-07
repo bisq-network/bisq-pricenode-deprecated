@@ -56,14 +56,14 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
     private static final double MAX_REQUESTS_PER_MONTH = 42_514;
 
     private final HttpClient httpClient = new HttpClient("https://apiv2.bitcoinaverage.com/");
-    private final String uriPath;
+    private final String symbolSet;
 
     private String pubKey;
     private String privKey;
 
-    public BitcoinAverage(String symbol, String metadataPrefix, double pctMaxRequests, String uriPath) {
+    public BitcoinAverage(String symbol, String metadataPrefix, double pctMaxRequests, String symbolSet) {
         super(symbol, metadataPrefix, ttlFor(pctMaxRequests));
-        this.uriPath = uriPath;
+        this.symbolSet = symbolSet;
     }
 
     private static Duration ttlFor(double pctMaxRequests) {
@@ -95,7 +95,9 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
      * curl -H "X-testing: testing" https://apiv2.bitcoinaverage.com/indices/global/ticker/all?crypto=BTC
      */
     private String getAllTickerDataAsJson() throws IOException {
-        return httpClient.requestWithGETNoProxy(uriPath, "X-signature", getHeader());
+        String path = String.format("indices/%s/ticker/all?crypto=BTC", symbolSet);
+        return httpClient.requestWithGETNoProxy(path, "X-signature", getHeader());
+
     }
 
     private Map<String, ExchangeRateData> getExchangeRatesFrom(Map<String, Object> allTickerData) {
@@ -171,14 +173,14 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
 
     public static class Global extends BitcoinAverage {
         public Global() {
-            super("BTCA_G", "btcAverageG", 0.3, "indices/global/ticker/all?crypto=BTC");
+            super("BTCA_G", "btcAverageG", 0.3, "global");
         }
     }
 
 
     public static class Local extends BitcoinAverage {
         public Local() {
-            super("BTCA_L", "btcAverageL", 0.7, "indices/local/ticker/all?crypto=BTC");
+            super("BTCA_L", "btcAverageL", 0.7, "local");
         }
     }
 }
