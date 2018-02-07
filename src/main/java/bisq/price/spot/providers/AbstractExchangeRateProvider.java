@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractExchangeRateProvider implements ExchangeRateProvider {
 
-    protected static final Logger log = LoggerFactory.getLogger(Poloniex.class);
+    protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private final Timer timer = new Timer();
 
