@@ -74,7 +74,19 @@ public abstract class AbstractExchangeRateProvider implements ExchangeRateProvid
         requestAndCache();
     }
 
-    protected abstract void requestAndCache() throws IOException;
+    protected void requestAndCache() throws IOException {
+        long ts = System.currentTimeMillis();
+        data = request();
+        log.info("requestAndCache took {} ms.", (System.currentTimeMillis() - ts));
+
+        if (data.get("USD") != null) {
+            log.info("{} local USD (last): {}", symbol, data.get("USD").getPrice());
+        }
+
+        if (data.get("LTC") != null) {
+            log.info("{} LTC (last): {}", symbol, data.get("LTC").getPrice());
+        }
+    }
 
     @Override
     public Map<? extends String, ? extends ExchangeRateData> getData() {

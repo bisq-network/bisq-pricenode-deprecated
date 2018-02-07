@@ -41,12 +41,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public abstract class BitcoinAverage extends AbstractExchangeRateProvider {
-
-    private static final Logger log = LoggerFactory.getLogger(BitcoinAverage.class);
 
     protected final HttpClient httpClient;
 
@@ -151,16 +146,6 @@ public abstract class BitcoinAverage extends AbstractExchangeRateProvider {
         }
 
         @Override
-        protected void requestAndCache() throws IOException {
-            long ts = System.currentTimeMillis();
-            data = request();
-
-            if (data.get("USD") != null)
-                log.info("BTCAverage global USD (last):" + data.get("USD").getPrice());
-            log.info("requestBtcAverageGlobalPrices took {} ms.", (System.currentTimeMillis() - ts));
-        }
-
-        @Override
         public Map<String, ExchangeRateData> request() throws IOException {
             return getMap(
                     httpClient.requestWithGETNoProxy("indices/global/ticker/all?crypto=BTC", "X-signature", getHeader()),
@@ -180,16 +165,6 @@ public abstract class BitcoinAverage extends AbstractExchangeRateProvider {
                     90_000, // 90 sec; 29760 requests per month
                     2
             );
-        }
-
-        @Override
-        protected void requestAndCache() throws IOException {
-            long ts = System.currentTimeMillis();
-            data = request();
-
-            if (data.get("USD") != null)
-                log.info("BTCAverage local USD (last):" + data.get("USD").getPrice());
-            log.info("requestAndCache took {} ms.", (System.currentTimeMillis() - ts));
         }
 
         @Override

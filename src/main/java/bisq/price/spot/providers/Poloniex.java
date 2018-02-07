@@ -56,16 +56,6 @@ public class Poloniex extends AbstractExchangeRateProvider {
                 .collect(Collectors.toSet());
     }
 
-    @Override
-    protected void requestAndCache() throws IOException {
-        long ts = System.currentTimeMillis();
-        data = request();
-        log.info("requestAndCache took {} ms.", (System.currentTimeMillis() - ts));
-
-        if (data.get("LTC") != null)
-            log.info("Poloniex LTC (last): " + data.get("LTC").getPrice());
-    }
-
     public Map<String, ExchangeRateData> request() throws IOException {
         Map<String, ExchangeRateData> marketPriceMap = new HashMap<>();
         String response = httpClient.requestWithGET("?command=returnTicker", "User-Agent", "");
