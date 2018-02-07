@@ -82,13 +82,6 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
         this.privKey = env.getRequiredVar("BITCOIN_AVG_PRIVKEY");
     }
 
-    @Override
-    public Map<String, ExchangeRateData> doRequestForCaching() throws IOException {
-        return getMap(
-                httpClient.requestWithGETNoProxy(uriPath, "X-signature", getHeader()),
-                getProviderSymbol());
-    }
-
     protected String getHeader() throws IOException {
 
         String algorithm = "HmacSHA256";
@@ -104,9 +97,10 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
         }
     }
 
-    protected Map<String, ExchangeRateData> getMap(String json, String provider) {
-
+    @Override
+    public Map<String, ExchangeRateData> doRequestForCaching() throws IOException {
         Map<String, ExchangeRateData> marketPriceMap = new HashMap<>();
+        String json = httpClient.requestWithGETNoProxy(uriPath, "X-signature", getHeader());
         LinkedTreeMap<String, Object> treeMap = new Gson().<LinkedTreeMap<String, Object>>fromJson(json, LinkedTreeMap.class);
         long ts = Instant.now().getEpochSecond();
         treeMap.entrySet().stream().forEach(e -> {
@@ -130,7 +124,7 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
                             log.warn("Unexpected data type: lastAsObject=" + lastAsObject);
 
                         marketPriceMap.put(currencyCode,
-                                new ExchangeRateData(currencyCode, last, ts, provider));
+                                new ExchangeRateData(currencyCode, last, ts, getProviderSymbol()));
                     } catch (Throwable exception) {
                         log.error("Error converting btcaverage data: " + currencyCode, exception);
                     }
