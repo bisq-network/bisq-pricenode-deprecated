@@ -76,16 +76,17 @@ public abstract class AbstractExchangeRateProvider implements ExchangeRateProvid
 
     protected void requestAndCache() throws IOException {
         long ts = System.currentTimeMillis();
+
         data = request();
-        log.info("requestAndCache took {} ms.", (System.currentTimeMillis() - ts));
 
         if (data.get("USD") != null) {
-            log.info("{} local USD (last): {}", symbol, data.get("USD").getPrice());
+            log.info("BTC/USD: {}", data.get("USD").getPrice());
+        }
+        if (data.get("LTC") != null) {
+            log.info("LTC/BTC: {}", data.get("LTC").getPrice());
         }
 
-        if (data.get("LTC") != null) {
-            log.info("{} LTC (last): {}", symbol, data.get("LTC").getPrice());
-        }
+        log.info("requestAndCache took {} ms.", (System.currentTimeMillis() - ts));
     }
 
     @Override
