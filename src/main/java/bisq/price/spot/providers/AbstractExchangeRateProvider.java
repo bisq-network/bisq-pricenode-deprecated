@@ -17,10 +17,13 @@
 
 package bisq.price.spot.providers;
 
+import bisq.price.spot.ExchangeRateData;
 import bisq.price.spot.ExchangeRateProvider;
+import bisq.price.util.Environment;
 
 import java.io.IOException;
 
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -33,6 +36,28 @@ public abstract class AbstractExchangeRateProvider implements ExchangeRateProvid
 
     private final Timer timer = new Timer();
 
+    private final String symbol;
+    private final String metadataPrefix;
+    private final long requestIntervalMs;
+    private final int order;
+
+    protected Map<String, ExchangeRateData> data;
+
+    public AbstractExchangeRateProvider(String symbol,
+                                        String metadataPrefix,
+                                        long requestIntervalMs,
+                                        int order) {
+        this.symbol = symbol;
+        this.metadataPrefix = metadataPrefix;
+        this.requestIntervalMs = requestIntervalMs;
+        this.order = order;
+    }
+
+    @Override
+    public void configure(Environment env) {
+        // no-op at this level; subclasses can override as necessary.
+    }
+
     public final void start() throws IOException {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -44,12 +69,30 @@ public abstract class AbstractExchangeRateProvider implements ExchangeRateProvid
                     e.printStackTrace();
                 }
             }
-        }, getRequestIntervalMs(), getRequestIntervalMs());
+        }, requestIntervalMs, requestIntervalMs);
 
         requestAndCache();
     }
 
-    protected abstract long getRequestIntervalMs();
-
     protected abstract void requestAndCache() throws IOException;
+
+    @Override
+    public Map<? extends String, ? extends ExchangeRateData> getData() {
+        return data;
+    }
+
+    @Override
+    public String getProviderSymbol() {
+        return symbol;
+    }
+
+    @Override
+    public String getMetadataPrefix() {
+        return metadataPrefix;
+    }
+
+    @Override
+    public int getOrder() {
+        return order;
+    }
 }

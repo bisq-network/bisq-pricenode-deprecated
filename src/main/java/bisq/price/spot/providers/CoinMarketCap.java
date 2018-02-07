@@ -18,7 +18,6 @@
 package bisq.price.spot.providers;
 
 import bisq.price.spot.ExchangeRateData;
-import bisq.price.util.Environment;
 
 import io.bisq.network.http.HttpClient;
 
@@ -39,37 +38,24 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import static java.lang.Double.parseDouble;
 
 public class CoinMarketCap extends AbstractExchangeRateProvider {
 
-    private static final Logger log = LoggerFactory.getLogger(CoinMarketCap.class);
-    private static final String PROVIDER_SYMBOL = "CMC";
-    private static final long REQUEST_INTERVAL_MS = 300_000;  // 5 min: large data structure; don't request too often
-
     private final Set<String> supportedAltcoins;
     private final HttpClient httpClient;
 
-    private Map<String, ExchangeRateData> data;
-
     public CoinMarketCap() {
+        super(
+                "CMC",
+                "coinmarketcap",
+                300_000,  // 5 min: large data structure; don't request too often
+                3
+        );
         this.httpClient = new HttpClient("https://api.coinmarketcap.com/");
         supportedAltcoins = CurrencyUtil.getAllSortedCryptoCurrencies().stream()
                 .map(TradeCurrency::getCode)
                 .collect(Collectors.toSet());
-    }
-
-    @Override
-    public void configure(Environment env) {
-        // no configuration necessary
-    }
-
-    @Override
-    protected long getRequestIntervalMs() {
-        return REQUEST_INTERVAL_MS;
     }
 
     @Override
@@ -92,29 +78,9 @@ public class CoinMarketCap extends AbstractExchangeRateProvider {
             String code = (String) treeMap.get("symbol");
             if (supportedAltcoins.contains(code)) {
                 double price_btc = parseDouble((String) treeMap.get("price_btc"));
-                marketPriceMap.put(code, new ExchangeRateData(code, price_btc, ts, PROVIDER_SYMBOL));
+                marketPriceMap.put(code, new ExchangeRateData(code, price_btc, ts, getProviderSymbol()));
             }
         });
         return marketPriceMap;
-    }
-
-    @Override
-    public Map<? extends String, ? extends ExchangeRateData> getData() {
-        return data;
-    }
-
-    @Override
-    public String getProviderSymbol() {
-        return PROVIDER_SYMBOL;
-    }
-
-    @Override
-    public String getMetadataPrefix() {
-        return "coinmarketcap";
-    }
-
-    @Override
-    public int getOrder() {
-        return 3;
     }
 }

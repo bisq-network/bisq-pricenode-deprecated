@@ -54,7 +54,16 @@ public abstract class BitcoinAverage extends AbstractExchangeRateProvider {
     private SecretKey secretKey;
     private boolean configured = false;
 
-    public BitcoinAverage() {
+    public BitcoinAverage(String symbol,
+                          String metadataPrefix,
+                          long requestIntervalMs,
+                          int order) {
+        super(
+                symbol,
+                metadataPrefix,
+                requestIntervalMs,
+                order
+        );
         this.httpClient = new HttpClient("https://apiv2.bitcoinaverage.com/");
     }
 
@@ -130,16 +139,15 @@ public abstract class BitcoinAverage extends AbstractExchangeRateProvider {
 
     public static class Global extends BitcoinAverage {
 
-        private static final String PROVIDER_SYMBOL = "BTCA_G";
-        // We adjust request time to fit into BitcoinAverage developer plan (45k request per month).
-        // We get 42514 (29760+12754) request with below numbers.
-        private static final long REQUEST_INTERVAL_MS = 210_000;    // 3.5 min; 12754 requests for 31 days
-
-        private Map<String, ExchangeRateData> data;
-
-        @Override
-        protected long getRequestIntervalMs() {
-            return REQUEST_INTERVAL_MS;
+        public Global() {
+            // We adjust the request interval to fit into BitcoinAverage developer plan (45k request per month).
+            // We get 42514 (29760+12754) request with below numbers. See Local numbers as well.
+            super(
+                    "BTCA_G",
+                    "btcAverageG",
+                    210_000, // 3.5 min; 12754 req/mo;
+                    1
+            );
         }
 
         @Override
@@ -156,43 +164,22 @@ public abstract class BitcoinAverage extends AbstractExchangeRateProvider {
         public Map<String, ExchangeRateData> request() throws IOException {
             return getMap(
                     httpClient.requestWithGETNoProxy("indices/global/ticker/all?crypto=BTC", "X-signature", getHeader()),
-                    PROVIDER_SYMBOL);
-        }
-
-        @Override
-        public Map<? extends String, ? extends ExchangeRateData> getData() {
-            return data;
-        }
-
-        @Override
-        public String getProviderSymbol() {
-            return PROVIDER_SYMBOL;
-        }
-
-        @Override
-        public String getMetadataPrefix() {
-            return "btcAverageG";
-        }
-
-        @Override
-        public int getOrder() {
-            return 1;
+                    getProviderSymbol());
         }
     }
 
 
     public static class Local extends BitcoinAverage {
 
-        private static final String PROVIDER_SYMBOL = "BTCA_L";
-        // We adjust request time to fit into BitcoinAverage developer plan (45k request per month).
-        // We get 42514 (29760+12754) request with below numbers.
-        private static final long REQUEST_INTERVAL_MS = 90_000;      // 90 sec; 29760 requests for 31 days
-
-        private Map<String, ExchangeRateData> data;
-
-        @Override
-        protected long getRequestIntervalMs() {
-            return REQUEST_INTERVAL_MS;
+        public Local() {
+            // We adjust the request interval to fit into BitcoinAverage developer plan (45k request per month).
+            // We get 42514 (29760+12754) request with below numbers. See Global numbers as well.
+            super(
+                    "BTCA_L",
+                    "btcAverageL",
+                    90_000, // 90 sec; 29760 requests per month
+                    2
+            );
         }
 
         @Override
@@ -205,32 +192,11 @@ public abstract class BitcoinAverage extends AbstractExchangeRateProvider {
             log.info("requestAndCache took {} ms.", (System.currentTimeMillis() - ts));
         }
 
-
         @Override
         public Map<String, ExchangeRateData> request() throws IOException {
             return getMap(
                     httpClient.requestWithGETNoProxy("indices/local/ticker/all?crypto=BTC", "X-signature", getHeader()),
-                    PROVIDER_SYMBOL);
-        }
-
-        @Override
-        public Map<? extends String, ? extends ExchangeRateData> getData() {
-            return data;
-        }
-
-        @Override
-        public String getProviderSymbol() {
-            return PROVIDER_SYMBOL;
-        }
-
-        @Override
-        public String getMetadataPrefix() {
-            return "btcAverageL";
-        }
-
-        @Override
-        public int getOrder() {
-            return 2;
+                    getProviderSymbol());
         }
     }
 }

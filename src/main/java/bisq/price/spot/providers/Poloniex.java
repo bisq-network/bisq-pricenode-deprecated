@@ -18,7 +18,6 @@
 package bisq.price.spot.providers;
 
 import bisq.price.spot.ExchangeRateData;
-import bisq.price.util.Environment;
 
 import io.bisq.network.http.HttpClient;
 
@@ -41,30 +40,20 @@ import static java.lang.Double.parseDouble;
 
 public class Poloniex extends AbstractExchangeRateProvider {
 
-    private static final long REQUEST_INTERVAL_MS = 60_000; // 1 min
-    private static final String PROVIDER_SYMBOL = "POLO";
-
     private final Set<String> supportedAltcoins;
     private final HttpClient httpClient;
 
-    private Map<String, ExchangeRateData> data;
-
     public Poloniex() {
+        super(
+                "POLO",
+                "poloniex",
+                60_000, // 1 min
+                4);
         this.httpClient = new HttpClient("https://poloniex.com/public");
 
         supportedAltcoins = CurrencyUtil.getAllSortedCryptoCurrencies().stream()
                 .map(TradeCurrency::getCode)
                 .collect(Collectors.toSet());
-    }
-
-    @Override
-    public void configure(Environment env) {
-        // no configuration necessary
-    }
-
-    @Override
-    protected long getRequestIntervalMs() {
-        return REQUEST_INTERVAL_MS;
     }
 
     @Override
@@ -99,7 +88,7 @@ public class Poloniex extends AbstractExchangeRateProvider {
                                     new ExchangeRateData(altcoinCurrency,
                                             parseDouble((String) data.get("last")),
                                             ts,
-                                            PROVIDER_SYMBOL)
+                                            getProviderSymbol())
                             );
                         }
                     }
@@ -109,25 +98,5 @@ public class Poloniex extends AbstractExchangeRateProvider {
             }
         });
         return marketPriceMap;
-    }
-
-    @Override
-    public Map<? extends String, ? extends ExchangeRateData> getData() {
-        return data;
-    }
-
-    @Override
-    public String getProviderSymbol() {
-        return PROVIDER_SYMBOL;
-    }
-
-    @Override
-    public String getMetadataPrefix() {
-        return "poloniex";
-    }
-
-    @Override
-    public int getOrder() {
-        return 4;
     }
 }
