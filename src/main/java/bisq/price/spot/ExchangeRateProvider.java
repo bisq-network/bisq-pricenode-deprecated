@@ -33,7 +33,7 @@ public interface ExchangeRateProvider {
 
     void configure(Environment env);
 
-    Map<? extends String, ? extends ExchangeRateData> getData();
+    Map<String, ExchangeRateData> getData();
 
     String getProviderSymbol();
 

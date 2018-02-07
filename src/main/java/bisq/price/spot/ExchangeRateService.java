@@ -58,7 +58,7 @@ public class ExchangeRateService {
 
     private void addMetadata(Map<String, Object> allMarketPrices) {
         for (ExchangeRateProvider provider : providers) {
-            Collection<? extends ExchangeRateData> prices = provider.getData().values();
+            Collection<ExchangeRateData> prices = provider.getData().values();
 
             String debugPrefix = provider.getMetadataPrefix();
             long count = prices.size();
@@ -84,7 +84,7 @@ public class ExchangeRateService {
         allMarketPrices.put("data", removeOutdatedPrices(allData).values().toArray());
     }
 
-    private long findFirstTimestampForProvider(Collection<? extends ExchangeRateData> prices, String providerSymbol) {
+    private long findFirstTimestampForProvider(Collection<ExchangeRateData> prices, String providerSymbol) {
         return prices.stream()
                 .filter(e -> providerSymbol.equals(e.getProvider()))
                 .findFirst()

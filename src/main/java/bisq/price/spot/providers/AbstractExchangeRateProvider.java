@@ -90,7 +90,7 @@ public abstract class AbstractExchangeRateProvider implements ExchangeRateProvid
     }
 
     @Override
-    public Map<? extends String, ? extends ExchangeRateData> getData() {
+    public Map<String, ExchangeRateData> getData() {
         return data;
     }
 
