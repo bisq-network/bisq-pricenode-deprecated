@@ -19,11 +19,9 @@ package bisq.price.spot.providers;
 
 import bisq.price.spot.ExchangeRateData;
 import bisq.price.spot.support.CachingExchangeRateProvider;
+import bisq.price.util.Altcoins;
 
 import io.bisq.network.http.HttpClient;
-
-import io.bisq.common.locale.CurrencyUtil;
-import io.bisq.common.locale.TradeCurrency;
 
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
@@ -35,14 +33,11 @@ import java.io.IOException;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static java.lang.Double.parseDouble;
 
 public class Poloniex extends CachingExchangeRateProvider {
 
-    private final Set<String> supportedAltcoins;
     private final HttpClient httpClient;
 
     public Poloniex() {
@@ -52,10 +47,6 @@ public class Poloniex extends CachingExchangeRateProvider {
                 Duration.ofMinutes(1)
         );
         this.httpClient = new HttpClient("https://poloniex.com/public");
-
-        supportedAltcoins = CurrencyUtil.getAllSortedCryptoCurrencies().stream()
-                .map(TradeCurrency::getCode)
-                .collect(Collectors.toSet());
     }
 
     @Override
@@ -73,7 +64,7 @@ public class Poloniex extends CachingExchangeRateProvider {
                 String[] tokens = invertedCurrencyPair.split("_");
                 if (tokens.length == 2) {
                     altcoinCurrency = tokens[1];
-                    if (supportedAltcoins.contains(altcoinCurrency)) {
+                    if (Altcoins.ALL_SUPPORTED.contains(altcoinCurrency)) {
                         if (value instanceof LinkedTreeMap) {
                             //noinspection unchecked
                             LinkedTreeMap<String, Object> data = (LinkedTreeMap) value;
