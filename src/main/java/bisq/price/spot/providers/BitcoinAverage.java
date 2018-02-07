@@ -142,39 +142,15 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
 
 
     public static class Global extends BitcoinAverage {
-
-        /**
-         * The percentage of {@link BitcoinAverage#MAX_REQUESTS_PER_MONTH} this
-         * provider should consume.
-         */
-        static double PCT_MAX_REQUESTS = 0.3;
-
         public Global() {
-            super(
-                    "BTCA_G",
-                    "btcAverageG",
-                    PCT_MAX_REQUESTS,
-                   "indices/global/ticker/all?crypto=BTC"
-            );
+            super("BTCA_G", "btcAverageG", 0.3, "indices/global/ticker/all?crypto=BTC");
         }
     }
 
 
     public static class Local extends BitcoinAverage {
-
-        /**
-         * The percentage of {@link BitcoinAverage#MAX_REQUESTS_PER_MONTH} this
-         * provider should consume.
-         */
-        static double PCT_MAX_REQUESTS = 1 - Global.PCT_MAX_REQUESTS;
-
         public Local() {
-            super(
-                    "BTCA_L",
-                    "btcAverageL",
-                    PCT_MAX_REQUESTS,
-                    "indices/local/ticker/all?crypto=BTC"
-            );
+            super("BTCA_L", "btcAverageL", 0.7, "indices/local/ticker/all?crypto=BTC");
         }
     }
 }
