@@ -72,11 +72,6 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
         this.symbolSet = symbolSet;
     }
 
-    private static Duration ttlFor(double pctMaxRequests) {
-        long requestsPerMonth = (long) (MAX_REQUESTS_PER_MONTH * pctMaxRequests);
-        return Duration.ofDays(31).dividedBy(requestsPerMonth);
-    }
-
     @Override
     public void doConfigure(Environment env) {
         this.pubKey = env.getRequiredVar("BITCOIN_AVG_PUBKEY");
@@ -85,29 +80,31 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
 
     @Override
     public Map<String, ExchangeRateData> doRequestForCaching() throws IOException {
-        Map<String, ExchangeRateData> allExchangeRates = new HashMap<>();
+        Map<String, ExchangeRateData> exchangeRates = new HashMap<>();
 
         getTickers().forEach((symbol, ticker) -> {
+            String currencyCode = symbol.substring(3);
 
-            // strip leading 'BTC' from the ticker symbol
-            String currencyCode = symbol.substring(3); // leaving 'USD', 'EUR' currency code
-
-            if ("VEF".equals(currencyCode)) {
-                // ignore Venezuelan currency as the "official" exchange rate is just wishful thinking
-                // we should use this api with a custom provider instead: http://api.bitcoinvenezuela.com/1
+            if (unsupportedCurrency(currencyCode))
                 return;
-            }
 
-            double lastPrice = ticker.getLast().doubleValue();
-            long timestamp = ticker.getTimestamp().getTime();
-
-            // and populate our own map with, e.g. {'USD' => ExchangeRateData} entries
-            allExchangeRates.put(
+            exchangeRates.put(
+                currencyCode, new ExchangeRateData(
                     currencyCode,
-                    new ExchangeRateData(currencyCode, lastPrice, timestamp, getProviderSymbol()));
+                    ticker.getLast().doubleValue(),
+                    ticker.getTimestamp().getTime(),
+                    this.getProviderSymbol()
+                )
+            );
         });
 
-        return allExchangeRates;
+        return exchangeRates;
+    }
+
+    private boolean unsupportedCurrency(String currencyCode) {
+        // ignore Venezuelan bolivars as the "official" exchange rate is just wishful thinking
+        // we should use this API with a custom provider instead: http://api.bitcoinvenezuela.com/1
+        return "VEF".equals(currencyCode);
     }
 
     private Map<String, BitcoinAverageTicker> getTickers() throws IOException {
@@ -132,6 +129,11 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
         } catch (NoSuchAlgorithmException | InvalidKeyException ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    private static Duration ttlFor(double pctMaxRequests) {
+        long requestsPerMonth = (long) (MAX_REQUESTS_PER_MONTH * pctMaxRequests);
+        return Duration.ofDays(31).dividedBy(requestsPerMonth);
     }
 
 
