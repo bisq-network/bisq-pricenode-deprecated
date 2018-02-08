@@ -37,15 +37,10 @@ import java.util.Map;
 public class CoinMarketCap extends CachingExchangeRateProvider {
 
     private final ObjectMapper mapper = new ObjectMapper();
-    private final HttpClient httpClient;
+    private final HttpClient httpClient = new HttpClient("https://api.coinmarketcap.com/");
 
     public CoinMarketCap() {
-        super(
-                "CMC",
-                "coinmarketcap",
-                Duration.ofMinutes(5) // large data structure, so don't request it too often
-        );
-        this.httpClient = new HttpClient("https://api.coinmarketcap.com/");
+        super("CMC", "coinmarketcap", Duration.ofMinutes(5)); // large data structure, so don't request it too often
     }
 
     @Override
