@@ -62,7 +62,7 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
     private final String symbolSet;
 
     private String pubKey;
-    private String privKey;
+    private Mac mac;
 
     /**
      * @param symbolSet "global" or "local"; see https://apiv2.bitcoinaverage.com/#supported-currencies
@@ -80,7 +80,7 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
     @Override
     public void doConfigure(Environment env) {
         this.pubKey = env.getRequiredVar("BITCOIN_AVG_PUBKEY");
-        this.privKey = env.getRequiredVar("BITCOIN_AVG_PRIVKEY");
+        this.mac = initMac(env.getRequiredVar("BITCOIN_AVG_PRIVKEY"));
     }
 
     @Override
@@ -112,22 +112,25 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
 
     private Map<String, BitcoinAverageTicker> getTickers() throws IOException {
         String path = String.format("indices/%s/ticker/all?crypto=BTC", symbolSet);
-        String json = httpClient.requestWithGETNoProxy(path, "X-signature", getHeader());
+        String json = httpClient.requestWithGETNoProxy(path, "X-signature", getAuthSignature());
         BitcoinAverageTickers value = mapper.readValue(json, BitcoinAverageTickers.class);
         return value.getTickers();
     }
 
-    protected String getHeader() throws IOException {
+    protected String getAuthSignature() {
+        String payload = String.format("%s.%s", Instant.now().getEpochSecond(), pubKey);
+        return String.format("%s.%s", payload, Hex.toHexString(mac.doFinal(payload.getBytes())));
+    }
+
+    private static Mac initMac(String privKey) {
         String algorithm = "HmacSHA256";
         SecretKey secretKey = new SecretKeySpec(privKey.getBytes(), algorithm);
-
         try {
-            String payload = Instant.now().getEpochSecond() + "." + pubKey;
             Mac mac = Mac.getInstance(algorithm);
             mac.init(secretKey);
-            return payload + "." + Hex.toHexString(mac.doFinal(payload.getBytes()));
-        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
-            throw new IOException(e);
+            return mac;
+        } catch (NoSuchAlgorithmException | InvalidKeyException ex) {
+            throw new RuntimeException(ex);
         }
     }
 
