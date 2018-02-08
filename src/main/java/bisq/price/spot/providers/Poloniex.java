@@ -38,15 +38,10 @@ import static java.lang.Double.parseDouble;
 
 public class Poloniex extends CachingExchangeRateProvider {
 
-    private final HttpClient httpClient;
+    private final HttpClient httpClient = new HttpClient("https://poloniex.com/public");
 
     public Poloniex() {
-        super(
-                "POLO",
-                "poloniex",
-                Duration.ofMinutes(1)
-        );
-        this.httpClient = new HttpClient("https://poloniex.com/public");
+        super("POLO", "poloniex", Duration.ofMinutes(1));
     }
 
     @Override
