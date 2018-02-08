@@ -23,23 +23,20 @@ import bisq.price.util.Altcoins;
 
 import io.bisq.network.http.HttpClient;
 
-import com.google.gson.Gson;
-import com.google.gson.internal.LinkedTreeMap;
+import org.knowm.xchange.coinmarketcap.dto.marketdata.CoinMarketCapTicker;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.Duration;
-import java.time.Instant;
 
 import java.io.IOException;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
-import static java.lang.Double.parseDouble;
 
 public class CoinMarketCap extends CachingExchangeRateProvider {
 
+    private final ObjectMapper mapper = new ObjectMapper();
     private final HttpClient httpClient;
 
     public CoinMarketCap() {
@@ -53,18 +50,32 @@ public class CoinMarketCap extends CachingExchangeRateProvider {
 
     @Override
     public Map<String, ExchangeRateData> doRequestForCaching() throws IOException {
-        Map<String, ExchangeRateData> marketPriceMap = new HashMap<>();
-        String response = httpClient.requestWithGET("v1/ticker/?limit=200", "User-Agent", "");
-        //noinspection unchecked
-        List<LinkedTreeMap<String, Object>> list = new Gson().fromJson(response, ArrayList.class);
-        long ts = Instant.now().getEpochSecond();
-        list.stream().forEach(treeMap -> {
-            String code = (String) treeMap.get("symbol");
-            if (Altcoins.ALL_SUPPORTED.contains(code)) {
-                double price_btc = parseDouble((String) treeMap.get("price_btc"));
-                marketPriceMap.put(code, new ExchangeRateData(code, price_btc, ts, getProviderSymbol()));
-            }
-        });
-        return marketPriceMap;
+        Map<String, ExchangeRateData> exchangeRates = new HashMap<>();
+
+        String json = httpClient.requestWithGET("v1/ticker/?limit=200", "User-Agent", "");
+
+        CoinMarketCapTicker[] tickers = mapper.readValue(json, CoinMarketCapTicker[].class);
+
+        for (CoinMarketCapTicker ticker : tickers) {
+            String altcoinCode = ticker.getName();
+
+            if (unsupportedAltcoin(altcoinCode))
+                continue;
+
+            exchangeRates.put(
+                altcoinCode, new ExchangeRateData(
+                    altcoinCode,
+                    ticker.getPriceBTC().doubleValue(),
+                    ticker.getLastUpdated().getTime(),
+                    getProviderSymbol()
+                )
+            );
+        }
+
+        return exchangeRates;
+    }
+
+    private static boolean unsupportedAltcoin(String altcoinCode) {
+        return !Altcoins.ALL_SUPPORTED.contains(altcoinCode);
     }
 }
