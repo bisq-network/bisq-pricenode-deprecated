@@ -37,9 +37,9 @@ import java.io.IOException;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Poloniex extends CachingExchangeRateProvider {
@@ -53,45 +53,32 @@ public class Poloniex extends CachingExchangeRateProvider {
 
     @Override
     public Set<ExchangeRate> doRequestForCaching() throws IOException {
-
-        Set<ExchangeRate> exchangeRates = new LinkedHashSet<>();
-
         Date timestamp = new Date(); // Poloniex tickers don't include their own timestamp
 
-        getTickers().forEach(ticker -> {
-
-            if (!ticker.getCurrencyPair().base.equals(Currency.BTC))
-                return;
-
-            String currency = ticker.getCurrencyPair().counter.getCurrencyCode();
-
-            if (!Altcoins.ALL_SUPPORTED.contains(currency))
-                return;
-
-            exchangeRates.add(
+        return getTickers()
+            .filter(t -> t.getCurrencyPair().base.equals(Currency.BTC))
+            .filter(t -> Altcoins.ALL_SUPPORTED.contains(t.getCurrencyPair().counter.getCurrencyCode()))
+            .map(t ->
                 new ExchangeRate(
-                    currency,
-                    ticker.getPoloniexMarketData().getLast(),
+                    t.getCurrencyPair().counter.getCurrencyCode(),
+                    t.getPoloniexMarketData().getLast(),
                     timestamp,
                     this.getName()
                 )
-            );
-        });
-
-        return exchangeRates;
+            )
+            .collect(Collectors.toSet());
     }
 
     private Stream<PoloniexTicker> getTickers() throws IOException {
         TypeReference typeReference = new TypeReference<HashMap<String, PoloniexMarketData>>() {
         };
-
         Map<String, PoloniexMarketData> tickers = mapper.readValue(getTickersJson(), typeReference);
 
         return tickers.entrySet().stream()
             .map(e -> {
                 String pair = e.getKey();
                 PoloniexMarketData data = e.getValue();
-                String[] symbols = pair.split("_");
+                String[] symbols = pair.split("_"); // e.g. BTC_USD => [BTC, USD]
                 return new PoloniexTicker(data, new CurrencyPair(symbols[0], symbols[1]));
             });
     }

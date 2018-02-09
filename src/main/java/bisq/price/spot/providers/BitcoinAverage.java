@@ -42,9 +42,9 @@ import java.security.NoSuchAlgorithmException;
 
 import java.io.IOException;
 
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * See the BitcoinAverage API documentation at https://apiv2.bitcoinaverage.com/#ticker-data-all
@@ -81,38 +81,37 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
 
     @Override
     public Set<ExchangeRate> doRequestForCaching() throws IOException {
-        Set<ExchangeRate> exchangeRates = new LinkedHashSet<>();
 
-        getTickers().forEach((symbol, ticker) -> {
-            String currency = symbol.substring(3);
-
-            if (unsupportedCurrency(currency))
-                return;
-
-            exchangeRates.add(
+        return getTickers().entrySet().stream()
+            .filter(e -> supportedCurrency(e.getKey()))
+            .map(e ->
                 new ExchangeRate(
-                    currency,
-                    ticker.getLast(),
-                    ticker.getTimestamp(),
+                    e.getKey(),
+                    e.getValue().getLast(),
+                    e.getValue().getTimestamp(),
                     this.getName()
                 )
-            );
-        });
-
-        return exchangeRates;
+            )
+            .collect(Collectors.toSet());
     }
 
-    private boolean unsupportedCurrency(String currencyCode) {
+    private boolean supportedCurrency(String currencyCode) {
         // ignore Venezuelan bolivars as the "official" exchange rate is just wishful thinking
         // we should use this API with a custom provider instead: http://api.bitcoinvenezuela.com/1
-        return "VEF".equals(currencyCode);
+        return !"VEF".equals(currencyCode);
     }
 
     private Map<String, BitcoinAverageTicker> getTickers() throws IOException {
         String path = String.format("indices/%s/ticker/all?crypto=BTC", symbolSet);
         String json = httpClient.requestWithGETNoProxy(path, "X-signature", getAuthSignature());
         BitcoinAverageTickers value = mapper.readValue(json, BitcoinAverageTickers.class);
-        return value.getTickers();
+        return rekey(value.getTickers());
+    }
+
+    private Map<String, BitcoinAverageTicker> rekey(Map<String, BitcoinAverageTicker> tickers) {
+        // go from a map with keys like "BTCUSD", "BTCVEF" to one with keys like "USD", "VEF"
+        return tickers.entrySet().stream()
+            .collect(Collectors.toMap(e -> e.getKey().substring(3), Map.Entry::getValue));
     }
 
     protected String getAuthSignature() {

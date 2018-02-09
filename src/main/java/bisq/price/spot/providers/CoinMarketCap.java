@@ -25,14 +25,17 @@ import io.bisq.network.http.HttpClient;
 
 import org.knowm.xchange.coinmarketcap.dto.marketdata.CoinMarketCapTicker;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.Duration;
 
 import java.io.IOException;
 
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class CoinMarketCap extends CachingExchangeRateProvider {
 
@@ -45,32 +48,27 @@ public class CoinMarketCap extends CachingExchangeRateProvider {
 
     @Override
     public Set<ExchangeRate> doRequestForCaching() throws IOException {
-        Set<ExchangeRate> exchangeRates = new LinkedHashSet<>();
 
-        String json = httpClient.requestWithGET("v1/ticker/?limit=200", "User-Agent", "");
-
-        CoinMarketCapTicker[] tickers = mapper.readValue(json, CoinMarketCapTicker[].class);
-
-        for (CoinMarketCapTicker ticker : tickers) {
-            String currency = ticker.getIsoCode();
-
-            if (unsupportedAltcoin(currency))
-                continue;
-
-            exchangeRates.add(
+        return getTickers()
+            .filter(t -> Altcoins.ALL_SUPPORTED.contains(t.getIsoCode()))
+            .map(t ->
                 new ExchangeRate(
-                    currency,
-                    ticker.getPriceBTC(),
-                    ticker.getLastUpdated(),
+                    t.getIsoCode(),
+                    t.getPriceBTC(),
+                    t.getLastUpdated(),
                     this.getName()
                 )
-            );
-        }
-
-        return exchangeRates;
+            )
+            .collect(Collectors.toSet());
     }
 
-    private static boolean unsupportedAltcoin(String altcoinCode) {
-        return !Altcoins.ALL_SUPPORTED.contains(altcoinCode);
+    private Stream<CoinMarketCapTicker> getTickers() throws IOException {
+        TypeReference typeReference = new TypeReference<List<CoinMarketCapTicker>>() {
+        };
+        return mapper.<List<CoinMarketCapTicker>>readValue(getTickersJson(), typeReference).stream();
+    }
+
+    private String getTickersJson() throws IOException {
+        return httpClient.requestWithGET("v1/ticker/?limit=200", "User-Agent", "");
     }
 }
