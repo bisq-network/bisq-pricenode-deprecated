@@ -23,8 +23,13 @@ import bisq.price.util.Altcoins;
 
 import io.bisq.network.http.HttpClient;
 
-import com.google.gson.Gson;
-import com.google.gson.internal.LinkedTreeMap;
+import org.knowm.xchange.currency.Currency;
+import org.knowm.xchange.currency.CurrencyPair;
+import org.knowm.xchange.poloniex.dto.marketdata.PoloniexMarketData;
+import org.knowm.xchange.poloniex.dto.marketdata.PoloniexTicker;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -33,11 +38,11 @@ import java.io.IOException;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static java.lang.Double.parseDouble;
+import java.util.stream.Stream;
 
 public class Poloniex extends CachingExchangeRateProvider {
 
+    private final ObjectMapper mapper = new ObjectMapper();
     private final HttpClient httpClient = new HttpClient("https://poloniex.com/public");
 
     public Poloniex() {
@@ -46,36 +51,50 @@ public class Poloniex extends CachingExchangeRateProvider {
 
     @Override
     public Map<String, ExchangeRateData> doRequestForCaching() throws IOException {
-        Map<String, ExchangeRateData> marketPriceMap = new HashMap<>();
-        String response = httpClient.requestWithGET("?command=returnTicker", "User-Agent", "");
-        //noinspection unchecked
-        LinkedTreeMap<String, Object> treeMap = new Gson().fromJson(response, LinkedTreeMap.class);
-        long ts = Instant.now().getEpochSecond();
-        treeMap.entrySet().stream().forEach(e -> {
-            Object value = e.getValue();
-            String invertedCurrencyPair = e.getKey();
-            String altcoinCurrency = null;
-            if (invertedCurrencyPair.startsWith("BTC")) {
-                String[] tokens = invertedCurrencyPair.split("_");
-                if (tokens.length == 2) {
-                    altcoinCurrency = tokens[1];
-                    if (Altcoins.ALL_SUPPORTED.contains(altcoinCurrency)) {
-                        if (value instanceof LinkedTreeMap) {
-                            //noinspection unchecked
-                            LinkedTreeMap<String, Object> data = (LinkedTreeMap) value;
-                            marketPriceMap.put(altcoinCurrency,
-                                    new ExchangeRateData(altcoinCurrency,
-                                            parseDouble((String) data.get("last")),
-                                            ts,
-                                            getProviderSymbol())
-                            );
-                        }
-                    }
-                } else {
-                    log.error("invertedCurrencyPair has invalid format: invertedCurrencyPair=" + invertedCurrencyPair);
-                }
-            }
+
+        Map<String, ExchangeRateData> exchangeRates = new HashMap<>();
+
+        long now = Instant.now().getEpochSecond();
+
+        getTickers().forEach(ticker -> {
+
+            if (!ticker.getCurrencyPair().base.equals(Currency.BTC))
+                return;
+
+            String altcoin = ticker.getCurrencyPair().counter.getCurrencyCode();
+
+            if (!Altcoins.ALL_SUPPORTED.contains(altcoin))
+                return;
+
+            exchangeRates.put(
+                altcoin, new ExchangeRateData(
+                    altcoin,
+                    ticker.getPoloniexMarketData().getLast().doubleValue(),
+                    now,
+                    this.getProviderSymbol()
+                )
+            );
         });
-        return marketPriceMap;
+
+        return exchangeRates;
+    }
+
+    private Stream<PoloniexTicker> getTickers() throws IOException {
+        TypeReference typeReference = new TypeReference<HashMap<String, PoloniexMarketData>>() {
+        };
+
+        Map<String, PoloniexMarketData> tickers = mapper.readValue(getTickersJson(), typeReference);
+
+        return tickers.entrySet().stream()
+            .map(e -> {
+                String pair = e.getKey();
+                PoloniexMarketData data = e.getValue();
+                String[] symbols = pair.split("_");
+                return new PoloniexTicker(data, new CurrencyPair(symbols[0], symbols[1]));
+            });
+    }
+
+    private String getTickersJson() throws IOException {
+        return httpClient.requestWithGET("?command=returnTicker", "User-Agent", "");
     }
 }
