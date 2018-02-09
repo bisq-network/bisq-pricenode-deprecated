@@ -88,17 +88,17 @@ public class ExchangeRateService {
 
     private long findFirstTimestampForProvider(Collection<ExchangeRateData> prices, String providerSymbol) {
         return prices.stream()
-                .filter(e -> providerSymbol.equals(e.getProvider()))
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("No exchange rate data found for " + providerSymbol))
-                .getTimestampSec();
+            .filter(e -> providerSymbol.equals(e.getProvider()))
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException("No exchange rate data found for " + providerSymbol))
+            .getTimestampSec();
     }
 
     private Map<String, ExchangeRateData> removeOutdatedPrices(Map<String, ExchangeRateData> map) {
         long now = Instant.now().getEpochSecond();
         long limit = now - MARKET_PRICE_TTL_SEC;
         return map.entrySet().stream()
-                .filter(e -> e.getValue().getTimestampSec() > limit)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            .filter(e -> e.getValue().getTimestampSec() > limit)
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }

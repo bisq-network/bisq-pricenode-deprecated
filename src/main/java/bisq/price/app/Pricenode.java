@@ -55,7 +55,7 @@ public class Pricenode {
 
     public void configure(Environment env) {
         env.getOptionalVar("PORT").ifPresent(port ->
-                setPort(Integer.valueOf(port))
+            setPort(Integer.valueOf(port))
         );
     }
 
@@ -79,7 +79,7 @@ public class Pricenode {
         get("/getFees", (req, res) -> toJson(feeEstimationService.getFees()));
         get("/getVersion", (req, res) -> version.toString());
         get("/getParams", (req, res) ->
-                ((BitcoinFees) feeEstimationService.getFeeEstimationProvider()).getCapacity() + ";" +
+            ((BitcoinFees) feeEstimationService.getFeeEstimationProvider()).getCapacity() + ";" +
                 ((BitcoinFees) feeEstimationService.getFeeEstimationProvider()).getMaxBlocks() + ";" +
                 feeEstimationService.getRequestIntervalMs());
     }

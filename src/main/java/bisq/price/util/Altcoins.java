@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 public abstract class Altcoins {
 
     public static final Set<String> ALL_SUPPORTED =
-            CurrencyUtil.getAllSortedCryptoCurrencies().stream()
-                    .map(TradeCurrency::getCode)
-                    .collect(Collectors.toSet());
+        CurrencyUtil.getAllSortedCryptoCurrencies().stream()
+            .map(TradeCurrency::getCode)
+            .collect(Collectors.toSet());
 }

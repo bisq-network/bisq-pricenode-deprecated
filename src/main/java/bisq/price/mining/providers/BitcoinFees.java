@@ -90,18 +90,18 @@ public class BitcoinFees implements FeeEstimationProvider {
 
         @SuppressWarnings("unchecked")
         LinkedTreeMap<String, ArrayList<LinkedTreeMap<String, Double>>> treeMap =
-                new Gson().fromJson(response, LinkedTreeMap.class);
+            new Gson().fromJson(response, LinkedTreeMap.class);
 
         final long[] fee = new long[1];
         // we want a fee which is at least in 20 blocks in (21.co estimation seem to be way too high, so we get
         // prob much faster in
         treeMap.entrySet().stream()
-                .flatMap(e -> e.getValue().stream())
-                .forEach(e -> {
-                    Double maxDelay = e.get("maxDelay");
-                    if (maxDelay <= maxBlocks && fee[0] == 0)
-                        fee[0] = MathUtils.roundDoubleToLong(e.get("maxFee"));
-                });
+            .flatMap(e -> e.getValue().stream())
+            .forEach(e -> {
+                Double maxDelay = e.get("maxDelay");
+                if (maxDelay <= maxBlocks && fee[0] == 0)
+                    fee[0] = MathUtils.roundDoubleToLong(e.get("maxFee"));
+            });
         fee[0] = Math.min(Math.max(fee[0], FeeEstimationService.BTC_MIN_TX_FEE), FeeEstimationService.BTC_MAX_TX_FEE);
 
         return getAverage(fee[0]);

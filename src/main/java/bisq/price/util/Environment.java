@@ -37,6 +37,6 @@ public class Environment {
 
     public String getRequiredVar(String name) {
         return getOptionalVar(name).orElseThrow(() -> new IllegalArgumentException(
-                        String.format("Error: required environment variable '%s' not found.", name)));
+            String.format("Error: required environment variable '%s' not found.", name)));
     }
 }

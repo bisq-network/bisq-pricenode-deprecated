@@ -10,8 +10,8 @@ mainClassName = "bisq.price.app.Main"
 version = "0.7.0"
 
 jar.manifest.attributes(
-        "Implementation-Title": rootProject.name,
-        "Implementation-Version": version)
+    "Implementation-Title": rootProject.name,
+    "Implementation-Version": version)
 
 repositories {
     jcenter()

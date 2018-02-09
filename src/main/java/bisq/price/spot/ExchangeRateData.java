@@ -51,9 +51,9 @@ public class ExchangeRateData {
         if (o == null || getClass() != o.getClass()) return false;
         ExchangeRateData exchangeRateData = (ExchangeRateData) o;
         return Double.compare(exchangeRateData.price, price) == 0 &&
-                timestampSec == exchangeRateData.timestampSec &&
-                Objects.equals(currencyCode, exchangeRateData.currencyCode) &&
-                Objects.equals(provider, exchangeRateData.provider);
+            timestampSec == exchangeRateData.timestampSec &&
+            Objects.equals(currencyCode, exchangeRateData.currencyCode) &&
+            Objects.equals(provider, exchangeRateData.provider);
     }
 
     @Override
@@ -64,10 +64,10 @@ public class ExchangeRateData {
     @Override
     public String toString() {
         return "ExchangeRateData{" +
-                "currencyCode='" + currencyCode + '\'' +
-                ", price=" + price +
-                ", timestampSec=" + timestampSec +
-                ", provider=" + provider +
-                '}';
+            "currencyCode='" + currencyCode + '\'' +
+            ", price=" + price +
+            ", timestampSec=" + timestampSec +
+            ", provider=" + provider +
+            '}';
     }
 }
