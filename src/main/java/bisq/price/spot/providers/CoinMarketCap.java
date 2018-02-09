@@ -52,14 +52,14 @@ public class CoinMarketCap extends CachingExchangeRateProvider {
         CoinMarketCapTicker[] tickers = mapper.readValue(json, CoinMarketCapTicker[].class);
 
         for (CoinMarketCapTicker ticker : tickers) {
-            String altcoinCode = ticker.getName();
+            String currency = ticker.getName();
 
-            if (unsupportedAltcoin(altcoinCode))
+            if (unsupportedAltcoin(currency))
                 continue;
 
             exchangeRates.put(
-                altcoinCode, new ExchangeRate(
-                    altcoinCode,
+                currency, new ExchangeRate(
+                    currency,
                     ticker.getPriceBTC().doubleValue(),
                     ticker.getLastUpdated().getTime(),
                     getProviderSymbol()

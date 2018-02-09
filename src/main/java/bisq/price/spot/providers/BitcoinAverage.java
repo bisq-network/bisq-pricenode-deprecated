@@ -83,14 +83,14 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
         Map<String, ExchangeRate> exchangeRates = new HashMap<>();
 
         getTickers().forEach((symbol, ticker) -> {
-            String currencyCode = symbol.substring(3);
+            String currency = symbol.substring(3);
 
-            if (unsupportedCurrency(currencyCode))
+            if (unsupportedCurrency(currency))
                 return;
 
             exchangeRates.put(
-                currencyCode, new ExchangeRate(
-                    currencyCode,
+                currency, new ExchangeRate(
+                    currency,
                     ticker.getLast().doubleValue(),
                     ticker.getTimestamp().getTime(),
                     this.getProviderSymbol()

@@ -54,23 +54,23 @@ public class Poloniex extends CachingExchangeRateProvider {
 
         Map<String, ExchangeRate> exchangeRates = new HashMap<>();
 
-        long now = Instant.now().getEpochSecond();
+        long timestamp = Instant.now().getEpochSecond();
 
         getTickers().forEach(ticker -> {
 
             if (!ticker.getCurrencyPair().base.equals(Currency.BTC))
                 return;
 
-            String altcoin = ticker.getCurrencyPair().counter.getCurrencyCode();
+            String currency = ticker.getCurrencyPair().counter.getCurrencyCode();
 
-            if (!Altcoins.ALL_SUPPORTED.contains(altcoin))
+            if (!Altcoins.ALL_SUPPORTED.contains(currency))
                 return;
 
             exchangeRates.put(
-                altcoin, new ExchangeRate(
-                    altcoin,
+                currency, new ExchangeRate(
+                    currency,
                     ticker.getPoloniexMarketData().getLast().doubleValue(),
-                    now,
+                    timestamp,
                     this.getProviderSymbol()
                 )
             );

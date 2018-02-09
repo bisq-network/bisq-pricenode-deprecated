@@ -86,6 +86,6 @@ public class ExchangeRateService {
             .filter(e -> providerSymbol.equals(e.getProvider()))
             .findFirst()
             .orElseThrow(() -> new IllegalStateException("No exchange rate data found for " + providerSymbol))
-            .getTimestampSec();
+            .getTimestamp();
     }
 }

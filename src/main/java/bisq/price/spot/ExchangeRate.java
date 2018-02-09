@@ -21,15 +21,15 @@ import java.util.Objects;
 
 public class ExchangeRate {
 
-    private final String currencyCode;
+    private final String currency;
     private final double price;
-    private final long timestampSec;
+    private final long timestamp;
     private final String provider;
 
-    public ExchangeRate(String currencyCode, double price, long timestampSec, String provider) {
-        this.currencyCode = currencyCode;
+    public ExchangeRate(String currency, double price, long timestamp, String provider) {
+        this.currency = currency;
         this.price = price;
-        this.timestampSec = timestampSec;
+        this.timestamp = timestamp;
         this.provider = provider;
     }
 
@@ -37,8 +37,8 @@ public class ExchangeRate {
         return this.price;
     }
 
-    long getTimestampSec() {
-        return this.timestampSec;
+    long getTimestamp() {
+        return this.timestamp;
     }
 
     public String getProvider() {
@@ -51,22 +51,22 @@ public class ExchangeRate {
         if (o == null || getClass() != o.getClass()) return false;
         ExchangeRate exchangeRate = (ExchangeRate) o;
         return Double.compare(exchangeRate.price, price) == 0 &&
-            timestampSec == exchangeRate.timestampSec &&
-            Objects.equals(currencyCode, exchangeRate.currencyCode) &&
+            timestamp == exchangeRate.timestamp &&
+            Objects.equals(currency, exchangeRate.currency) &&
             Objects.equals(provider, exchangeRate.provider);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(currencyCode, price, timestampSec, provider);
+        return Objects.hash(currency, price, timestamp, provider);
     }
 
     @Override
     public String toString() {
         return "ExchangeRate{" +
-            "currencyCode='" + currencyCode + '\'' +
+            "currency='" + currency + '\'' +
             ", price=" + price +
-            ", timestampSec=" + timestampSec +
+            ", timestamp=" + timestamp +
             ", provider=" + provider +
             '}';
     }
