@@ -59,7 +59,7 @@ public class ExchangeRateService {
 
             String debugPrefix = provider.getMetadataPrefix();
             long count = prices.size();
-            long timestamp = findFirstTimestampForProvider(prices, provider.getProviderSymbol());
+            long timestamp = findFirstTimestampForProvider(prices, provider.getName());
 
             if (provider instanceof BitcoinAverage.Local) {
                 // `git log --grep btcAverageTs` for details on this special case
@@ -81,11 +81,11 @@ public class ExchangeRateService {
         allMarketPrices.put("data", allData.values().toArray());
     }
 
-    private long findFirstTimestampForProvider(Collection<ExchangeRate> prices, String providerSymbol) {
+    private long findFirstTimestampForProvider(Collection<ExchangeRate> prices, String providerName) {
         return prices.stream()
-            .filter(e -> providerSymbol.equals(e.getProvider()))
+            .filter(e -> providerName.equals(e.getProvider()))
             .findFirst()
-            .orElseThrow(() -> new IllegalStateException("No exchange rate data found for " + providerSymbol))
+            .orElseThrow(() -> new IllegalStateException("No exchange rate data found for " + providerName))
             .getTimestamp();
     }
 }

@@ -71,7 +71,7 @@ public class Poloniex extends CachingExchangeRateProvider {
                     currency,
                     ticker.getPoloniexMarketData().getLast(),
                     timestamp,
-                    this.getProviderSymbol()
+                    this.getName()
                 )
             );
         });

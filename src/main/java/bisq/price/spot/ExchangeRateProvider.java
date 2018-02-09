@@ -32,7 +32,7 @@ public interface ExchangeRateProvider {
 
     void configure(Environment env);
 
-    String getProviderSymbol();
+    String getName();
 
     String getMetadataPrefix();
 

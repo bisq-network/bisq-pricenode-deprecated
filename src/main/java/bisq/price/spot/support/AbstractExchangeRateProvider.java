@@ -64,7 +64,7 @@ public abstract class AbstractExchangeRateProvider implements ExchangeRateProvid
     protected abstract Map<String, ExchangeRate> doRequest() throws IOException;
 
     @Override
-    public String getProviderSymbol() {
+    public String getName() {
         return symbol;
     }
 

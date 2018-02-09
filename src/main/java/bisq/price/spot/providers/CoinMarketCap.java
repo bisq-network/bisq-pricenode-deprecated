@@ -62,7 +62,7 @@ public class CoinMarketCap extends CachingExchangeRateProvider {
                     currency,
                     ticker.getPriceBTC(),
                     ticker.getLastUpdated(),
-                    getProviderSymbol()
+                    this.getName()
                 )
             );
         }

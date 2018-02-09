@@ -93,7 +93,7 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
                     currency,
                     ticker.getLast(),
                     ticker.getTimestamp(),
-                    this.getProviderSymbol()
+                    this.getName()
                 )
             );
         });
