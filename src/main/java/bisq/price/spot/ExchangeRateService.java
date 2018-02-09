@@ -57,8 +57,6 @@ public class ExchangeRateService {
         for (ExchangeRateProvider provider : providers) {
             Collection<ExchangeRate> prices = provider.request().values();
 
-            String debugPrefix = provider.getMetadataPrefix();
-            long count = prices.size();
             long timestamp = findFirstTimestampForProvider(prices, provider.getName());
 
             if (provider instanceof BitcoinAverage.Local) {
@@ -66,8 +64,9 @@ public class ExchangeRateService {
                 allMarketPrices.put("btcAverageTs", timestamp);
             }
 
-            allMarketPrices.put(debugPrefix + "Ts", timestamp);
-            allMarketPrices.put(debugPrefix + "Count", count);
+            String prefix = provider.getPrefix();
+            allMarketPrices.put(prefix + "Ts", timestamp);
+            allMarketPrices.put(prefix + "Count", prices.size());
         }
     }
 

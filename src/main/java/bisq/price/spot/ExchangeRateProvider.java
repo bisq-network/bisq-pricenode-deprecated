@@ -34,7 +34,7 @@ public interface ExchangeRateProvider {
 
     String getName();
 
-    String getMetadataPrefix();
+    String getPrefix();
 
     /**
      * Load, configure and return a list of {@link ExchangeRateProvider} implementations

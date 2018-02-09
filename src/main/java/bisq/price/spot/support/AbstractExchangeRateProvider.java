@@ -69,7 +69,7 @@ public abstract class AbstractExchangeRateProvider implements ExchangeRateProvid
     }
 
     @Override
-    public String getMetadataPrefix() {
+    public String getPrefix() {
         return metadataPrefix;
     }
 }
