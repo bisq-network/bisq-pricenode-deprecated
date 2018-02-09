@@ -22,6 +22,10 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Objects;
 
+/**
+ * A value object representing the spot price in bitcoin for a given currency at a given
+ * time as reported by a given provider.
+ */
 public class ExchangeRate {
 
     private final String currency;
