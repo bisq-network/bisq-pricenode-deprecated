@@ -48,7 +48,7 @@ public class ExchangeRateService {
         Map<String, Object> allMarketPrices = new LinkedHashMap<>();
 
         addMetadata(allMarketPrices);
-        addData(allMarketPrices);
+        addExchangeRates(allMarketPrices);
 
         return allMarketPrices;
     }
@@ -71,14 +71,14 @@ public class ExchangeRateService {
         }
     }
 
-    private void addData(Map<String, Object> allMarketPrices) throws IOException {
-        Map<String, ExchangeRate> allData = new HashMap<>();
+    private void addExchangeRates(Map<String, Object> allMarketPrices) throws IOException {
+        Map<String, ExchangeRate> exchangeRates = new HashMap<>();
 
         for (ExchangeRateProvider provider : providers) {
-            allData.putAll(provider.request());
+            exchangeRates.putAll(provider.request());
         }
 
-        allMarketPrices.put("data", allData.values().toArray());
+        allMarketPrices.put("data", exchangeRates.values().toArray());
     }
 
     private long findFirstTimestampForProvider(Collection<ExchangeRate> prices, String providerName) {
