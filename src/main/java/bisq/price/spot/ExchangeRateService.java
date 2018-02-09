@@ -20,8 +20,6 @@ package bisq.price.spot;
 import bisq.price.spot.providers.BitcoinAverage;
 import bisq.price.spot.support.CachingExchangeRateProvider;
 
-import java.time.Instant;
-
 import java.io.IOException;
 
 import java.util.Collection;
@@ -29,11 +27,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class ExchangeRateService {
-
-    private static final long MARKET_PRICE_TTL_SEC = 1800; // 30 min
 
     private final List<ExchangeRateProvider> providers;
 
@@ -83,7 +78,7 @@ public class ExchangeRateService {
             allData.putAll(provider.request());
         }
 
-        allMarketPrices.put("data", removeOutdatedPrices(allData).values().toArray());
+        allMarketPrices.put("data", allData.values().toArray());
     }
 
     private long findFirstTimestampForProvider(Collection<ExchangeRateData> prices, String providerSymbol) {
@@ -92,13 +87,5 @@ public class ExchangeRateService {
             .findFirst()
             .orElseThrow(() -> new IllegalStateException("No exchange rate data found for " + providerSymbol))
             .getTimestampSec();
-    }
-
-    private Map<String, ExchangeRateData> removeOutdatedPrices(Map<String, ExchangeRateData> map) {
-        long now = Instant.now().getEpochSecond();
-        long limit = now - MARKET_PRICE_TTL_SEC;
-        return map.entrySet().stream()
-            .filter(e -> e.getValue().getTimestampSec() > limit)
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }
