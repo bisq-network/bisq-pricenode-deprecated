@@ -33,6 +33,8 @@
           <emptyLine />
           <package name="java.time" withSubpackages="true" static="false" />
           <emptyLine />
+          <package name="java.math" withSubpackages="true" static="false" />
+          <emptyLine />
           <package name="java.security" withSubpackages="true" static="false" />
           <emptyLine />
           <package name="java.io" withSubpackages="true" static="false" />

@@ -17,6 +17,9 @@
 
 package bisq.price.spot;
 
+import java.math.BigDecimal;
+
+import java.util.Date;
 import java.util.Objects;
 
 public class ExchangeRate {
@@ -25,6 +28,15 @@ public class ExchangeRate {
     private final double price;
     private final long timestamp;
     private final String provider;
+
+    public ExchangeRate(String currency, BigDecimal price, Date timestamp, String provider) {
+        this(
+            currency,
+            price.doubleValue(),
+            timestamp.getTime(),
+            provider
+        );
+    }
 
     public ExchangeRate(String currency, double price, long timestamp, String provider) {
         this.currency = currency;

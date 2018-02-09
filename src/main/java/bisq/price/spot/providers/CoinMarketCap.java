@@ -60,8 +60,8 @@ public class CoinMarketCap extends CachingExchangeRateProvider {
             exchangeRates.put(
                 currency, new ExchangeRate(
                     currency,
-                    ticker.getPriceBTC().doubleValue(),
-                    ticker.getLastUpdated().getTime(),
+                    ticker.getPriceBTC(),
+                    ticker.getLastUpdated(),
                     getProviderSymbol()
                 )
             );

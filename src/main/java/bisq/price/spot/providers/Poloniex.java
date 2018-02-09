@@ -32,10 +32,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.Duration;
-import java.time.Instant;
 
 import java.io.IOException;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -54,7 +54,7 @@ public class Poloniex extends CachingExchangeRateProvider {
 
         Map<String, ExchangeRate> exchangeRates = new HashMap<>();
 
-        long timestamp = Instant.now().getEpochSecond();
+        Date timestamp = new Date(); // Poloniex tickers don't include their own timestamp
 
         getTickers().forEach(ticker -> {
 
@@ -69,7 +69,7 @@ public class Poloniex extends CachingExchangeRateProvider {
             exchangeRates.put(
                 currency, new ExchangeRate(
                     currency,
-                    ticker.getPoloniexMarketData().getLast().doubleValue(),
+                    ticker.getPoloniexMarketData().getLast(),
                     timestamp,
                     this.getProviderSymbol()
                 )
