@@ -49,6 +49,10 @@ public class ExchangeRate {
         this.provider = provider;
     }
 
+    public String getCurrency() {
+        return currency;
+    }
+
     public double getPrice() {
         return this.price;
     }

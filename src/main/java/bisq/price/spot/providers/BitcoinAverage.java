@@ -42,8 +42,9 @@ import java.security.NoSuchAlgorithmException;
 
 import java.io.IOException;
 
-import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * See the BitcoinAverage API documentation at https://apiv2.bitcoinaverage.com/#ticker-data-all
@@ -79,8 +80,8 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
     }
 
     @Override
-    public Map<String, ExchangeRate> doRequestForCaching() throws IOException {
-        Map<String, ExchangeRate> exchangeRates = new HashMap<>();
+    public Set<ExchangeRate> doRequestForCaching() throws IOException {
+        Set<ExchangeRate> exchangeRates = new LinkedHashSet<>();
 
         getTickers().forEach((symbol, ticker) -> {
             String currency = symbol.substring(3);
@@ -88,8 +89,8 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
             if (unsupportedCurrency(currency))
                 return;
 
-            exchangeRates.put(
-                currency, new ExchangeRate(
+            exchangeRates.add(
+                new ExchangeRate(
                     currency,
                     ticker.getLast(),
                     ticker.getTimestamp(),

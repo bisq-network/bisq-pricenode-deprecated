@@ -23,12 +23,12 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.ServiceLoader;
+import java.util.Set;
 
 public interface ExchangeRateProvider {
 
-    Map<String, ExchangeRate> request() throws IOException;
+    Set<ExchangeRate> request() throws IOException;
 
     void configure(Environment env);
 

@@ -23,13 +23,13 @@ import java.time.Duration;
 
 import java.io.IOException;
 
-import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public abstract class CachingExchangeRateProvider extends AbstractExchangeRateProvider {
 
-    protected Map<String, ExchangeRate> data;
+    protected Set<ExchangeRate> data;
 
     private final Duration ttl;
 
@@ -60,20 +60,17 @@ public abstract class CachingExchangeRateProvider extends AbstractExchangeRatePr
 
         data = doRequestForCaching();
 
-        if (data.get("USD") != null) {
-            log.info("BTC/USD: {}", data.get("USD").getPrice());
-        }
-        if (data.get("LTC") != null) {
-            log.info("LTC/BTC: {}", data.get("LTC").getPrice());
-        }
+        data.stream()
+            .filter(e -> "USD".equals(e.getCurrency()) || "LTC".equals(e.getCurrency()))
+            .forEach(e -> log.info("BTC/{}: {}", e.getCurrency(), e.getPrice()));
 
         log.info("requestAndCache took {} ms.", (System.currentTimeMillis() - ts));
     }
 
     @Override
-    public final Map<String, ExchangeRate> doRequest() {
+    public final Set<ExchangeRate> doRequest() {
         return data;
     }
 
-    protected abstract Map<String, ExchangeRate> doRequestForCaching() throws IOException;
+    protected abstract Set<ExchangeRate> doRequestForCaching() throws IOException;
 }

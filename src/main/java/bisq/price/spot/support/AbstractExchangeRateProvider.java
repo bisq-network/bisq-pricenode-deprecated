@@ -23,7 +23,7 @@ import bisq.price.util.Environment;
 
 import java.io.IOException;
 
-import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,14 +54,14 @@ public abstract class AbstractExchangeRateProvider implements ExchangeRateProvid
     }
 
     @Override
-    public final Map<String, ExchangeRate> request() throws IOException {
+    public final Set<ExchangeRate> request() throws IOException {
         if (!configured) {
             throw new IllegalStateException("'configure' method was not called");
         }
         return doRequest();
     }
 
-    protected abstract Map<String, ExchangeRate> doRequest() throws IOException;
+    protected abstract Set<ExchangeRate> doRequest() throws IOException;
 
     @Override
     public String getName() {

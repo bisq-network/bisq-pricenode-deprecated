@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class ExchangeRateService {
 
@@ -55,9 +56,9 @@ public class ExchangeRateService {
 
     private void addMetadata(Map<String, Object> allMarketPrices) throws IOException {
         for (ExchangeRateProvider provider : providers) {
-            Collection<ExchangeRate> prices = provider.request().values();
+            Set<ExchangeRate> exchangeRates = provider.request();
 
-            long timestamp = findFirstTimestampForProvider(prices, provider.getName());
+            long timestamp = findFirstTimestampForProvider(exchangeRates, provider.getName());
 
             if (provider instanceof BitcoinAverage.Local) {
                 // `git log --grep btcAverageTs` for details on this special case
@@ -66,7 +67,7 @@ public class ExchangeRateService {
 
             String prefix = provider.getPrefix();
             allMarketPrices.put(prefix + "Ts", timestamp);
-            allMarketPrices.put(prefix + "Count", prices.size());
+            allMarketPrices.put(prefix + "Count", exchangeRates.size());
         }
     }
 
@@ -74,7 +75,9 @@ public class ExchangeRateService {
         Map<String, ExchangeRate> exchangeRates = new HashMap<>();
 
         for (ExchangeRateProvider provider : providers) {
-            exchangeRates.putAll(provider.request());
+            for (ExchangeRate exchangeRate : provider.request()) {
+                exchangeRates.put(exchangeRate.getCurrency(), exchangeRate);
+            }
         }
 
         allMarketPrices.put("data", exchangeRates.values().toArray());

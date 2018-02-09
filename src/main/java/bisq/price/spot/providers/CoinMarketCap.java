@@ -31,8 +31,8 @@ import java.time.Duration;
 
 import java.io.IOException;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class CoinMarketCap extends CachingExchangeRateProvider {
 
@@ -44,21 +44,21 @@ public class CoinMarketCap extends CachingExchangeRateProvider {
     }
 
     @Override
-    public Map<String, ExchangeRate> doRequestForCaching() throws IOException {
-        Map<String, ExchangeRate> exchangeRates = new HashMap<>();
+    public Set<ExchangeRate> doRequestForCaching() throws IOException {
+        Set<ExchangeRate> exchangeRates = new LinkedHashSet<>();
 
         String json = httpClient.requestWithGET("v1/ticker/?limit=200", "User-Agent", "");
 
         CoinMarketCapTicker[] tickers = mapper.readValue(json, CoinMarketCapTicker[].class);
 
         for (CoinMarketCapTicker ticker : tickers) {
-            String currency = ticker.getName();
+            String currency = ticker.getIsoCode();
 
             if (unsupportedAltcoin(currency))
                 continue;
 
-            exchangeRates.put(
-                currency, new ExchangeRate(
+            exchangeRates.add(
+                new ExchangeRate(
                     currency,
                     ticker.getPriceBTC(),
                     ticker.getLastUpdated(),

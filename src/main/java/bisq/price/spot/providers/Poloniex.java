@@ -37,7 +37,9 @@ import java.io.IOException;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
 public class Poloniex extends CachingExchangeRateProvider {
@@ -50,9 +52,9 @@ public class Poloniex extends CachingExchangeRateProvider {
     }
 
     @Override
-    public Map<String, ExchangeRate> doRequestForCaching() throws IOException {
+    public Set<ExchangeRate> doRequestForCaching() throws IOException {
 
-        Map<String, ExchangeRate> exchangeRates = new HashMap<>();
+        Set<ExchangeRate> exchangeRates = new LinkedHashSet<>();
 
         Date timestamp = new Date(); // Poloniex tickers don't include their own timestamp
 
@@ -66,8 +68,8 @@ public class Poloniex extends CachingExchangeRateProvider {
             if (!Altcoins.ALL_SUPPORTED.contains(currency))
                 return;
 
-            exchangeRates.put(
-                currency, new ExchangeRate(
+            exchangeRates.add(
+                new ExchangeRate(
                     currency,
                     ticker.getPoloniexMarketData().getLast(),
                     timestamp,
