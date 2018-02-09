@@ -22,8 +22,6 @@ import bisq.price.spot.support.CachingExchangeRateProvider;
 
 import java.io.IOException;
 
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,48 +44,44 @@ public class ExchangeRateService {
     }
 
     public Map<String, Object> getAllMarketPrices() throws IOException {
-        Map<String, Object> allMarketPrices = new LinkedHashMap<>();
+        Map<String, Object> metadata = new LinkedHashMap<>();
+        Map<String, Object> allExchangeRates = new LinkedHashMap<>();
 
-        addMetadata(allMarketPrices);
-        addExchangeRates(allMarketPrices);
-
-        return allMarketPrices;
-    }
-
-    private void addMetadata(Map<String, Object> allMarketPrices) throws IOException {
         for (ExchangeRateProvider provider : providers) {
             Set<ExchangeRate> exchangeRates = provider.request();
-
-            long timestamp = findFirstTimestampForProvider(exchangeRates, provider.getName());
-
-            if (provider instanceof BitcoinAverage.Local) {
-                // `git log --grep btcAverageTs` for details on this special case
-                allMarketPrices.put("btcAverageTs", timestamp);
-            }
-
-            String prefix = provider.getPrefix();
-            allMarketPrices.put(prefix + "Ts", timestamp);
-            allMarketPrices.put(prefix + "Count", exchangeRates.size());
-        }
-    }
-
-    private void addExchangeRates(Map<String, Object> allMarketPrices) throws IOException {
-        Map<String, ExchangeRate> exchangeRates = new HashMap<>();
-
-        for (ExchangeRateProvider provider : providers) {
-            for (ExchangeRate exchangeRate : provider.request()) {
-                exchangeRates.put(exchangeRate.getCurrency(), exchangeRate);
-            }
+            metadata.putAll(getMetadata(provider, exchangeRates));
+            exchangeRates.forEach(e ->
+                allExchangeRates.put(e.getCurrency(), e)
+            );
         }
 
-        allMarketPrices.put("data", exchangeRates.values().toArray());
+        return new LinkedHashMap<String, Object>() {{
+            putAll(metadata);
+            put("data", allExchangeRates);
+        }};
     }
 
-    private long findFirstTimestampForProvider(Collection<ExchangeRate> prices, String providerName) {
-        return prices.stream()
-            .filter(e -> providerName.equals(e.getProvider()))
+    private Map<String, Object> getMetadata(ExchangeRateProvider provider, Set<ExchangeRate> exchangeRates) {
+        Map<String, Object> metadata = new LinkedHashMap<>();
+
+        long timestamp = getTimestamp(provider, exchangeRates);
+
+        if (provider instanceof BitcoinAverage.Local) {
+            metadata.put("btcAverageTs", timestamp);
+        }
+
+        String prefix = provider.getPrefix();
+        metadata.put(prefix + "Ts", timestamp);
+        metadata.put(prefix + "Count", exchangeRates.size());
+
+        return metadata;
+    }
+
+    private long getTimestamp(ExchangeRateProvider provider, Set<ExchangeRate> exchangeRates) {
+        return exchangeRates.stream()
+            .filter(e -> provider.getName().equals(e.getProvider()))
             .findFirst()
-            .orElseThrow(() -> new IllegalStateException("No exchange rate data found for " + providerName))
+            .orElseThrow(() -> new IllegalStateException("No exchange rate data found for " + provider.getName()))
             .getTimestamp();
     }
 }
