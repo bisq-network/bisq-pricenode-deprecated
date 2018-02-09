@@ -17,7 +17,7 @@
 
 package bisq.price.spot.providers;
 
-import bisq.price.spot.ExchangeRateData;
+import bisq.price.spot.ExchangeRate;
 import bisq.price.spot.support.CachingExchangeRateProvider;
 import bisq.price.util.Environment;
 
@@ -79,8 +79,8 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
     }
 
     @Override
-    public Map<String, ExchangeRateData> doRequestForCaching() throws IOException {
-        Map<String, ExchangeRateData> exchangeRates = new HashMap<>();
+    public Map<String, ExchangeRate> doRequestForCaching() throws IOException {
+        Map<String, ExchangeRate> exchangeRates = new HashMap<>();
 
         getTickers().forEach((symbol, ticker) -> {
             String currencyCode = symbol.substring(3);
@@ -89,7 +89,7 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
                 return;
 
             exchangeRates.put(
-                currencyCode, new ExchangeRateData(
+                currencyCode, new ExchangeRate(
                     currencyCode,
                     ticker.getLast().doubleValue(),
                     ticker.getTimestamp().getTime(),

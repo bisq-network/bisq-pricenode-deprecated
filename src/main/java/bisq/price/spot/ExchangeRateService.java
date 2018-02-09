@@ -55,7 +55,7 @@ public class ExchangeRateService {
 
     private void addMetadata(Map<String, Object> allMarketPrices) throws IOException {
         for (ExchangeRateProvider provider : providers) {
-            Collection<ExchangeRateData> prices = provider.request().values();
+            Collection<ExchangeRate> prices = provider.request().values();
 
             String debugPrefix = provider.getMetadataPrefix();
             long count = prices.size();
@@ -72,7 +72,7 @@ public class ExchangeRateService {
     }
 
     private void addData(Map<String, Object> allMarketPrices) throws IOException {
-        Map<String, ExchangeRateData> allData = new HashMap<>();
+        Map<String, ExchangeRate> allData = new HashMap<>();
 
         for (ExchangeRateProvider provider : providers) {
             allData.putAll(provider.request());
@@ -81,7 +81,7 @@ public class ExchangeRateService {
         allMarketPrices.put("data", allData.values().toArray());
     }
 
-    private long findFirstTimestampForProvider(Collection<ExchangeRateData> prices, String providerSymbol) {
+    private long findFirstTimestampForProvider(Collection<ExchangeRate> prices, String providerSymbol) {
         return prices.stream()
             .filter(e -> providerSymbol.equals(e.getProvider()))
             .findFirst()

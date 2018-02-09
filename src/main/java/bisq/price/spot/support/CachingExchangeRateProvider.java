@@ -17,7 +17,7 @@
 
 package bisq.price.spot.support;
 
-import bisq.price.spot.ExchangeRateData;
+import bisq.price.spot.ExchangeRate;
 
 import java.time.Duration;
 
@@ -29,7 +29,7 @@ import java.util.TimerTask;
 
 public abstract class CachingExchangeRateProvider extends AbstractExchangeRateProvider {
 
-    protected Map<String, ExchangeRateData> data;
+    protected Map<String, ExchangeRate> data;
 
     private final Duration ttl;
 
@@ -71,9 +71,9 @@ public abstract class CachingExchangeRateProvider extends AbstractExchangeRatePr
     }
 
     @Override
-    public final Map<String, ExchangeRateData> doRequest() {
+    public final Map<String, ExchangeRate> doRequest() {
         return data;
     }
 
-    protected abstract Map<String, ExchangeRateData> doRequestForCaching() throws IOException;
+    protected abstract Map<String, ExchangeRate> doRequestForCaching() throws IOException;
 }

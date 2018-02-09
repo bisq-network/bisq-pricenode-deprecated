@@ -17,7 +17,7 @@
 
 package bisq.price.spot.providers;
 
-import bisq.price.spot.ExchangeRateData;
+import bisq.price.spot.ExchangeRate;
 import bisq.price.spot.support.CachingExchangeRateProvider;
 import bisq.price.util.Altcoins;
 
@@ -44,8 +44,8 @@ public class CoinMarketCap extends CachingExchangeRateProvider {
     }
 
     @Override
-    public Map<String, ExchangeRateData> doRequestForCaching() throws IOException {
-        Map<String, ExchangeRateData> exchangeRates = new HashMap<>();
+    public Map<String, ExchangeRate> doRequestForCaching() throws IOException {
+        Map<String, ExchangeRate> exchangeRates = new HashMap<>();
 
         String json = httpClient.requestWithGET("v1/ticker/?limit=200", "User-Agent", "");
 
@@ -58,7 +58,7 @@ public class CoinMarketCap extends CachingExchangeRateProvider {
                 continue;
 
             exchangeRates.put(
-                altcoinCode, new ExchangeRateData(
+                altcoinCode, new ExchangeRate(
                     altcoinCode,
                     ticker.getPriceBTC().doubleValue(),
                     ticker.getLastUpdated().getTime(),

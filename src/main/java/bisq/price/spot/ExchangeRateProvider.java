@@ -28,7 +28,7 @@ import java.util.ServiceLoader;
 
 public interface ExchangeRateProvider {
 
-    Map<String, ExchangeRateData> request() throws IOException;
+    Map<String, ExchangeRate> request() throws IOException;
 
     void configure(Environment env);
 

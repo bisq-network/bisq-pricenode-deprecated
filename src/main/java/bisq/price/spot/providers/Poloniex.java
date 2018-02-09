@@ -17,7 +17,7 @@
 
 package bisq.price.spot.providers;
 
-import bisq.price.spot.ExchangeRateData;
+import bisq.price.spot.ExchangeRate;
 import bisq.price.spot.support.CachingExchangeRateProvider;
 import bisq.price.util.Altcoins;
 
@@ -50,9 +50,9 @@ public class Poloniex extends CachingExchangeRateProvider {
     }
 
     @Override
-    public Map<String, ExchangeRateData> doRequestForCaching() throws IOException {
+    public Map<String, ExchangeRate> doRequestForCaching() throws IOException {
 
-        Map<String, ExchangeRateData> exchangeRates = new HashMap<>();
+        Map<String, ExchangeRate> exchangeRates = new HashMap<>();
 
         long now = Instant.now().getEpochSecond();
 
@@ -67,7 +67,7 @@ public class Poloniex extends CachingExchangeRateProvider {
                 return;
 
             exchangeRates.put(
-                altcoin, new ExchangeRateData(
+                altcoin, new ExchangeRate(
                     altcoin,
                     ticker.getPoloniexMarketData().getLast().doubleValue(),
                     now,

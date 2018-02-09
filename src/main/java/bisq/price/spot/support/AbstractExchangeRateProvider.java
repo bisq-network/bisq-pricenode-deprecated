@@ -17,7 +17,7 @@
 
 package bisq.price.spot.support;
 
-import bisq.price.spot.ExchangeRateData;
+import bisq.price.spot.ExchangeRate;
 import bisq.price.spot.ExchangeRateProvider;
 import bisq.price.util.Environment;
 
@@ -54,14 +54,14 @@ public abstract class AbstractExchangeRateProvider implements ExchangeRateProvid
     }
 
     @Override
-    public final Map<String, ExchangeRateData> request() throws IOException {
+    public final Map<String, ExchangeRate> request() throws IOException {
         if (!configured) {
             throw new IllegalStateException("'configure' method was not called");
         }
         return doRequest();
     }
 
-    protected abstract Map<String, ExchangeRateData> doRequest() throws IOException;
+    protected abstract Map<String, ExchangeRate> doRequest() throws IOException;
 
     @Override
     public String getProviderSymbol() {
