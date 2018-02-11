@@ -33,8 +33,8 @@ public abstract class CachingExchangeRateProvider extends AbstractExchangeRatePr
 
     private final Duration ttl;
 
-    public CachingExchangeRateProvider(String symbol, String metadataPrefix, Duration ttl) {
-        super(symbol, metadataPrefix);
+    public CachingExchangeRateProvider(String name, String prefix, Duration ttl) {
+        super(name, prefix);
         this.ttl = ttl;
         log.info("will refresh exchange rate data every {}", ttl);
     }

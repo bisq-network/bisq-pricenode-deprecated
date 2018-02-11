@@ -32,13 +32,12 @@ public abstract class AbstractExchangeRateProvider implements ExchangeRateProvid
 
     private boolean configured;
 
-    private final String symbol;
-    private final String metadataPrefix;
+    private final String name;
+    private final String prefix;
 
-    public AbstractExchangeRateProvider(String symbol,
-                                        String metadataPrefix) {
-        this.symbol = symbol;
-        this.metadataPrefix = metadataPrefix;
+    public AbstractExchangeRateProvider(String name, String prefix) {
+        this.name = name;
+        this.prefix = prefix;
     }
 
     @Override
@@ -63,11 +62,11 @@ public abstract class AbstractExchangeRateProvider implements ExchangeRateProvid
 
     @Override
     public String getName() {
-        return symbol;
+        return name;
     }
 
     @Override
     public String getPrefix() {
-        return metadataPrefix;
+        return prefix;
     }
 }

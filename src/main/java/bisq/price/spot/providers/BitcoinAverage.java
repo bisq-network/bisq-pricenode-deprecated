@@ -68,8 +68,8 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
     /**
      * @param symbolSet "global" or "local"; see https://apiv2.bitcoinaverage.com/#supported-currencies
      */
-    public BitcoinAverage(String symbol, String metadataPrefix, double pctMaxRequests, String symbolSet) {
-        super(symbol, metadataPrefix, ttlFor(pctMaxRequests));
+    public BitcoinAverage(String name, String prefix, double pctMaxRequests, String symbolSet) {
+        super(name, prefix, ttlFor(pctMaxRequests));
         this.symbolSet = symbolSet;
     }
 
