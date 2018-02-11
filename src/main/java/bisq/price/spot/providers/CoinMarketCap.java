@@ -47,7 +47,7 @@ public class CoinMarketCap extends CachingExchangeRateProvider {
     }
 
     @Override
-    public Set<ExchangeRate> doRequestForCaching() throws IOException {
+    public Set<ExchangeRate> doGetForCache() throws IOException {
 
         return getTickers()
             .filter(t -> Altcoins.ALL_SUPPORTED.contains(t.getIsoCode()))

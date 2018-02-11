@@ -21,8 +21,6 @@ import bisq.price.spot.ExchangeRate;
 import bisq.price.spot.ExchangeRateProvider;
 import bisq.price.util.Environment;
 
-import java.io.IOException;
-
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -54,14 +52,14 @@ public abstract class AbstractExchangeRateProvider implements ExchangeRateProvid
     }
 
     @Override
-    public final Set<ExchangeRate> request() throws IOException {
-        if (!configured) {
-            throw new IllegalStateException("'configure' method was not called");
-        }
-        return doRequest();
+    public final Set<ExchangeRate> get() {
+        if (!configured)
+            throw new IllegalStateException("call 'configure' before calling 'get'");
+
+        return doGet();
     }
 
-    protected abstract Set<ExchangeRate> doRequest() throws IOException;
+    protected abstract Set<ExchangeRate> doGet();
 
     @Override
     public String getName() {

@@ -19,16 +19,13 @@ package bisq.price.spot;
 
 import bisq.price.util.Environment;
 
-import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.function.Supplier;
 
-public interface ExchangeRateProvider {
-
-    Set<ExchangeRate> request() throws IOException;
+public interface ExchangeRateProvider extends Supplier<Set<ExchangeRate>> {
 
     void configure(Environment env);
 

@@ -20,8 +20,6 @@ package bisq.price.spot;
 import bisq.price.spot.providers.BitcoinAverage;
 import bisq.price.spot.support.CachingExchangeRateProvider;
 
-import java.io.IOException;
-
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,12 +41,12 @@ public class ExchangeRateService {
         }
     }
 
-    public Map<String, Object> getAllMarketPrices() throws IOException {
+    public Map<String, Object> getAllMarketPrices() {
         Map<String, Object> metadata = new LinkedHashMap<>();
         Map<String, Object> allExchangeRates = new LinkedHashMap<>();
 
         for (ExchangeRateProvider provider : providers) {
-            Set<ExchangeRate> exchangeRates = provider.request();
+            Set<ExchangeRate> exchangeRates = provider.get();
             metadata.putAll(getMetadata(provider, exchangeRates));
             exchangeRates.forEach(e ->
                 allExchangeRates.put(e.getCurrency(), e)

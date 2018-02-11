@@ -29,7 +29,7 @@ import java.util.TimerTask;
 
 public abstract class CachingExchangeRateProvider extends AbstractExchangeRateProvider {
 
-    protected Set<ExchangeRate> data;
+    private Set<ExchangeRate> cachedExchangeRates;
 
     private final Duration ttl;
 
@@ -39,12 +39,17 @@ public abstract class CachingExchangeRateProvider extends AbstractExchangeRatePr
         log.info("will refresh exchange rate data every {}", ttl);
     }
 
+    @Override
+    public final Set<ExchangeRate> doGet() {
+        return cachedExchangeRates;
+    }
+
     public final void start() throws IOException {
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 try {
-                    requestAndCache();
+                    getAndCache();
                 } catch (IOException e) {
                     log.warn(e.toString());
                     e.printStackTrace();
@@ -52,25 +57,20 @@ public abstract class CachingExchangeRateProvider extends AbstractExchangeRatePr
             }
         }, ttl.toMillis(), ttl.toMillis());
 
-        requestAndCache();
+        getAndCache();
     }
 
-    public void requestAndCache() throws IOException {
+    private void getAndCache() throws IOException {
         long ts = System.currentTimeMillis();
 
-        data = doRequestForCaching();
+        cachedExchangeRates = doGetForCache();
 
-        data.stream()
+        cachedExchangeRates.stream()
             .filter(e -> "USD".equals(e.getCurrency()) || "LTC".equals(e.getCurrency()))
             .forEach(e -> log.info("BTC/{}: {}", e.getCurrency(), e.getPrice()));
 
-        log.info("requestAndCache took {} ms.", (System.currentTimeMillis() - ts));
+        log.info("getAndCache took {} ms.", (System.currentTimeMillis() - ts));
     }
 
-    @Override
-    public final Set<ExchangeRate> doRequest() {
-        return data;
-    }
-
-    protected abstract Set<ExchangeRate> doRequestForCaching() throws IOException;
+    protected abstract Set<ExchangeRate> doGetForCache() throws IOException;
 }
