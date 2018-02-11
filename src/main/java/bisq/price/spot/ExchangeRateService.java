@@ -45,13 +45,13 @@ public class ExchangeRateService {
         Map<String, Object> metadata = new LinkedHashMap<>();
         Map<String, Object> allExchangeRates = new LinkedHashMap<>();
 
-        for (ExchangeRateProvider provider : providers) {
-            Set<ExchangeRate> exchangeRates = provider.get();
-            metadata.putAll(getMetadata(provider, exchangeRates));
+        providers.forEach(p -> {
+            Set<ExchangeRate> exchangeRates = p.get();
+            metadata.putAll(getMetadata(p, exchangeRates));
             exchangeRates.forEach(e ->
                 allExchangeRates.put(e.getCurrency(), e)
             );
-        }
+        });
 
         return new LinkedHashMap<String, Object>() {{
             putAll(metadata);
