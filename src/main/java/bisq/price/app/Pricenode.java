@@ -26,6 +26,10 @@ import bisq.price.util.Version;
 import io.bisq.common.app.Log;
 import io.bisq.common.util.Utilities;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+
 import java.io.File;
 
 import org.slf4j.Logger;
@@ -40,6 +44,7 @@ public class Pricenode {
 
     private static final Logger log = LoggerFactory.getLogger(Pricenode.class);
     private static final int DEFAULT_PORT = 8080;
+    private static final ObjectWriter mapper = new ObjectMapper().writerWithDefaultPrettyPrinter();
 
     private final ExchangeRateService exchangeRateService;
     private final FeeEstimationService feeEstimationService;
@@ -93,7 +98,11 @@ public class Pricenode {
         Utilities.printSysInfo();
     }
 
-    private static Object toJson(Object data) {
-        return Utilities.objectToJson(data);
+    private static String toJson(Object object) {
+        try {
+            return mapper.writeValueAsString(object);
+        } catch (JsonProcessingException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 }
