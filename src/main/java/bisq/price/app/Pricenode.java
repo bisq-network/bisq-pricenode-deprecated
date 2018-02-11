@@ -84,9 +84,12 @@ public class Pricenode {
         get("/getFees", (req, res) -> toJson(feeEstimationService.getFees()));
         get("/getVersion", (req, res) -> version.toString());
         get("/getParams", (req, res) ->
-            ((BitcoinFees) feeEstimationService.getFeeEstimationProvider()).getCapacity() + ";" +
-                ((BitcoinFees) feeEstimationService.getFeeEstimationProvider()).getMaxBlocks() + ";" +
-                feeEstimationService.getRequestIntervalMs());
+            String.format("%s;%s;%s",
+                ((BitcoinFees) feeEstimationService.getFeeEstimationProvider()).getCapacity(),
+                ((BitcoinFees) feeEstimationService.getFeeEstimationProvider()).getMaxBlocks(),
+                feeEstimationService.getRequestIntervalMs()
+            )
+        );
     }
 
     private void initLogging() {
