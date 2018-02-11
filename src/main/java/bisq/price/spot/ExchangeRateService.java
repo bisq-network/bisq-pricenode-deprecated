@@ -53,10 +53,10 @@ public class ExchangeRateService {
             );
         });
 
-        return new LinkedHashMap<String, Object>() {{
-            putAll(metadata);
-            put("data", allExchangeRates);
-        }};
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.putAll(metadata);
+        result.put("data", allExchangeRates);
+        return result;
     }
 
     private Map<String, Object> getMetadata(ExchangeRateProvider provider, Set<ExchangeRate> exchangeRates) {
