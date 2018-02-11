@@ -28,7 +28,7 @@ public class Main {
     public static void main(String[] args) throws Exception {
         Environment env = new Environment(args);
 
-        ExchangeRateService exchangeRateService = new ExchangeRateService(ExchangeRateProvider.loadAll(env));
+        ExchangeRateService exchangeRateService = new ExchangeRateService(ExchangeRateProvider.loadAll());
         FeeEstimationService feeEstimationService = new FeeEstimationService(FeeEstimationProvider.load(env));
         feeEstimationService.configure(env);
 

@@ -40,7 +40,7 @@ public abstract class CachingExchangeRateProvider extends AbstractExchangeRatePr
     }
 
     @Override
-    public final Set<ExchangeRate> doGet() {
+    public final Set<ExchangeRate> get() {
         return cachedExchangeRates;
     }
 
@@ -63,7 +63,7 @@ public abstract class CachingExchangeRateProvider extends AbstractExchangeRatePr
     private void getAndCache() throws IOException {
         long ts = System.currentTimeMillis();
 
-        cachedExchangeRates = doGetForCache();
+        cachedExchangeRates = doGet();
 
         cachedExchangeRates.stream()
             .filter(e -> "USD".equals(e.getCurrency()) || "LTC".equals(e.getCurrency()))
@@ -72,5 +72,5 @@ public abstract class CachingExchangeRateProvider extends AbstractExchangeRatePr
         log.info("getAndCache took {} ms.", (System.currentTimeMillis() - ts));
     }
 
-    protected abstract Set<ExchangeRate> doGetForCache() throws IOException;
+    protected abstract Set<ExchangeRate> doGet() throws IOException;
 }
