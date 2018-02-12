@@ -17,6 +17,8 @@
 
 package bisq.price.spot;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.math.BigDecimal;
 
 import java.util.Date;
@@ -49,18 +51,22 @@ public class ExchangeRate {
         this.provider = provider;
     }
 
+    @JsonProperty(value = "currencyCode", index = 1)
     public String getCurrency() {
         return currency;
     }
 
+    @JsonProperty(value = "price", index = 2)
     public double getPrice() {
         return this.price;
     }
 
-    long getTimestamp() {
+    @JsonProperty(value = "timestampSec", index = 3)
+    public long getTimestamp() {
         return this.timestamp;
     }
 
+    @JsonProperty(value = "provider",index = 4)
     public String getProvider() {
         return provider;
     }

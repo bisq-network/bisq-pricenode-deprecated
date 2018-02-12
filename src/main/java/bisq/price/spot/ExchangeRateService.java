@@ -22,6 +22,7 @@ import bisq.price.spot.support.CachingExchangeRateProvider;
 
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,14 +55,12 @@ public class ExchangeRateService {
 
     public Map<String, Object> getAllMarketPrices() {
         Map<String, Object> metadata = new LinkedHashMap<>();
-        Map<String, Object> allExchangeRates = new LinkedHashMap<>();
+        List<ExchangeRate> allExchangeRates = new ArrayList<>();
 
         providers.forEach(p -> {
             Set<ExchangeRate> exchangeRates = p.get();
             metadata.putAll(getMetadata(p, exchangeRates));
-            exchangeRates.forEach(e ->
-                allExchangeRates.put(e.getCurrency(), e)
-            );
+            allExchangeRates.addAll(exchangeRates);
         });
 
         return new LinkedHashMap<String, Object>() {{
