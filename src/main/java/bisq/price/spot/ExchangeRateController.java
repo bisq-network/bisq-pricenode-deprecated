@@ -15,11 +15,7 @@
  * along with Bisq. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package bisq.price.app;
-
-import bisq.price.mining.FeeEstimationService;
-import bisq.price.mining.providers.BitcoinFees;
-import bisq.price.util.Version;
+package bisq.price.spot;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -36,26 +32,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @RestController
-public class Pricenode {
+public class ExchangeRateController {
 
-    private static final Logger log = LoggerFactory.getLogger(Pricenode.class);
+    private static final Logger log = LoggerFactory.getLogger(ExchangeRateController.class);
 
-    private final FeeEstimationService feeEstimationService;
-    private final Version version;
+    private final ExchangeRateService exchangeRateService;
 
-    public Pricenode(FeeEstimationService feeEstimationService) {
-        this.feeEstimationService = feeEstimationService;
-        this.version = new Version(Pricenode.class);
+    public ExchangeRateController(ExchangeRateService exchangeRateService) {
+        this.exchangeRateService = exchangeRateService;
     }
 
     @PostConstruct
     public void start() {
-        feeEstimationService.start();
+        exchangeRateService.start();
     }
 
     @PreDestroy
     public void stop() {
-        feeEstimationService.stop();
+        exchangeRateService.stop();
     }
 
     @ModelAttribute
@@ -63,21 +57,8 @@ public class Pricenode {
         log.info("Incoming {} request from: {}", req.getServletPath(), req.getHeader("User-Agent"));
     }
 
-    @GetMapping(path = "/getFees")
-    public Map<String, Object> getFees() {
-        return feeEstimationService.getFees();
-    }
-
-    @GetMapping(path = "/getVersion")
-    public String getVersion() {
-        return version.toString();
-    }
-
-    @GetMapping(path = "/getParams")
-    public String getParams() {
-        return String.format("%s;%s;%s",
-            ((BitcoinFees) feeEstimationService.getFeeEstimationProvider()).getCapacity(),
-            ((BitcoinFees) feeEstimationService.getFeeEstimationProvider()).getMaxBlocks(),
-            feeEstimationService.getRequestIntervalMs());
+    @GetMapping(path = "/getAllMarketPrices")
+    public Map<String, Object> getAllMarketPrices() {
+        return exchangeRateService.getAllMarketPrices();
     }
 }
