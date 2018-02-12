@@ -15,9 +15,7 @@
  * along with Bisq. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package bisq.price.app;
-
-import bisq.price.util.Version;
+package bisq.price.util;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -29,14 +27,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @RestController
-public class Pricenode {
+public class VersionController {
 
-    private static final Logger log = LoggerFactory.getLogger(Pricenode.class);
+    private static final Logger log = LoggerFactory.getLogger(VersionController.class);
 
     private final Version version;
 
-    public Pricenode() {
-        this.version = new Version(Pricenode.class);
+    public VersionController() {
+        this.version = new Version(this.getClass());
     }
 
     @ModelAttribute
