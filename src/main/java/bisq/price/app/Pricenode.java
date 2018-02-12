@@ -23,18 +23,12 @@ import bisq.price.spot.ExchangeRateService;
 import bisq.price.util.Environment;
 import bisq.price.util.Version;
 
-import io.bisq.common.app.Log;
-import io.bisq.common.util.Utilities;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
-import java.io.File;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ch.qos.logback.classic.Level;
 
 import static spark.Spark.before;
 import static spark.Spark.get;
@@ -69,7 +63,6 @@ public class Pricenode {
     }
 
     public void start() {
-        initLogging();
         exchangeRateService.start();
         feeEstimationService.start();
         mapRoutesAndStart();
@@ -95,15 +88,6 @@ public class Pricenode {
                 feeEstimationService.getRequestIntervalMs()
             )
         );
-    }
-
-    private void initLogging() {
-        final String logPath = System.getProperty("user.home") + File.separator + "provider";
-        Log.setup(logPath);
-        Log.setLevel(Level.INFO);
-        log.info("Log files under: " + logPath);
-        log.info("bisq-pricenode version: " + version);
-        Utilities.printSysInfo();
     }
 
     private static String toJson(Object object) {
