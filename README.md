@@ -28,6 +28,7 @@ Prerequisites
 
 To run a price relay, you will need:
 
+  - [BitcoinAverage API keys](https://bitcoinaverage.com/en/plans). Free plans are fine for local development or personal nodes; paid plans should be used for well-known production nodes.
   - [Tor Browser](https://www.torproject.org/projects/torbrowser.html.en) to verify .onion URLs.
   - JDK 8 if you want to build and run a node locally.
   - The `tor` binary (e.g. `brew install tor`) if you want to run a hidden service locally.
@@ -39,7 +40,7 @@ Deploy Locally
 Run the following commands:
 
     ./gradlew installDist
-    ./build/install/bisq-pricenode/bin/bisq-pricenode [capacity] [max-blocks] [request-interval-mins]
+    BITCOIN_AVG_PUBKEY=[your pubkey] BITCOIN_AVG_PRIVKEY=[your privkey] ./build/install/bisq-pricenode/bin/bisq-pricenode [capacity] [max-blocks] [request-interval-mins]
     curl http://localhost:8080/getAllMarketPrices
 
 To register the node as a Tor hidden service, run:
