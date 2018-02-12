@@ -18,28 +18,15 @@
 package bisq.price.util;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @RestController
 public class VersionController {
-
-    private static final Logger log = LoggerFactory.getLogger(VersionController.class);
 
     private final Version version;
 
     public VersionController() {
         this.version = new Version(this.getClass());
-    }
-
-    @ModelAttribute
-    public void logRequest(HttpServletRequest req) {
-        log.info("Incoming {} request from: {}", req.getServletPath(), req.getHeader("User-Agent"));
     }
 
     @GetMapping(path = "/getVersion")

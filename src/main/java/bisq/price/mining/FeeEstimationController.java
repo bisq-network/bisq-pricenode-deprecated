@@ -20,23 +20,15 @@ package bisq.price.mining;
 import bisq.price.mining.providers.BitcoinFees;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 @RestController
 public class FeeEstimationController {
-
-    private static final Logger log = LoggerFactory.getLogger(FeeEstimationController.class);
 
     private final FeeEstimationService feeEstimationService;
 
@@ -52,11 +44,6 @@ public class FeeEstimationController {
     @PreDestroy
     public void stop() {
         feeEstimationService.stop();
-    }
-
-    @ModelAttribute
-    public void logRequest(HttpServletRequest req) {
-        log.info("Incoming {} request from: {}", req.getServletPath(), req.getHeader("User-Agent"));
     }
 
     @GetMapping(path = "/getFees")

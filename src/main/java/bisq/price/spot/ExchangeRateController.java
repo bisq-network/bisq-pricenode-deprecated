@@ -18,23 +18,15 @@
 package bisq.price.spot;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 @RestController
 public class ExchangeRateController {
-
-    private static final Logger log = LoggerFactory.getLogger(ExchangeRateController.class);
 
     private final ExchangeRateService exchangeRateService;
 
@@ -50,11 +42,6 @@ public class ExchangeRateController {
     @PreDestroy
     public void stop() {
         exchangeRateService.stop();
-    }
-
-    @ModelAttribute
-    public void logRequest(HttpServletRequest req) {
-        log.info("Incoming {} request from: {}", req.getServletPath(), req.getHeader("User-Agent"));
     }
 
     @GetMapping(path = "/getAllMarketPrices")
