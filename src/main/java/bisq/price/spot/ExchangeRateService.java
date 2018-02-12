@@ -20,11 +20,14 @@ package bisq.price.spot;
 import bisq.price.spot.providers.BitcoinAverage;
 import bisq.price.spot.support.CachingExchangeRateProvider;
 
+import org.springframework.stereotype.Service;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+@Service
 public class ExchangeRateService {
 
     private final List<ExchangeRateProvider> providers;

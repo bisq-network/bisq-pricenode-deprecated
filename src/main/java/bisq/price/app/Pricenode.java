@@ -20,31 +20,30 @@ package bisq.price.app;
 import bisq.price.mining.FeeEstimationService;
 import bisq.price.mining.providers.BitcoinFees;
 import bisq.price.spot.ExchangeRateService;
-import bisq.price.util.Environment;
 import bisq.price.util.Version;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static spark.Spark.before;
-import static spark.Spark.get;
-import static spark.Spark.port;
-
+@RestController
 public class Pricenode {
 
     private static final Logger log = LoggerFactory.getLogger(Pricenode.class);
-    private static final int DEFAULT_PORT = 8080;
-    private static final ObjectWriter mapper = new ObjectMapper().writerWithDefaultPrettyPrinter();
 
     private final ExchangeRateService exchangeRateService;
     private final FeeEstimationService feeEstimationService;
     private final Version version;
-
-    private int port = DEFAULT_PORT;
 
     public Pricenode(ExchangeRateService exchangeRateService, FeeEstimationService feeEstimationService) {
         this.exchangeRateService = exchangeRateService;
@@ -52,49 +51,43 @@ public class Pricenode {
         this.version = new Version(Pricenode.class);
     }
 
-    public void configure(Environment env) {
-        env.getOptionalVar("PORT").ifPresent(port ->
-            setPort(Integer.valueOf(port))
-        );
-    }
-
-    public void setPort(int port) {
-        this.port = port;
-    }
-
+    @PostConstruct
     public void start() {
         exchangeRateService.start();
         feeEstimationService.start();
-        mapRoutesAndStart();
     }
 
+    @PreDestroy
     public void stop() {
         exchangeRateService.stop();
         feeEstimationService.stop();
     }
 
-    private void mapRoutesAndStart() {
-        port(port);
-
-        before("/*", (req, res) -> log.info("Incoming {} request from: {}", req.pathInfo(), req.userAgent()));
-
-        get("/getAllMarketPrices", (req, res) -> toJson(exchangeRateService.getAllMarketPrices()));
-        get("/getFees", (req, res) -> toJson(feeEstimationService.getFees()));
-        get("/getVersion", (req, res) -> version.toString());
-        get("/getParams", (req, res) ->
-            String.format("%s;%s;%s",
-                ((BitcoinFees) feeEstimationService.getFeeEstimationProvider()).getCapacity(),
-                ((BitcoinFees) feeEstimationService.getFeeEstimationProvider()).getMaxBlocks(),
-                feeEstimationService.getRequestIntervalMs()
-            )
-        );
+    @ModelAttribute
+    public void logRequest(HttpServletRequest req) {
+        log.info("Incoming {} request from: {}", req.getServletPath(), req.getHeader("User-Agent"));
     }
 
-    private static String toJson(Object object) {
-        try {
-            return mapper.writeValueAsString(object);
-        } catch (JsonProcessingException ex) {
-            throw new RuntimeException(ex);
-        }
+    @GetMapping(path = "/getAllMarketPrices")
+    public Map<String, Object> getAllMarketPrices() {
+        return exchangeRateService.getAllMarketPrices();
+    }
+
+    @GetMapping(path = "/getFees")
+    public Map<String, Object> getFees() {
+        return feeEstimationService.getFees();
+    }
+
+    @GetMapping(path = "/getVersion")
+    public String getVersion() {
+        return version.toString();
+    }
+
+    @GetMapping(path = "/getParams")
+    public String getParams() {
+        return String.format("%s;%s;%s",
+            ((BitcoinFees) feeEstimationService.getFeeEstimationProvider()).getCapacity(),
+            ((BitcoinFees) feeEstimationService.getFeeEstimationProvider()).getMaxBlocks(),
+            feeEstimationService.getRequestIntervalMs());
     }
 }

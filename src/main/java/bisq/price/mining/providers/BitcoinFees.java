@@ -19,11 +19,14 @@ package bisq.price.mining.providers;
 
 import bisq.price.mining.FeeEstimationProvider;
 import bisq.price.mining.FeeEstimationService;
-import bisq.price.util.Environment;
 
 import io.bisq.network.http.HttpClient;
 
 import io.bisq.common.util.MathUtils;
+
+import org.springframework.core.env.CommandLinePropertySource;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
@@ -38,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 //TODO consider alternative https://www.bitgo.com/api/v1/tx/fee?numBlocks=3
+@Component
 public class BitcoinFees implements FeeEstimationProvider {
 
     private static final Logger log = LoggerFactory.getLogger(BitcoinFees.class);
@@ -48,20 +52,22 @@ public class BitcoinFees implements FeeEstimationProvider {
     private final HttpClient httpClient;
     private final LinkedList<Long> fees = new LinkedList<>();
 
-    private int capacity = DEFAULT_CAPACITY;
-    private int maxBlocks = DEFAULT_MAX_BLOCKS;
+    private final int capacity;
+    private final int maxBlocks;
 
     // other: https://estimatefee.com/n/2
-    public BitcoinFees() {
+    public BitcoinFees(Environment env) {
         this.httpClient = new HttpClient("https://bitcoinfees.earn.com/api/v1/fees/");
-    }
 
-    public void configure(Environment env) {
-        String[] args = env.getArgs();
+        String[] args =
+            env.getProperty(CommandLinePropertySource.DEFAULT_NON_OPTION_ARGS_PROPERTY_NAME, String[].class);
 
-        if (args.length >= 2) {
-            setCapacity(Integer.valueOf(args[0]));
-            setMaxBlocks(Integer.valueOf(args[1]));
+        if (args != null && args.length >= 2) {
+            this.capacity = Integer.valueOf(args[0]);
+            this.maxBlocks = Integer.valueOf(args[1]);
+        } else {
+            this.capacity = DEFAULT_CAPACITY;
+            this.maxBlocks = DEFAULT_MAX_BLOCKS;
         }
     }
 
@@ -69,16 +75,8 @@ public class BitcoinFees implements FeeEstimationProvider {
         return capacity;
     }
 
-    public void setCapacity(int capacity) {
-        this.capacity = capacity;
-    }
-
     public int getMaxBlocks() {
         return maxBlocks;
-    }
-
-    public void setMaxBlocks(int maxBlocks) {
-        this.maxBlocks = maxBlocks;
     }
 
     public long getFee() {

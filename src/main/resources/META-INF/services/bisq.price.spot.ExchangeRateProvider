@@ -1,7 +1,0 @@
-# The order of entries in this file is significant.
-# See ExchangeRateProvider#loadAll for details.
-
-bisq.price.spot.providers.BitcoinAverage$Global
-bisq.price.spot.providers.BitcoinAverage$Local
-bisq.price.spot.providers.CoinMarketCap
-bisq.price.spot.providers.Poloniex

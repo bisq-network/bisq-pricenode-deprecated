@@ -28,6 +28,9 @@ import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.poloniex.dto.marketdata.PoloniexMarketData;
 import org.knowm.xchange.poloniex.dto.marketdata.PoloniexTicker;
 
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -43,6 +46,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Component
+@Order(4)
 public class Poloniex extends CachingExchangeRateProvider {
 
     private final ObjectMapper mapper = new ObjectMapper();

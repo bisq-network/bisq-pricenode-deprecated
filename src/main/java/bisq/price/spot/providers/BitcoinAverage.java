@@ -19,12 +19,15 @@ package bisq.price.spot.providers;
 
 import bisq.price.spot.ExchangeRate;
 import bisq.price.spot.support.CachingExchangeRateProvider;
-import bisq.price.util.Environment;
 
 import io.bisq.network.http.HttpClient;
 
 import org.knowm.xchange.bitcoinaverage.dto.marketdata.BitcoinAverageTicker;
 import org.knowm.xchange.bitcoinaverage.dto.marketdata.BitcoinAverageTickers;
+
+import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -69,15 +72,11 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
     /**
      * @param symbolSet "global" or "local"; see https://apiv2.bitcoinaverage.com/#supported-currencies
      */
-    public BitcoinAverage(String name, String prefix, double pctMaxRequests, String symbolSet) {
+    public BitcoinAverage(double pctMaxRequests, String prefix, String name, String symbolSet, Environment env) {
         super(name, prefix, ttlFor(pctMaxRequests));
         this.symbolSet = symbolSet;
-    }
-
-    @Override
-    public void doConfigure(Environment env) {
-        this.pubKey = env.getRequiredVar("BITCOIN_AVG_PUBKEY");
-        this.mac = initMac(env.getRequiredVar("BITCOIN_AVG_PRIVKEY"));
+        this.pubKey = env.getRequiredProperty("BITCOIN_AVG_PUBKEY");
+        this.mac = initMac(env.getRequiredProperty("BITCOIN_AVG_PRIVKEY"));
     }
 
     @Override
@@ -142,16 +141,20 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
     }
 
 
+    @Component
+    @Order(1)
     public static class Global extends BitcoinAverage {
-        public Global() {
-            super("BTCA_G", "btcAverageG", 0.3, "global");
+        public Global(Environment env) {
+            super(0.3, "btcAverageG", "BTCA_G", "global", env);
         }
     }
 
 
+    @Component
+    @Order(2)
     public static class Local extends BitcoinAverage {
-        public Local() {
-            super("BTCA_L", "btcAverageL", 0.7, "local");
+        public Local(Environment env) {
+            super(0.7, "btcAverageL", "BTCA_L", "local", env);
         }
     }
 }

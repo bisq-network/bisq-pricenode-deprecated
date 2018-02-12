@@ -15,28 +15,15 @@
  * along with Bisq. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package bisq.price.util;
+package bisq.price;
 
-import java.util.Optional;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-public class Environment {
+@SpringBootApplication
+public class Main {
 
-    private final String[] args;
-
-    public Environment(String[] args) {
-        this.args = args;
-    }
-
-    public String[] getArgs() {
-        return args;
-    }
-
-    public Optional<String> getOptionalVar(String name) {
-        return Optional.ofNullable(System.getenv(name));
-    }
-
-    public String getRequiredVar(String name) {
-        return getOptionalVar(name).orElseThrow(() -> new IllegalArgumentException(
-            String.format("Error: required environment variable '%s' not found.", name)));
+    public static void main(String[] args) {
+        SpringApplication.run(Main.class, args);
     }
 }

@@ -39,7 +39,7 @@ public abstract class CachingExchangeRateProvider extends AbstractExchangeRatePr
     }
 
     @Override
-    public final Set<ExchangeRate> doGet() {
+    public final Set<ExchangeRate> get() {
         return cachedExchangeRates;
     }
 

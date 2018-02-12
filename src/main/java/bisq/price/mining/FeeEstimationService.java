@@ -17,7 +17,9 @@
 
 package bisq.price.mining;
 
-import bisq.price.util.Environment;
+import org.springframework.core.env.CommandLinePropertySource;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 
@@ -31,6 +33,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Service
 public class FeeEstimationService {
 
     private static final Logger log = LoggerFactory.getLogger(FeeEstimationService.class);
@@ -41,14 +44,22 @@ public class FeeEstimationService {
     public static final long BTC_MAX_TX_FEE = 1000;
 
     private final Timer timer = new Timer();
-    private final FeeEstimationProvider feeEstimationProvider;
     private final Map<String, Long> dataMap = new ConcurrentHashMap<>();
 
-    private long requestIntervalMs = DEFAULT_REQUEST_INTERVAL_MS;
+    private final FeeEstimationProvider feeEstimationProvider;
+    private final long requestIntervalMs;
+
     private long bitcoinFeesTs;
 
-    public FeeEstimationService(FeeEstimationProvider feeEstimationProvider) {
+    public FeeEstimationService(FeeEstimationProvider feeEstimationProvider, Environment env) {
         this.feeEstimationProvider = feeEstimationProvider;
+
+        String[] args =
+            env.getProperty(CommandLinePropertySource.DEFAULT_NON_OPTION_ARGS_PROPERTY_NAME, String[].class);
+
+        this.requestIntervalMs = (args != null && args.length >= 3) ?
+            TimeUnit.MINUTES.toMillis(Long.valueOf(args[2])) :
+            DEFAULT_REQUEST_INTERVAL_MS;
 
         // For now we don't need a fee estimation for LTC so we set it fixed, but we keep it in the provider to
         // be flexible if fee pressure grows on LTC
@@ -57,24 +68,12 @@ public class FeeEstimationService {
         dataMap.put("dashTxFee", 50L /*FeeService.DASH_DEFAULT_TX_FEE*/);
     }
 
-    public void configure(Environment env) {
-        String[] args = env.getArgs();
-
-        if (args.length >= 3) {
-            setRequestIntervalMs(TimeUnit.MINUTES.toMillis(Long.valueOf(args[2])));
-        }
-    }
-
     public FeeEstimationProvider getFeeEstimationProvider() {
         return feeEstimationProvider;
     }
 
     public long getRequestIntervalMs() {
         return requestIntervalMs;
-    }
-
-    public void setRequestIntervalMs(long requestIntervalMs) {
-        this.requestIntervalMs = requestIntervalMs;
     }
 
     public void start() {

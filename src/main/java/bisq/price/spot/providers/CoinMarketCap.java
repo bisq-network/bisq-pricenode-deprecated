@@ -25,6 +25,9 @@ import io.bisq.network.http.HttpClient;
 
 import org.knowm.xchange.coinmarketcap.dto.marketdata.CoinMarketCapTicker;
 
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -38,6 +41,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Component
+@Order(3)
 public class CoinMarketCap extends CachingExchangeRateProvider {
 
     private final ObjectMapper mapper = new ObjectMapper();

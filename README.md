@@ -40,7 +40,7 @@ Deploy Locally
 Run the following commands:
 
     ./gradlew installDist
-    BITCOIN_AVG_PUBKEY=[your pubkey] BITCOIN_AVG_PRIVKEY=[your privkey] ./build/install/bisq-pricenode/bin/bisq-pricenode [capacity] [max-blocks] [request-interval-mins]
+    BITCOIN_AVG_PUBKEY=[your pubkey] BITCOIN_AVG_PRIVKEY=[your privkey] java -jar ./build/libs/bisq-pricenode.jar [capacity] [max-blocks] [request-interval-mins]
     curl http://localhost:8080/getAllMarketPrices
 
 To register the node as a Tor hidden service, run:

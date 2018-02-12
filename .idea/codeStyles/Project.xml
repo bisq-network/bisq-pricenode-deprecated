@@ -23,6 +23,12 @@
           <emptyLine />
           <package name="org.knowm.xchange" withSubpackages="true" static="false" />
           <emptyLine />
+          <package name="org.springframework" withSubpackages="true" static="false" />
+          <emptyLine />
+          <package name="javax.servlet" withSubpackages="true" static="false" />
+          <emptyLine />
+          <package name="javax.annotation" withSubpackages="true" static="false" />
+          <emptyLine />
           <package name="com.fasterxml.jackson" withSubpackages="true" static="false" />
           <emptyLine />
           <package name="com.google.gson" withSubpackages="true" static="false" />
