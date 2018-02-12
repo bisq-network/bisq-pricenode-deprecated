@@ -31,6 +31,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Duration;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 
 import java.util.List;
 import java.util.Set;
@@ -47,7 +48,7 @@ public class CoinMarketCap extends CachingExchangeRateProvider {
     }
 
     @Override
-    public Set<ExchangeRate> doGetForCache() throws IOException {
+    public Set<ExchangeRate> doGetForCache() {
 
         return getTickers()
             .filter(t -> Altcoins.ALL_SUPPORTED.contains(t.getIsoCode()))
@@ -62,13 +63,15 @@ public class CoinMarketCap extends CachingExchangeRateProvider {
             .collect(Collectors.toSet());
     }
 
-    private Stream<CoinMarketCapTicker> getTickers() throws IOException {
+    private Stream<CoinMarketCapTicker> getTickers() {
         TypeReference typeReference = new TypeReference<List<CoinMarketCapTicker>>() {
         };
-        return mapper.<List<CoinMarketCapTicker>>readValue(getTickersJson(), typeReference).stream();
-    }
-
-    private String getTickersJson() throws IOException {
-        return httpClient.requestWithGET("v1/ticker/?limit=200", "User-Agent", "");
+        try {
+            String json = httpClient.requestWithGET("v1/ticker/?limit=200", "User-Agent", "");
+            List<CoinMarketCapTicker> tickers = mapper.readValue(json, typeReference);
+            return tickers.stream();
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
+        }
     }
 }

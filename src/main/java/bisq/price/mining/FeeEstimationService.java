@@ -21,8 +21,6 @@ import bisq.price.util.Environment;
 
 import java.time.Instant;
 
-import java.io.IOException;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
@@ -42,14 +40,14 @@ public class FeeEstimationService {
     public static final long BTC_MIN_TX_FEE = 10; // satoshi/byte
     public static final long BTC_MAX_TX_FEE = 1000;
 
-    private final Timer timerBitcoinFeesLocal = new Timer();
+    private final Timer timer = new Timer();
     private final FeeEstimationProvider feeEstimationProvider;
     private final Map<String, Long> dataMap = new ConcurrentHashMap<>();
 
     private long requestIntervalMs = DEFAULT_REQUEST_INTERVAL_MS;
     private long bitcoinFeesTs;
 
-    public FeeEstimationService(FeeEstimationProvider feeEstimationProvider) throws IOException {
+    public FeeEstimationService(FeeEstimationProvider feeEstimationProvider) {
         this.feeEstimationProvider = feeEstimationProvider;
 
         // For now we don't need a fee estimation for LTC so we set it fixed, but we keep it in the provider to
@@ -57,8 +55,6 @@ public class FeeEstimationService {
         dataMap.put("ltcTxFee", 500L /*FeeService.LTC_DEFAULT_TX_FEE*/);
         dataMap.put("dogeTxFee", 5_000_000L /*FeeService.DOGE_DEFAULT_TX_FEE*/);
         dataMap.put("dashTxFee", 50L /*FeeService.DASH_DEFAULT_TX_FEE*/);
-
-        requestBitcoinFees();
     }
 
     public void configure(Environment env) {
@@ -81,23 +77,26 @@ public class FeeEstimationService {
         this.requestIntervalMs = requestIntervalMs;
     }
 
-    public void start() throws IOException {
-        timerBitcoinFeesLocal.scheduleAtFixedRate(new TimerTask() {
+    public void start() {
+        requestBitcoinFees();
+
+        timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 try {
                     requestBitcoinFees();
-                } catch (IOException e) {
-                    log.warn(e.toString());
-                    e.printStackTrace();
+                } catch (Throwable t) {
+                    log.warn("scheduled call to requestBitcoinFees failed", t);
                 }
             }
         }, requestIntervalMs, requestIntervalMs);
-
-        requestBitcoinFees();
     }
 
-    private void requestBitcoinFees() throws IOException {
+    public void stop() {
+        timer.cancel();
+    }
+
+    private void requestBitcoinFees() {
         long ts = System.currentTimeMillis();
         long btcFee = feeEstimationProvider.getFee();
         log.info("requestBitcoinFees took {} ms.", (System.currentTimeMillis() - ts));
@@ -117,4 +116,5 @@ public class FeeEstimationService {
         map.put("dataMap", dataMap);
         return map;
     }
+
 }

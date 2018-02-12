@@ -33,10 +33,18 @@ public class ExchangeRateService {
         this.providers = providers;
     }
 
-    public void start() throws Exception {
+    public void start() {
         for (ExchangeRateProvider provider : providers) {
             if (provider instanceof CachingExchangeRateProvider) {
                 ((CachingExchangeRateProvider) provider).start();
+            }
+        }
+    }
+
+    public void stop() {
+        for (ExchangeRateProvider provider : providers) {
+            if (provider instanceof CachingExchangeRateProvider) {
+                ((CachingExchangeRateProvider) provider).stop();
             }
         }
     }

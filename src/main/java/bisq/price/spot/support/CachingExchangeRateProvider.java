@@ -21,8 +21,6 @@ import bisq.price.spot.ExchangeRate;
 
 import java.time.Duration;
 
-import java.io.IOException;
-
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -32,6 +30,7 @@ public abstract class CachingExchangeRateProvider extends AbstractExchangeRatePr
     private Set<ExchangeRate> cachedExchangeRates;
 
     private final Duration ttl;
+    private final Timer timer = new Timer();
 
     public CachingExchangeRateProvider(String name, String prefix, Duration ttl) {
         super(name, prefix);
@@ -44,23 +43,26 @@ public abstract class CachingExchangeRateProvider extends AbstractExchangeRatePr
         return cachedExchangeRates;
     }
 
-    public final void start() throws IOException {
-        new Timer().scheduleAtFixedRate(new TimerTask() {
+    public final void start() {
+        getAndCache();
+
+        timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 try {
                     getAndCache();
-                } catch (IOException e) {
-                    log.warn(e.toString());
-                    e.printStackTrace();
+                } catch (Throwable t) {
+                    log.warn("scheduled call to getAndCache failed", t);
                 }
             }
         }, ttl.toMillis(), ttl.toMillis());
-
-        getAndCache();
     }
 
-    private void getAndCache() throws IOException {
+    public void stop() {
+        timer.cancel();
+    }
+
+    private void getAndCache() {
         long ts = System.currentTimeMillis();
 
         cachedExchangeRates = doGetForCache();
@@ -72,5 +74,5 @@ public abstract class CachingExchangeRateProvider extends AbstractExchangeRatePr
         log.info("getAndCache took {} ms.", (System.currentTimeMillis() - ts));
     }
 
-    protected abstract Set<ExchangeRate> doGetForCache() throws IOException;
+    protected abstract Set<ExchangeRate> doGetForCache();
 }

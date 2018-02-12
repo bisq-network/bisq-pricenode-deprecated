@@ -34,6 +34,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Duration;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -52,7 +53,7 @@ public class Poloniex extends CachingExchangeRateProvider {
     }
 
     @Override
-    public Set<ExchangeRate> doGetForCache() throws IOException {
+    public Set<ExchangeRate> doGetForCache() {
         Date timestamp = new Date(); // Poloniex tickers don't include their own timestamp
 
         return getTickers()
@@ -69,12 +70,9 @@ public class Poloniex extends CachingExchangeRateProvider {
             .collect(Collectors.toSet());
     }
 
-    private Stream<PoloniexTicker> getTickers() throws IOException {
-        TypeReference typeReference = new TypeReference<HashMap<String, PoloniexMarketData>>() {
-        };
-        Map<String, PoloniexMarketData> tickers = mapper.readValue(getTickersJson(), typeReference);
+    private Stream<PoloniexTicker> getTickers() {
 
-        return tickers.entrySet().stream()
+        return getTickerMapEntries()
             .map(e -> {
                 String pair = e.getKey();
                 PoloniexMarketData data = e.getValue();
@@ -83,7 +81,15 @@ public class Poloniex extends CachingExchangeRateProvider {
             });
     }
 
-    private String getTickersJson() throws IOException {
-        return httpClient.requestWithGET("?command=returnTicker", "User-Agent", "");
+    private Stream<Map.Entry<String, PoloniexMarketData>> getTickerMapEntries() {
+        TypeReference typeReference = new TypeReference<HashMap<String, PoloniexMarketData>>() {
+        };
+        try {
+            String json = httpClient.requestWithGET("?command=returnTicker", "User-Agent", "");
+            Map<String, PoloniexMarketData> tickers = mapper.readValue(json, typeReference);
+            return tickers.entrySet().stream();
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
+        }
     }
 }

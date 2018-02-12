@@ -2,7 +2,6 @@
 
 The list of stuff remaining to complete the PR at https://github.com/bisq-network/pricenode/pull/7
 
- - Improve error handling: make sure failures at startup kill the JVM, and that failures on scheduled requests do not
  - Replace our own caching infrastructure with Spring's @Cacheable
  - Refactor bisq.price.app.Pricenode into individual Spring controllers
  - Replace our own Environment implementation with Spring's Environment

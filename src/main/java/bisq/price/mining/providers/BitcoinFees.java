@@ -29,6 +29,7 @@ import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -80,13 +81,8 @@ public class BitcoinFees implements FeeEstimationProvider {
         this.maxBlocks = maxBlocks;
     }
 
-    public long getFee() throws IOException {
-        // prev. used:  https://bitcoinfees.earn.com/api/v1/fees/recommended
-        // but was way too high
-
-        // https://bitcoinfees.earn.com/api/v1/fees/list
-        String response = httpClient.requestWithGET("list", "User-Agent", "");
-        log.info("Get recommended fee response:  " + response);
+    public long getFee() {
+        String response = getFeeJson();
 
         @SuppressWarnings("unchecked")
         LinkedTreeMap<String, ArrayList<LinkedTreeMap<String, Double>>> treeMap =
@@ -105,6 +101,20 @@ public class BitcoinFees implements FeeEstimationProvider {
         fee[0] = Math.min(Math.max(fee[0], FeeEstimationService.BTC_MIN_TX_FEE), FeeEstimationService.BTC_MAX_TX_FEE);
 
         return getAverage(fee[0]);
+    }
+
+    private String getFeeJson() {
+        try {
+            // prev. used:  https://bitcoinfees.earn.com/api/v1/fees/recommended
+            // but was way too high
+
+            // https://bitcoinfees.earn.com/api/v1/fees/list
+            String response = httpClient.requestWithGET("list", "User-Agent", "");
+            log.info("Get recommended fee response:  " + response);
+            return response;
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
+        }
     }
 
     // We take the average of the last 12 calls (every 5 minute) so we smooth extreme values.

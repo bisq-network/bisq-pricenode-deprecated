@@ -41,6 +41,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 
 import java.util.Map;
 import java.util.Set;
@@ -80,7 +81,7 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
     }
 
     @Override
-    public Set<ExchangeRate> doGetForCache() throws IOException {
+    public Set<ExchangeRate> doGetForCache() {
 
         return getTickers().entrySet().stream()
             .filter(e -> supportedCurrency(e.getKey()))
@@ -101,11 +102,15 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
         return !"VEF".equals(currencyCode);
     }
 
-    private Map<String, BitcoinAverageTicker> getTickers() throws IOException {
+    private Map<String, BitcoinAverageTicker> getTickers() {
         String path = String.format("indices/%s/ticker/all?crypto=BTC", symbolSet);
-        String json = httpClient.requestWithGETNoProxy(path, "X-signature", getAuthSignature());
-        BitcoinAverageTickers value = mapper.readValue(json, BitcoinAverageTickers.class);
-        return rekey(value.getTickers());
+        try {
+            String json = httpClient.requestWithGETNoProxy(path, "X-signature", getAuthSignature());
+            BitcoinAverageTickers value = mapper.readValue(json, BitcoinAverageTickers.class);
+            return rekey(value.getTickers());
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
+        }
     }
 
     private Map<String, BitcoinAverageTicker> rekey(Map<String, BitcoinAverageTicker> tickers) {

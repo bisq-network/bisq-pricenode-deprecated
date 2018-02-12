@@ -68,11 +68,16 @@ public class Pricenode {
         this.port = port;
     }
 
-    public void start() throws Exception {
+    public void start() {
         initLogging();
         exchangeRateService.start();
         feeEstimationService.start();
         mapRoutesAndStart();
+    }
+
+    public void stop() {
+        exchangeRateService.stop();
+        feeEstimationService.stop();
     }
 
     private void mapRoutesAndStart() {

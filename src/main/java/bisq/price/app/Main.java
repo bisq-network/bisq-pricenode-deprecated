@@ -25,7 +25,7 @@ import bisq.price.util.Environment;
 
 public class Main {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         Environment env = new Environment(args);
 
         ExchangeRateService exchangeRateService = new ExchangeRateService(ExchangeRateProvider.loadAll(env));
@@ -35,6 +35,11 @@ public class Main {
         Pricenode pricenode = new Pricenode(exchangeRateService, feeEstimationService);
         pricenode.configure(env);
 
-        pricenode.start();
+        try {
+            pricenode.start();
+        } catch (Throwable t) {
+            pricenode.stop();
+            throw t;
+        }
     }
 }
