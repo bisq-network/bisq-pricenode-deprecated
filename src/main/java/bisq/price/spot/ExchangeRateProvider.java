@@ -17,6 +17,8 @@
 
 package bisq.price.spot;
 
+import bisq.price.util.Environment;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
@@ -24,6 +26,8 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 public interface ExchangeRateProvider extends Supplier<Set<ExchangeRate>> {
+
+    void configure(Environment env);
 
     String getName();
 
@@ -42,12 +46,14 @@ public interface ExchangeRateProvider extends Supplier<Set<ExchangeRate>> {
      * data about Litecoin (LTC), then the Poloniex data will overwrite the CoinMarketCap
      * data.
      *
+     * @param env for configuring each provider, e.g. for accessing environment variables
      * @see ServiceLoader
      */
-    static List<ExchangeRateProvider> loadAll() {
+    static List<ExchangeRateProvider> loadAll(Environment env) {
         List<ExchangeRateProvider> providers = new ArrayList<>();
 
         for (ExchangeRateProvider provider : ServiceLoader.load(ExchangeRateProvider.class)) {
+            provider.configure(env);
             providers.add(provider);
         }
 

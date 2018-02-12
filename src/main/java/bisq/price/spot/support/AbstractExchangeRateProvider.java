@@ -17,7 +17,11 @@
 
 package bisq.price.spot.support;
 
+import bisq.price.spot.ExchangeRate;
 import bisq.price.spot.ExchangeRateProvider;
+import bisq.price.util.Environment;
+
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +30,8 @@ public abstract class AbstractExchangeRateProvider implements ExchangeRateProvid
 
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
+    private boolean configured;
+
     private final String name;
     private final String prefix;
 
@@ -33,6 +39,26 @@ public abstract class AbstractExchangeRateProvider implements ExchangeRateProvid
         this.name = name;
         this.prefix = prefix;
     }
+
+    @Override
+    public final void configure(Environment env) {
+        doConfigure(env);
+        configured = true;
+    }
+
+    protected void doConfigure(Environment env) {
+        // no-op by default; subclasses can override as necessary
+    }
+
+    @Override
+    public final Set<ExchangeRate> get() {
+        if (!configured)
+            throw new IllegalStateException("call 'configure' before calling 'get'");
+
+        return doGet();
+    }
+
+    protected abstract Set<ExchangeRate> doGet();
 
     @Override
     public String getName() {
