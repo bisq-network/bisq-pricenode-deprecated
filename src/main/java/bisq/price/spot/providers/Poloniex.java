@@ -18,7 +18,7 @@
 package bisq.price.spot.providers;
 
 import bisq.price.spot.ExchangeRate;
-import bisq.price.spot.support.CachingExchangeRateProvider;
+import bisq.price.spot.ExchangeRateProvider;
 import bisq.price.util.Altcoins;
 
 import io.bisq.network.http.HttpClient;
@@ -48,7 +48,7 @@ import java.util.stream.Stream;
 
 @Component
 @Order(4)
-public class Poloniex extends CachingExchangeRateProvider {
+public class Poloniex extends ExchangeRateProvider {
 
     private final ObjectMapper mapper = new ObjectMapper();
     private final HttpClient httpClient = new HttpClient("https://poloniex.com/public");

@@ -15,48 +15,50 @@
  * along with Bisq. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package bisq.price.spot.support;
-
-import bisq.price.spot.ExchangeRate;
+package bisq.price;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import java.time.Duration;
 
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.function.Supplier;
 
-public abstract class CachingExchangeRateProvider extends AbstractExchangeRateProvider {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-    private final Duration ttl;
+public abstract class PriceProvider<T> implements Supplier<T> {
+
+    protected final Logger log = LoggerFactory.getLogger(this.getClass());
+
     private final Timer timer = new Timer();
+    private final Duration ttl;
 
-    private Set<ExchangeRate> cachedExchangeRates;
+    private T cachedResult;
 
-    public CachingExchangeRateProvider(String name, String prefix, Duration ttl) {
-        super(name, prefix);
+    public PriceProvider(Duration ttl) {
         this.ttl = ttl;
-        log.info("will refresh exchange rate data every {}", ttl);
+        log.info("will refresh every {}", ttl);
     }
 
     @Override
-    public final Set<ExchangeRate> get() {
-        return cachedExchangeRates;
+    public final T get() {
+        return cachedResult;
     }
 
     @PostConstruct
     public final void start() {
-        getAndCache();
+        refresh();
 
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 try {
-                    getAndCache();
+                    refresh();
                 } catch (Throwable t) {
-                    log.warn("scheduled call to getAndCache failed", t);
+                    log.warn("refresh failed", t);
                 }
             }
         }, ttl.toMillis(), ttl.toMillis());
@@ -67,17 +69,18 @@ public abstract class CachingExchangeRateProvider extends AbstractExchangeRatePr
         timer.cancel();
     }
 
-    private void getAndCache() {
+    private void refresh() {
         long ts = System.currentTimeMillis();
 
-        cachedExchangeRates = doGet();
+        cachedResult = doGet();
 
-        cachedExchangeRates.stream()
-            .filter(e -> "USD".equals(e.getCurrency()) || "LTC".equals(e.getCurrency()))
-            .forEach(e -> log.info("BTC/{}: {}", e.getCurrency(), e.getPrice()));
+        log.info("refresh took {} ms.", (System.currentTimeMillis() - ts));
 
-        log.info("getAndCache took {} ms.", (System.currentTimeMillis() - ts));
+        onRefresh();
     }
 
-    protected abstract Set<ExchangeRate> doGet();
+    protected abstract T doGet();
+
+    protected void onRefresh() {
+    }
 }

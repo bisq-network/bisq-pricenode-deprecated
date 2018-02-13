@@ -18,7 +18,7 @@
 package bisq.price.spot.providers;
 
 import bisq.price.spot.ExchangeRate;
-import bisq.price.spot.support.CachingExchangeRateProvider;
+import bisq.price.spot.ExchangeRateProvider;
 import bisq.price.util.Altcoins;
 
 import io.bisq.network.http.HttpClient;
@@ -43,7 +43,7 @@ import java.util.stream.Stream;
 
 @Component
 @Order(3)
-public class CoinMarketCap extends CachingExchangeRateProvider {
+public class CoinMarketCap extends ExchangeRateProvider {
 
     private final ObjectMapper mapper = new ObjectMapper();
     private final HttpClient httpClient = new HttpClient("https://api.coinmarketcap.com/");

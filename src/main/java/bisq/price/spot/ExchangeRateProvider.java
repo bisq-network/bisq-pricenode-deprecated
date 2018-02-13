@@ -17,12 +17,35 @@
 
 package bisq.price.spot;
 
+import bisq.price.PriceProvider;
+
+import java.time.Duration;
+
 import java.util.Set;
-import java.util.function.Supplier;
 
-public interface ExchangeRateProvider extends Supplier<Set<ExchangeRate>> {
+public abstract class ExchangeRateProvider extends PriceProvider<Set<ExchangeRate>> {
 
-    String getName();
+    private final String name;
+    private final String prefix;
 
-    String getPrefix();
+    public ExchangeRateProvider(String name, String prefix, Duration ttl) {
+        super(ttl);
+        this.name = name;
+        this.prefix = prefix;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getPrefix() {
+        return prefix;
+    }
+
+    @Override
+    protected void onRefresh() {
+        get().stream()
+            .filter(e -> "USD".equals(e.getCurrency()) || "LTC".equals(e.getCurrency()))
+            .forEach(e -> log.info("BTC/{}: {}", e.getCurrency(), e.getPrice()));
+    }
 }

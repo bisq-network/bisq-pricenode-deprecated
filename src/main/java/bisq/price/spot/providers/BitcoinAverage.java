@@ -18,7 +18,7 @@
 package bisq.price.spot.providers;
 
 import bisq.price.spot.ExchangeRate;
-import bisq.price.spot.support.CachingExchangeRateProvider;
+import bisq.price.spot.ExchangeRateProvider;
 
 import io.bisq.network.http.HttpClient;
 
@@ -53,7 +53,7 @@ import java.util.stream.Collectors;
 /**
  * See the BitcoinAverage API documentation at https://apiv2.bitcoinaverage.com/#ticker-data-all
  */
-public abstract class BitcoinAverage extends CachingExchangeRateProvider {
+public abstract class BitcoinAverage extends ExchangeRateProvider {
 
     /**
      * Max number of requests allowed per month on the BitcoinAverage developer plan.
