@@ -80,7 +80,7 @@ public abstract class BitcoinAverage extends CachingExchangeRateProvider {
     }
 
     @Override
-    public Set<ExchangeRate> doGetForCache() {
+    public Set<ExchangeRate> doGet() {
 
         return getTickers().entrySet().stream()
             .filter(e -> supportedCurrency(e.getKey()))

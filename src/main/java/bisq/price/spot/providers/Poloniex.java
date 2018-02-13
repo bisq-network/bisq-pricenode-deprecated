@@ -58,7 +58,7 @@ public class Poloniex extends CachingExchangeRateProvider {
     }
 
     @Override
-    public Set<ExchangeRate> doGetForCache() {
+    public Set<ExchangeRate> doGet() {
         Date timestamp = new Date(); // Poloniex tickers don't include their own timestamp
 
         return getTickers()
