@@ -18,7 +18,6 @@
 package bisq.price.spot;
 
 import bisq.price.spot.providers.BitcoinAverage;
-import bisq.price.spot.support.CachingExchangeRateProvider;
 
 import org.springframework.stereotype.Service;
 
@@ -34,22 +33,6 @@ public class ExchangeRateService {
 
     public ExchangeRateService(List<ExchangeRateProvider> providers) {
         this.providers = providers;
-    }
-
-    public void start() {
-        for (ExchangeRateProvider provider : providers) {
-            if (provider instanceof CachingExchangeRateProvider) {
-                ((CachingExchangeRateProvider) provider).start();
-            }
-        }
-    }
-
-    public void stop() {
-        for (ExchangeRateProvider provider : providers) {
-            if (provider instanceof CachingExchangeRateProvider) {
-                ((CachingExchangeRateProvider) provider).stop();
-            }
-        }
     }
 
     public Map<String, Object> getAllMarketPrices() {

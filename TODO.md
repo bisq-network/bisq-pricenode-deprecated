@@ -2,7 +2,6 @@
 
 The list of stuff remaining to complete the PR at https://github.com/bisq-network/pricenode/pull/7
 
- - Replace our own caching infrastructure with Spring's @Cacheable
  - Replace use of bisq-core's HttpClient with Spring's RestTemplate
  - Finish refactoring 'mining' package, esp FeeEstimationService
  - Make classes package private where appropriate

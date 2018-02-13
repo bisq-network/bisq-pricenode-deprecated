@@ -20,9 +20,6 @@ package bisq.price.spot;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-
 import java.util.Map;
 
 @RestController
@@ -32,16 +29,6 @@ public class ExchangeRateController {
 
     public ExchangeRateController(ExchangeRateService exchangeRateService) {
         this.exchangeRateService = exchangeRateService;
-    }
-
-    @PostConstruct
-    public void start() {
-        exchangeRateService.start();
-    }
-
-    @PreDestroy
-    public void stop() {
-        exchangeRateService.stop();
     }
 
     @GetMapping(path = "/getAllMarketPrices")

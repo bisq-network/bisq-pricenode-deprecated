@@ -21,6 +21,9 @@ import org.springframework.core.env.CommandLinePropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
 import java.time.Instant;
 
 import java.util.HashMap;
@@ -76,6 +79,7 @@ public class FeeEstimationService {
         return requestIntervalMs;
     }
 
+    @PostConstruct
     public void start() {
         requestBitcoinFees();
 
@@ -91,6 +95,7 @@ public class FeeEstimationService {
         }, requestIntervalMs, requestIntervalMs);
     }
 
+    @PreDestroy
     public void stop() {
         timer.cancel();
     }

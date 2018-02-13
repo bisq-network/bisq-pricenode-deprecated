@@ -22,9 +22,6 @@ import bisq.price.mining.providers.BitcoinFees;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-
 import java.util.Map;
 
 @RestController
@@ -34,16 +31,6 @@ public class FeeEstimationController {
 
     public FeeEstimationController(FeeEstimationService feeEstimationService) {
         this.feeEstimationService = feeEstimationService;
-    }
-
-    @PostConstruct
-    public void start() {
-        feeEstimationService.start();
-    }
-
-    @PreDestroy
-    public void stop() {
-        feeEstimationService.stop();
     }
 
     @GetMapping(path = "/getFees")

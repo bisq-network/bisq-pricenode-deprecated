@@ -19,6 +19,9 @@ package bisq.price.spot.support;
 
 import bisq.price.spot.ExchangeRate;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
 import java.time.Duration;
 
 import java.util.Set;
@@ -43,6 +46,7 @@ public abstract class CachingExchangeRateProvider extends AbstractExchangeRatePr
         return cachedExchangeRates;
     }
 
+    @PostConstruct
     public final void start() {
         getAndCache();
 
@@ -58,6 +62,7 @@ public abstract class CachingExchangeRateProvider extends AbstractExchangeRatePr
         }, ttl.toMillis(), ttl.toMillis());
     }
 
+    @PreDestroy
     public void stop() {
         timer.cancel();
     }
