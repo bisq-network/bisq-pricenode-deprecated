@@ -17,7 +17,8 @@
 
 package bisq.price.mining;
 
-public interface FeeEstimationProvider {
+import java.util.function.Supplier;
 
-    long getFee();
+public interface FeeEstimationProvider extends Supplier<Long> {
+
 }

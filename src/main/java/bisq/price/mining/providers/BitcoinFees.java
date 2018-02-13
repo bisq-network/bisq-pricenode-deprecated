@@ -79,7 +79,7 @@ public class BitcoinFees implements FeeEstimationProvider {
         return maxBlocks;
     }
 
-    public long getFee() {
+    public Long get() {
         String response = getFeeJson();
 
         @SuppressWarnings("unchecked")

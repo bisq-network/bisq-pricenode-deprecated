@@ -102,7 +102,7 @@ public class FeeEstimationService {
 
     private void requestBitcoinFees() {
         long ts = System.currentTimeMillis();
-        long btcFee = feeEstimationProvider.getFee();
+        long btcFee = feeEstimationProvider.get();
         log.info("requestBitcoinFees took {} ms.", (System.currentTimeMillis() - ts));
         if (btcFee < FeeEstimationService.BTC_MIN_TX_FEE) {
             log.warn("Response for fee is lower as min fee. Fee=" + btcFee);
