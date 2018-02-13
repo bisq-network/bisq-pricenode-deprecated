@@ -30,10 +30,10 @@ import java.util.TimerTask;
 
 public abstract class CachingExchangeRateProvider extends AbstractExchangeRateProvider {
 
-    private Set<ExchangeRate> cachedExchangeRates;
-
     private final Duration ttl;
     private final Timer timer = new Timer();
+
+    private Set<ExchangeRate> cachedExchangeRates;
 
     public CachingExchangeRateProvider(String name, String prefix, Duration ttl) {
         super(name, prefix);
