@@ -27,8 +27,6 @@
           <emptyLine />
           <package name="com.fasterxml.jackson" withSubpackages="true" static="false" />
           <emptyLine />
-          <package name="com.google.gson" withSubpackages="true" static="false" />
-          <emptyLine />
           <package name="org.bouncycastle" withSubpackages="true" static="false" />
           <emptyLine />
           <package name="javax.crypto" withSubpackages="true" static="false" />

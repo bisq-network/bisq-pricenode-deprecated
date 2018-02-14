@@ -21,6 +21,7 @@ import bisq.price.PriceController;
 import bisq.price.mining.FeeRate;
 import bisq.price.mining.FeeRateProvider;
 
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.env.CommandLinePropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.http.RequestEntity;
@@ -30,29 +31,28 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.google.gson.Gson;
-import com.google.gson.internal.LinkedTreeMap;
-
 import java.time.Duration;
 import java.time.Instant;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 //TODO consider alternative https://www.bitgo.com/api/v1/tx/fee?numBlocks=3
 @Component
 class BitcoinFeeRateProvider extends FeeRateProvider {
 
-    private static final long MIN_TX_FEE = 10; // satoshi/byte
-    private static final long MAX_TX_FEE = 1000;
+    private static final long MIN_FEE_RATE = 10; // satoshi/byte
+    private static final long MAX_FEE_RATE = 1000;
 
     private static final int DEFAULT_CAPACITY = 4; // if we request each 5 min. we take average of last 20 min.
     private static final int DEFAULT_MAX_BLOCKS = 10;
     private static final int DEFAULT_TTL = 5;
 
     private final RestTemplate restTemplate = new RestTemplate();
-    private final LinkedList<Long> fees = new LinkedList<>();
+    private final LinkedList<Long> lastFeeRates = new LinkedList<>();
 
     private final int capacity;
     private final int maxBlocks;
@@ -65,28 +65,29 @@ class BitcoinFeeRateProvider extends FeeRateProvider {
     }
 
     protected FeeRate doGet() {
-        String response = getFeeJson();
-
-        @SuppressWarnings("unchecked")
-        LinkedTreeMap<String, ArrayList<LinkedTreeMap<String, Double>>> treeMap =
-            new Gson().fromJson(response, LinkedTreeMap.class);
-
-        final long[] fee = new long[1];
-        // we want a fee which is at least in 20 blocks in (21.co estimation seem to be way too high, so we get
-        // prob much faster in
-        treeMap.entrySet().stream()
-            .flatMap(e -> e.getValue().stream())
-            .forEach(e -> {
-                Double maxDelay = e.get("maxDelay");
-                if (maxDelay <= maxBlocks && fee[0] == 0)
-                    fee[0] = e.get("maxFee").longValue();
-            });
-        fee[0] = Math.min(Math.max(fee[0], MIN_TX_FEE), MAX_TX_FEE);
-
-        return new FeeRate("BTC", getAverage(fee[0]), Instant.now().getEpochSecond());
+        return new FeeRate("BTC", getEstimatedFeeRate(), Instant.now().getEpochSecond());
     }
 
-    private String getFeeJson() {
+    private long getEstimatedFeeRate() {
+        return getFeeRatePredictions()
+            .filter(p -> p.get("maxDelay") <= maxBlocks)
+            .findFirst()
+            .map(p -> p.get("maxFee"))
+            .map(r -> {
+                log.info("latest fee rate prediction is {} sat/byte", r);
+                return r;
+            })
+            .map(r -> movingAverage(r))
+            .map(r -> {
+                log.info("average of last {} fee rate predictions is {} sat/byte", lastFeeRates.size(), r);
+                return r;
+            })
+            .map(r -> Math.max(r, MIN_FEE_RATE))
+            .map(r -> Math.min(r, MAX_FEE_RATE))
+            .orElse(MIN_FEE_RATE);
+    }
+
+    private Stream<Map<String, Long>> getFeeRatePredictions() {
         return restTemplate.exchange(
             RequestEntity
                 .get(UriComponentsBuilder
@@ -95,20 +96,21 @@ class BitcoinFeeRateProvider extends FeeRateProvider {
                     .build().toUri())
                 .header("User-Agent", "") // required to avoid 403
                 .build(),
-            String.class).getBody();
+            new ParameterizedTypeReference<Map<String, List<Map<String, Long>>>>() {
+            }
+        ).getBody().entrySet().stream()
+            .flatMap(e -> e.getValue().stream());
     }
 
     // We take the average of the last 12 calls (every 5 minute) so we smooth extreme values.
     // We observed very radical jumps in the fee estimations, so that should help to avoid that.
-    private long getAverage(long newFee) {
-        log.info("new fee " + newFee);
-        fees.add(newFee);
-        long average = ((Double) fees.stream().mapToDouble(e -> e).average().getAsDouble()).longValue();
-        log.info("average of last {} calls: {}", fees.size(), average);
-        if (fees.size() == capacity)
-            fees.removeFirst();
+    private long movingAverage(long feeRate) {
+        if (lastFeeRates.size() == capacity)
+            lastFeeRates.removeFirst();
 
-        return average;
+        lastFeeRates.add(feeRate);
+
+        return ((Double) lastFeeRates.stream().mapToLong(e -> e).average().getAsDouble()).longValue();
     }
 
     private static Optional<String[]> args(Environment env) {
