@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Service
-public class FeeRateService {
+class FeeRateService {
 
     private final Set<FeeRateProvider> providers;
 

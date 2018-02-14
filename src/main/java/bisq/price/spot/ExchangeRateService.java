@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Service
-public class ExchangeRateService {
+class ExchangeRateService {
 
     private final List<ExchangeRateProvider> providers;
 

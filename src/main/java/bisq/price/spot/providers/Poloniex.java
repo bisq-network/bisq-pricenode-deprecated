@@ -48,7 +48,7 @@ import java.util.stream.Stream;
 
 @Component
 @Order(4)
-public class Poloniex extends ExchangeRateProvider {
+class Poloniex extends ExchangeRateProvider {
 
     private final ObjectMapper mapper = new ObjectMapper();
     private final HttpClient httpClient = new HttpClient("https://poloniex.com/public");

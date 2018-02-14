@@ -43,7 +43,7 @@ import java.util.stream.Stream;
 
 @Component
 @Order(3)
-public class CoinMarketCap extends ExchangeRateProvider {
+class CoinMarketCap extends ExchangeRateProvider {
 
     private final ObjectMapper mapper = new ObjectMapper();
     private final HttpClient httpClient = new HttpClient("https://api.coinmarketcap.com/");
