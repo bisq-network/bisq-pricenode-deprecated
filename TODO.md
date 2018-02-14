@@ -3,7 +3,6 @@
 The list of stuff remaining to complete the PR at https://github.com/bisq-network/pricenode/pull/7
 
  - Replace use of bisq-core's HttpClient with Spring's RestTemplate
- - Finish refactoring 'mining' package, esp FeeEstimationService
  - Make classes package private where appropriate
  - Document provider implementations w/ links to API docs, etc
  - Add integration tests

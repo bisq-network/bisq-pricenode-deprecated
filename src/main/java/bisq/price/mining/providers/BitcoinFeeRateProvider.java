@@ -41,6 +41,7 @@ import java.io.UncheckedIOException;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Optional;
 
 //TODO consider alternative https://www.bitgo.com/api/v1/tx/fee?numBlocks=3
 @Component
@@ -51,8 +52,9 @@ class BitcoinFeeRateProvider extends FeeRateProvider {
 
     private static final int DEFAULT_CAPACITY = 4; // if we request each 5 min. we take average of last 20 min.
     private static final int DEFAULT_MAX_BLOCKS = 10;
+    private static final int DEFAULT_TTL = 5;
 
-    private final HttpClient httpClient;
+    private final HttpClient httpClient = new HttpClient("https://bitcoinfees.earn.com/api/v1/fees/");
     private final LinkedList<Long> fees = new LinkedList<>();
 
     private final int capacity;
@@ -60,32 +62,9 @@ class BitcoinFeeRateProvider extends FeeRateProvider {
 
     // other: https://estimatefee.com/n/2
     public BitcoinFeeRateProvider(Environment env) {
-        super(getTtl(env));
-
-        this.httpClient = new HttpClient("https://bitcoinfees.earn.com/api/v1/fees/");
-
-        String[] args =
-            env.getProperty(CommandLinePropertySource.DEFAULT_NON_OPTION_ARGS_PROPERTY_NAME, String[].class);
-
-        if (args != null && args.length >= 2) {
-            this.capacity = Integer.valueOf(args[0]);
-            this.maxBlocks = Integer.valueOf(args[1]);
-        } else {
-            this.capacity = DEFAULT_CAPACITY;
-            this.maxBlocks = DEFAULT_MAX_BLOCKS;
-        }
-    }
-
-    public int getCapacity() {
-        return capacity;
-    }
-
-    public int getMaxBlocks() {
-        return maxBlocks;
-    }
-
-    public Duration getTtl() {
-        return ttl;
+        super(Duration.ofMinutes(ttl(env)));
+        this.capacity = capacity(env);
+        this.maxBlocks = maxBlocks(env);
     }
 
     protected FeeRate doGet() {
@@ -137,13 +116,30 @@ class BitcoinFeeRateProvider extends FeeRateProvider {
         return average;
     }
 
-    private static Duration getTtl(Environment env) {
-        String[] args =
-            env.getProperty(CommandLinePropertySource.DEFAULT_NON_OPTION_ARGS_PROPERTY_NAME, String[].class);
+    private static Optional<String[]> args(Environment env) {
+        return Optional.ofNullable(
+            env.getProperty(CommandLinePropertySource.DEFAULT_NON_OPTION_ARGS_PROPERTY_NAME, String[].class));
+    }
 
-        return (args != null && args.length >= 3) ?
-            Duration.ofMinutes(Long.valueOf(args[2])) :
-            Duration.ofMinutes(5);
+    private static int capacity(Environment env) {
+        return args(env)
+            .filter(args -> args.length >= 1)
+            .map(args -> Integer.valueOf(args[0]))
+            .orElse(DEFAULT_CAPACITY);
+    }
+
+    private static int maxBlocks(Environment env) {
+        return args(env)
+            .filter(args -> args.length >= 2)
+            .map(args -> Integer.valueOf(args[1]))
+            .orElse(DEFAULT_MAX_BLOCKS);
+    }
+
+    private static long ttl(Environment env) {
+        return args(env)
+            .filter(args -> args.length >= 3)
+            .map(args -> Integer.valueOf(args[2]))
+            .orElse(DEFAULT_TTL);
     }
 
 
@@ -152,7 +148,7 @@ class BitcoinFeeRateProvider extends FeeRateProvider {
 
         @GetMapping(path = "/getParams")
         public String getParams() {
-            return String.format("%s;%s;%s", getCapacity(), getMaxBlocks(), getTtl().toMillis());
+            return String.format("%s;%s;%s", capacity, maxBlocks, ttl.toMillis());
         }
     }
 }
