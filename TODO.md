@@ -2,8 +2,7 @@
 
 The list of stuff remaining to complete the PR at https://github.com/bisq-network/pricenode/pull/7
 
- - Replace use of bisq-core's HttpClient with Spring's RestTemplate
- - Remove verbose 'Get recommended fee response' logging
+ - Remove use of Gson
  - Customize banner
  - Remove custom Version management in favor of Boot / Gradle version integration (incl. commit hash) exposed via Boot actuator endpoint
  - Document provider implementations w/ links to API docs, etc

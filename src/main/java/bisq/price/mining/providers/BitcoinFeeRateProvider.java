@@ -21,22 +21,20 @@ import bisq.price.PriceController;
 import bisq.price.mining.FeeRate;
 import bisq.price.mining.FeeRateProvider;
 
-import io.bisq.network.http.HttpClient;
-
 import org.springframework.core.env.CommandLinePropertySource;
 import org.springframework.core.env.Environment;
+import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 
 import java.time.Duration;
 import java.time.Instant;
-
-import java.io.IOException;
-import java.io.UncheckedIOException;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -53,7 +51,7 @@ class BitcoinFeeRateProvider extends FeeRateProvider {
     private static final int DEFAULT_MAX_BLOCKS = 10;
     private static final int DEFAULT_TTL = 5;
 
-    private final HttpClient httpClient = new HttpClient("https://bitcoinfees.earn.com/api/v1/fees/");
+    private final RestTemplate restTemplate = new RestTemplate();
     private final LinkedList<Long> fees = new LinkedList<>();
 
     private final int capacity;
@@ -89,17 +87,15 @@ class BitcoinFeeRateProvider extends FeeRateProvider {
     }
 
     private String getFeeJson() {
-        try {
-            // prev. used:  https://bitcoinfees.earn.com/api/v1/fees/recommended
-            // but was way too high
-
-            // https://bitcoinfees.earn.com/api/v1/fees/list
-            String response = httpClient.requestWithGET("list", "User-Agent", "");
-            log.info("Get recommended fee response:  " + response);
-            return response;
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
-        }
+        return restTemplate.exchange(
+            RequestEntity
+                .get(UriComponentsBuilder
+                    // now using /fees/list because /fees/recommended estimates were too high
+                    .fromUriString("https://bitcoinfees.earn.com/api/v1/fees/list")
+                    .build().toUri())
+                .header("User-Agent", "") // required to avoid 403
+                .build(),
+            String.class).getBody();
     }
 
     // We take the average of the last 12 calls (every 5 minute) so we smooth extreme values.

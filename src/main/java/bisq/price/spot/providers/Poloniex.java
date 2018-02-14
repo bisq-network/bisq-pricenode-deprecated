@@ -21,26 +21,21 @@ import bisq.price.spot.ExchangeRate;
 import bisq.price.spot.ExchangeRateProvider;
 import bisq.price.util.Altcoins;
 
-import io.bisq.network.http.HttpClient;
-
 import org.knowm.xchange.currency.Currency;
 import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.poloniex.dto.marketdata.PoloniexMarketData;
 import org.knowm.xchange.poloniex.dto.marketdata.PoloniexTicker;
 
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.Duration;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -50,8 +45,7 @@ import java.util.stream.Stream;
 @Order(4)
 class Poloniex extends ExchangeRateProvider {
 
-    private final ObjectMapper mapper = new ObjectMapper();
-    private final HttpClient httpClient = new HttpClient("https://poloniex.com/public");
+    private final RestTemplate restTemplate = new RestTemplate();
 
     public Poloniex() {
         super("POLO", "poloniex", Duration.ofMinutes(1));
@@ -77,7 +71,7 @@ class Poloniex extends ExchangeRateProvider {
 
     private Stream<PoloniexTicker> getTickers() {
 
-        return getTickerMapEntries()
+        return getTickersKeyedByCurrencyPair().entrySet().stream()
             .map(e -> {
                 String pair = e.getKey();
                 PoloniexMarketData data = e.getValue();
@@ -86,15 +80,15 @@ class Poloniex extends ExchangeRateProvider {
             });
     }
 
-    private Stream<Map.Entry<String, PoloniexMarketData>> getTickerMapEntries() {
-        TypeReference typeReference = new TypeReference<HashMap<String, PoloniexMarketData>>() {
-        };
-        try {
-            String json = httpClient.requestWithGET("?command=returnTicker", "User-Agent", "");
-            Map<String, PoloniexMarketData> tickers = mapper.readValue(json, typeReference);
-            return tickers.entrySet().stream();
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
-        }
+    private Map<String, PoloniexMarketData> getTickersKeyedByCurrencyPair() {
+        return restTemplate.exchange(
+            RequestEntity
+                .get(UriComponentsBuilder
+                    .fromUriString("https://poloniex.com/public?command=returnTicker").build()
+                    .toUri())
+                .build(),
+            new ParameterizedTypeReference<Map<String, PoloniexMarketData>>() {
+            }
+        ).getBody();
     }
 }

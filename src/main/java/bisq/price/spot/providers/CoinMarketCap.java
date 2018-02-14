@@ -21,20 +21,16 @@ import bisq.price.spot.ExchangeRate;
 import bisq.price.spot.ExchangeRateProvider;
 import bisq.price.util.Altcoins;
 
-import io.bisq.network.http.HttpClient;
-
 import org.knowm.xchange.coinmarketcap.dto.marketdata.CoinMarketCapTicker;
 
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.Duration;
-
-import java.io.IOException;
-import java.io.UncheckedIOException;
 
 import java.util.List;
 import java.util.Set;
@@ -45,8 +41,7 @@ import java.util.stream.Stream;
 @Order(3)
 class CoinMarketCap extends ExchangeRateProvider {
 
-    private final ObjectMapper mapper = new ObjectMapper();
-    private final HttpClient httpClient = new HttpClient("https://api.coinmarketcap.com/");
+    private final RestTemplate restTemplate = new RestTemplate();
 
     public CoinMarketCap() {
         super("CMC", "coinmarketcap", Duration.ofMinutes(5)); // large data structure, so don't request it too often
@@ -69,14 +64,14 @@ class CoinMarketCap extends ExchangeRateProvider {
     }
 
     private Stream<CoinMarketCapTicker> getTickers() {
-        TypeReference typeReference = new TypeReference<List<CoinMarketCapTicker>>() {
-        };
-        try {
-            String json = httpClient.requestWithGET("v1/ticker/?limit=200", "User-Agent", "");
-            List<CoinMarketCapTicker> tickers = mapper.readValue(json, typeReference);
-            return tickers.stream();
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
-        }
+        return restTemplate.exchange(
+            RequestEntity
+                .get(UriComponentsBuilder
+                    .fromUriString("https://api.coinmarketcap.com/v1/ticker/?limit=200").build()
+                    .toUri())
+                .build(),
+            new ParameterizedTypeReference<List<CoinMarketCapTicker>>() {
+            }
+        ).getBody().stream();
     }
 }

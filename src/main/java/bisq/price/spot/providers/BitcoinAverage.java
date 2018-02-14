@@ -20,16 +20,15 @@ package bisq.price.spot.providers;
 import bisq.price.spot.ExchangeRate;
 import bisq.price.spot.ExchangeRateProvider;
 
-import io.bisq.network.http.HttpClient;
-
 import org.knowm.xchange.bitcoinaverage.dto.marketdata.BitcoinAverageTicker;
 import org.knowm.xchange.bitcoinaverage.dto.marketdata.BitcoinAverageTickers;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
+import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Component;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import org.bouncycastle.util.encoders.Hex;
 
@@ -42,9 +41,6 @@ import java.time.Instant;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-
-import java.io.IOException;
-import java.io.UncheckedIOException;
 
 import java.util.Map;
 import java.util.Set;
@@ -62,8 +58,7 @@ public abstract class BitcoinAverage extends ExchangeRateProvider {
      */
     private static final double MAX_REQUESTS_PER_MONTH = 42_514;
 
-    private final ObjectMapper mapper = new ObjectMapper();
-    private final HttpClient httpClient = new HttpClient("https://apiv2.bitcoinaverage.com/");
+    private final RestTemplate restTemplate = new RestTemplate();
     private final String symbolSet;
 
     private String pubKey;
@@ -82,7 +77,7 @@ public abstract class BitcoinAverage extends ExchangeRateProvider {
     @Override
     public Set<ExchangeRate> doGet() {
 
-        return getTickers().entrySet().stream()
+        return getTickersKeyedByCurrency().entrySet().stream()
             .filter(e -> supportedCurrency(e.getKey()))
             .map(e ->
                 new ExchangeRate(
@@ -101,21 +96,24 @@ public abstract class BitcoinAverage extends ExchangeRateProvider {
         return !"VEF".equals(currencyCode);
     }
 
-    private Map<String, BitcoinAverageTicker> getTickers() {
-        String path = String.format("indices/%s/ticker/all?crypto=BTC", symbolSet);
-        try {
-            String json = httpClient.requestWithGETNoProxy(path, "X-signature", getAuthSignature());
-            BitcoinAverageTickers value = mapper.readValue(json, BitcoinAverageTickers.class);
-            return rekey(value.getTickers());
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
-        }
+    private Map<String, BitcoinAverageTicker> getTickersKeyedByCurrency() {
+        // go from a map with keys like "BTCUSD", "BTCVEF"
+        return getTickersKeyedByCurrencyPair().entrySet().stream()
+            // to a map with keys like "USD", "VEF"
+            .collect(Collectors.toMap(e -> e.getKey().substring(3), Map.Entry::getValue));
     }
 
-    private Map<String, BitcoinAverageTicker> rekey(Map<String, BitcoinAverageTicker> tickers) {
-        // go from a map with keys like "BTCUSD", "BTCVEF" to one with keys like "USD", "VEF"
-        return tickers.entrySet().stream()
-            .collect(Collectors.toMap(e -> e.getKey().substring(3), Map.Entry::getValue));
+    private Map<String, BitcoinAverageTicker> getTickersKeyedByCurrencyPair() {
+        return restTemplate.exchange(
+            RequestEntity
+                .get(UriComponentsBuilder
+                    .fromUriString("https://apiv2.bitcoinaverage.com/indices/{symbol-set}/ticker/all?crypto=BTC")
+                    .buildAndExpand(symbolSet)
+                    .toUri())
+                .header("X-signature", getAuthSignature())
+                .build(),
+            BitcoinAverageTickers.class
+        ).getBody().getTickers();
     }
 
     protected String getAuthSignature() {
