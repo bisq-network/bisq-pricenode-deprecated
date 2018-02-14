@@ -72,7 +72,7 @@ public abstract class BitcoinAverage extends ExchangeRateProvider {
     /**
      * @param symbolSet "global" or "local"; see https://apiv2.bitcoinaverage.com/#supported-currencies
      */
-    public BitcoinAverage(double pctMaxRequests, String prefix, String name, String symbolSet, Environment env) {
+    public BitcoinAverage(String name, String prefix, double pctMaxRequests, String symbolSet, Environment env) {
         super(name, prefix, ttlFor(pctMaxRequests));
         this.symbolSet = symbolSet;
         this.pubKey = env.getRequiredProperty("BITCOIN_AVG_PUBKEY");
@@ -145,7 +145,7 @@ public abstract class BitcoinAverage extends ExchangeRateProvider {
     @Order(1)
     public static class Global extends BitcoinAverage {
         public Global(Environment env) {
-            super(0.3, "btcAverageG", "BTCA_G", "global", env);
+            super("BTCA_G", "btcAverageG", 0.3, "global", env);
         }
     }
 
@@ -154,7 +154,7 @@ public abstract class BitcoinAverage extends ExchangeRateProvider {
     @Order(2)
     public static class Local extends BitcoinAverage {
         public Local(Environment env) {
-            super(0.7, "btcAverageL", "BTCA_L", "local", env);
+            super("BTCA_L", "btcAverageL", 0.7, "local", env);
         }
     }
 }
