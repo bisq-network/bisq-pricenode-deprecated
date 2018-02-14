@@ -17,8 +17,30 @@
 
 package bisq.price.mining;
 
-import java.util.function.Supplier;
+import bisq.price.PriceProvider;
 
-public interface FeeEstimationProvider extends Supplier<Long> {
+import org.springframework.core.env.CommandLinePropertySource;
+import org.springframework.core.env.Environment;
 
+import java.time.Duration;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public abstract class FeeEstimationProvider extends PriceProvider<Long> {
+
+    protected final Logger log = LoggerFactory.getLogger(this.getClass());
+
+    public FeeEstimationProvider(Environment env) {
+        super(getTtl(env));
+    }
+
+    private static Duration getTtl(Environment env) {
+        String[] args =
+            env.getProperty(CommandLinePropertySource.DEFAULT_NON_OPTION_ARGS_PROPERTY_NAME, String[].class);
+
+        return (args != null && args.length >= 3) ?
+            Duration.ofMinutes(Long.valueOf(args[2])) :
+            Duration.ofMinutes(5);
+    }
 }

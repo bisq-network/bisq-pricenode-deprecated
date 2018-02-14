@@ -18,7 +18,6 @@
 package bisq.price.mining.providers;
 
 import bisq.price.mining.FeeEstimationProvider;
-import bisq.price.mining.FeeEstimationService;
 
 import io.bisq.network.http.HttpClient;
 
@@ -31,23 +30,23 @@ import org.springframework.stereotype.Component;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 
+import java.time.Duration;
+
 import java.io.IOException;
 import java.io.UncheckedIOException;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 //TODO consider alternative https://www.bitgo.com/api/v1/tx/fee?numBlocks=3
 @Component
-public class BitcoinFees implements FeeEstimationProvider {
+public class BitcoinFees extends FeeEstimationProvider {
 
-    private static final Logger log = LoggerFactory.getLogger(BitcoinFees.class);
+    private static final long MIN_TX_FEE = 10; // satoshi/byte
+    private static final long MAX_TX_FEE = 1000;
 
-    public static int DEFAULT_CAPACITY = 4; // if we request each 5 min. we take average of last 20 min.
-    public static int DEFAULT_MAX_BLOCKS = 10;
+    private static final int DEFAULT_CAPACITY = 4; // if we request each 5 min. we take average of last 20 min.
+    private static final int DEFAULT_MAX_BLOCKS = 10;
 
     private final HttpClient httpClient;
     private final LinkedList<Long> fees = new LinkedList<>();
@@ -57,6 +56,8 @@ public class BitcoinFees implements FeeEstimationProvider {
 
     // other: https://estimatefee.com/n/2
     public BitcoinFees(Environment env) {
+        super(env);
+
         this.httpClient = new HttpClient("https://bitcoinfees.earn.com/api/v1/fees/");
 
         String[] args =
@@ -79,7 +80,11 @@ public class BitcoinFees implements FeeEstimationProvider {
         return maxBlocks;
     }
 
-    public Long get() {
+    public Duration getTtl() {
+        return ttl;
+    }
+
+    protected Long doGet() {
         String response = getFeeJson();
 
         @SuppressWarnings("unchecked")
@@ -96,7 +101,7 @@ public class BitcoinFees implements FeeEstimationProvider {
                 if (maxDelay <= maxBlocks && fee[0] == 0)
                     fee[0] = MathUtils.roundDoubleToLong(e.get("maxFee"));
             });
-        fee[0] = Math.min(Math.max(fee[0], FeeEstimationService.BTC_MIN_TX_FEE), FeeEstimationService.BTC_MAX_TX_FEE);
+        fee[0] = Math.min(Math.max(fee[0], MIN_TX_FEE), MAX_TX_FEE);
 
         return getAverage(fee[0]);
     }
@@ -117,7 +122,7 @@ public class BitcoinFees implements FeeEstimationProvider {
 
     // We take the average of the last 12 calls (every 5 minute) so we smooth extreme values.
     // We observed very radical jumps in the fee estimations, so that should help to avoid that.
-    long getAverage(long newFee) {
+    private long getAverage(long newFee) {
         log.info("new fee " + newFee);
         fees.add(newFee);
         long average = ((Double) fees.stream().mapToDouble(e -> e).average().getAsDouble()).longValue();

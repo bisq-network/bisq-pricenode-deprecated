@@ -28,9 +28,12 @@ import java.util.Map;
 public class FeeEstimationController {
 
     private final FeeEstimationService feeEstimationService;
+    private final BitcoinFees feeEstimationProvider;
 
-    public FeeEstimationController(FeeEstimationService feeEstimationService) {
+    public FeeEstimationController(FeeEstimationService feeEstimationService,
+                                   BitcoinFees feeEstimationProvider) {
         this.feeEstimationService = feeEstimationService;
+        this.feeEstimationProvider = feeEstimationProvider;
     }
 
     @GetMapping(path = "/getFees")
@@ -41,8 +44,8 @@ public class FeeEstimationController {
     @GetMapping(path = "/getParams")
     public String getParams() {
         return String.format("%s;%s;%s",
-            ((BitcoinFees) feeEstimationService.getFeeEstimationProvider()).getCapacity(),
-            ((BitcoinFees) feeEstimationService.getFeeEstimationProvider()).getMaxBlocks(),
-            feeEstimationService.getRequestIntervalMs());
+            feeEstimationProvider.getCapacity(),
+            feeEstimationProvider.getMaxBlocks(),
+            feeEstimationProvider.getTtl().toMillis());
     }
 }

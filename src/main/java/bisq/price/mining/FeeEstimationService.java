@@ -17,108 +17,33 @@
 
 package bisq.price.mining;
 
-import org.springframework.core.env.CommandLinePropertySource;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 
 import java.time.Instant;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Service
 public class FeeEstimationService {
 
-    private static final Logger log = LoggerFactory.getLogger(FeeEstimationService.class);
-
-    public static int DEFAULT_REQUEST_INTERVAL_MS = 300_000; // 5 mins
-
-    public static final long BTC_MIN_TX_FEE = 10; // satoshi/byte
-    public static final long BTC_MAX_TX_FEE = 1000;
-
-    private final Timer timer = new Timer();
-    private final Map<String, Long> dataMap = new ConcurrentHashMap<>();
-
     private final FeeEstimationProvider feeEstimationProvider;
-    private final long requestIntervalMs;
 
-    private long bitcoinFeesTs;
-
-    public FeeEstimationService(FeeEstimationProvider feeEstimationProvider, Environment env) {
+    public FeeEstimationService(FeeEstimationProvider feeEstimationProvider) {
         this.feeEstimationProvider = feeEstimationProvider;
+    }
 
-        String[] args =
-            env.getProperty(CommandLinePropertySource.DEFAULT_NON_OPTION_ARGS_PROPERTY_NAME, String[].class);
-
-        this.requestIntervalMs = (args != null && args.length >= 3) ?
-            TimeUnit.MINUTES.toMillis(Long.valueOf(args[2])) :
-            DEFAULT_REQUEST_INTERVAL_MS;
-
+    public Map<String, Object> getFees() {
+        Map<String, Object> map = new HashMap<>();
+        Map<String, Long> dataMap = new HashMap<>();
+        dataMap.put("btcTxFee", feeEstimationProvider.get());
         // For now we don't need a fee estimation for LTC so we set it fixed, but we keep it in the provider to
         // be flexible if fee pressure grows on LTC
         dataMap.put("ltcTxFee", 500L /*FeeService.LTC_DEFAULT_TX_FEE*/);
         dataMap.put("dogeTxFee", 5_000_000L /*FeeService.DOGE_DEFAULT_TX_FEE*/);
         dataMap.put("dashTxFee", 50L /*FeeService.DASH_DEFAULT_TX_FEE*/);
-    }
-
-    public FeeEstimationProvider getFeeEstimationProvider() {
-        return feeEstimationProvider;
-    }
-
-    public long getRequestIntervalMs() {
-        return requestIntervalMs;
-    }
-
-    @PostConstruct
-    public void start() {
-        requestBitcoinFees();
-
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                try {
-                    requestBitcoinFees();
-                } catch (Throwable t) {
-                    log.warn("scheduled call to requestBitcoinFees failed", t);
-                }
-            }
-        }, requestIntervalMs, requestIntervalMs);
-    }
-
-    @PreDestroy
-    public void stop() {
-        timer.cancel();
-    }
-
-    private void requestBitcoinFees() {
-        long ts = System.currentTimeMillis();
-        long btcFee = feeEstimationProvider.get();
-        log.info("requestBitcoinFees took {} ms.", (System.currentTimeMillis() - ts));
-        if (btcFee < FeeEstimationService.BTC_MIN_TX_FEE) {
-            log.warn("Response for fee is lower as min fee. Fee=" + btcFee);
-        } else if (btcFee > FeeEstimationService.BTC_MAX_TX_FEE) {
-            log.warn("Response for fee is larger as max fee. Fee=" + btcFee);
-        } else {
-            bitcoinFeesTs = Instant.now().getEpochSecond();
-            dataMap.put("btcTxFee", btcFee);
-        }
-    }
-
-    public Map<String, Object> getFees() {
-        Map<String, Object> map = new HashMap<>();
-        map.put("bitcoinFeesTs", bitcoinFeesTs);
+        map.put("bitcoinFeesTs", Instant.now().getEpochSecond());
         map.put("dataMap", dataMap);
         return map;
     }
-
 }
