@@ -66,7 +66,7 @@ public class ExchangeRate {
         return this.timestamp;
     }
 
-    @JsonProperty(value = "provider",index = 4)
+    @JsonProperty(value = "provider", index = 4)
     public String getProvider() {
         return provider;
     }
