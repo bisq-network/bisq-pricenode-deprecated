@@ -23,8 +23,6 @@ import bisq.price.mining.FeeRateProvider;
 
 import io.bisq.network.http.HttpClient;
 
-import io.bisq.common.util.MathUtils;
-
 import org.springframework.core.env.CommandLinePropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
@@ -83,7 +81,7 @@ class BitcoinFeeRateProvider extends FeeRateProvider {
             .forEach(e -> {
                 Double maxDelay = e.get("maxDelay");
                 if (maxDelay <= maxBlocks && fee[0] == 0)
-                    fee[0] = MathUtils.roundDoubleToLong(e.get("maxFee"));
+                    fee[0] = e.get("maxFee").longValue();
             });
         fee[0] = Math.min(Math.max(fee[0], MIN_TX_FEE), MAX_TX_FEE);
 

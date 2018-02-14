@@ -2,7 +2,6 @@
 
 The list of stuff remaining to complete the PR at https://github.com/bisq-network/pricenode/pull/7
 
- - Replace use of bisq-core's MathUtils
  - Replace use of bisq-core's HttpClient with Spring's RestTemplate
  - Remove verbose 'Get recommended fee response' logging
  - Customize banner
