@@ -15,32 +15,14 @@
  * along with Bisq. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package bisq.price.mining;
+package bisq.price.mining.providers;
 
-/**
- * A value object representing the mining fee rate for a given base currency.
- */
-public class FeeRate {
+import org.springframework.stereotype.Component;
 
-    private final String currency;
-    private final long price;
-    private final long timestamp;
+@Component
+class LitecoinFeeRateProvider extends FixedFeeRateProvider {
 
-    public FeeRate(String currency, long price, long timestamp) {
-        this.currency = currency;
-        this.price = price;
-        this.timestamp = timestamp;
-    }
-
-    public String getCurrency() {
-        return currency;
-    }
-
-    public long getPrice() {
-        return this.price;
-    }
-
-    public long getTimestamp() {
-        return this.timestamp;
+    public LitecoinFeeRateProvider() {
+        super("LTC", 500);
     }
 }

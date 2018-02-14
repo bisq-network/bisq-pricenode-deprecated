@@ -15,32 +15,26 @@
  * along with Bisq. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package bisq.price.mining;
+package bisq.price.mining.providers;
 
-/**
- * A value object representing the mining fee rate for a given base currency.
- */
-public class FeeRate {
+import bisq.price.mining.FeeRate;
+import bisq.price.mining.FeeRateProvider;
+
+import java.time.Duration;
+import java.time.Instant;
+
+abstract class FixedFeeRateProvider extends FeeRateProvider {
 
     private final String currency;
     private final long price;
-    private final long timestamp;
 
-    public FeeRate(String currency, long price, long timestamp) {
+    public FixedFeeRateProvider(String currency, long price) {
+        super(Duration.ofDays(1));
         this.currency = currency;
         this.price = price;
-        this.timestamp = timestamp;
     }
 
-    public String getCurrency() {
-        return currency;
-    }
-
-    public long getPrice() {
-        return this.price;
-    }
-
-    public long getTimestamp() {
-        return this.timestamp;
+    protected final FeeRate doGet() {
+        return new FeeRate(currency, price, Instant.now().getEpochSecond());
     }
 }

@@ -17,34 +17,38 @@
 
 package bisq.price.mining;
 
+import bisq.price.mining.providers.BitcoinFeeRateProvider;
+
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 public class FeeRateService {
 
-    private final FeeRateProvider feeRateProvider;
+    private final Set<FeeRateProvider> providers;
 
-    public FeeRateService(FeeRateProvider feeRateProvider) {
-        this.feeRateProvider = feeRateProvider;
+    public FeeRateService(Set<FeeRateProvider> providers) {
+        this.providers = providers;
     }
 
     public Map<String, Object> getFees() {
-        Map<String, Long> dataMap = new HashMap<>();
-        FeeRate feeRate = feeRateProvider.get();
-        dataMap.put(feeRate.getCurrency().toLowerCase() + "TxFee", feeRate.getPrice());
+        Map<String, Long> metadata = new HashMap<>();
+        Map<String, Long> allFeeRates = new HashMap<>();
 
-        // For now we don't need a fee estimation for LTC so we set it fixed, but we keep it in the provider to
-        // be flexible if fee pressure grows on LTC
-        dataMap.put("ltcTxFee", 500L /*FeeService.LTC_DEFAULT_TX_FEE*/);
-        dataMap.put("dogeTxFee", 5_000_000L /*FeeService.DOGE_DEFAULT_TX_FEE*/);
-        dataMap.put("dashTxFee", 50L /*FeeService.DASH_DEFAULT_TX_FEE*/);
+        providers.forEach(p -> {
+            FeeRate feeRate = p.get();
+            if (p instanceof BitcoinFeeRateProvider) {
+                metadata.put("bitcoinFeesTs", feeRate.getTimestamp());
+            }
+            allFeeRates.put(feeRate.getCurrency().toLowerCase() + "TxFee", feeRate.getPrice());
+        });
 
         return new HashMap<String, Object>() {{
-            put("dataMap", dataMap);
-            put(feeRate.getProvider() + "Ts", feeRate.getTimestamp());
+            putAll(metadata);
+            put("dataMap", allFeeRates);
         }};
     }
 }

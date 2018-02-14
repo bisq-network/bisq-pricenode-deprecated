@@ -42,7 +42,7 @@ import java.util.LinkedList;
 
 //TODO consider alternative https://www.bitgo.com/api/v1/tx/fee?numBlocks=3
 @Component
-public class BitcoinFees extends FeeRateProvider {
+public class BitcoinFeeRateProvider extends FeeRateProvider {
 
     private static final long MIN_TX_FEE = 10; // satoshi/byte
     private static final long MAX_TX_FEE = 1000;
@@ -57,8 +57,8 @@ public class BitcoinFees extends FeeRateProvider {
     private final int maxBlocks;
 
     // other: https://estimatefee.com/n/2
-    public BitcoinFees(Environment env) {
-        super(env);
+    public BitcoinFeeRateProvider(Environment env) {
+        super(getTtl(env));
 
         this.httpClient = new HttpClient("https://bitcoinfees.earn.com/api/v1/fees/");
 
@@ -105,7 +105,7 @@ public class BitcoinFees extends FeeRateProvider {
             });
         fee[0] = Math.min(Math.max(fee[0], MIN_TX_FEE), MAX_TX_FEE);
 
-        return new FeeRate("BTC", getAverage(fee[0]), Instant.now().getEpochSecond(), "bitcoinFees");
+        return new FeeRate("BTC", getAverage(fee[0]), Instant.now().getEpochSecond());
     }
 
     private String getFeeJson() {
@@ -133,5 +133,14 @@ public class BitcoinFees extends FeeRateProvider {
             fees.removeFirst();
 
         return average;
+    }
+
+    private static Duration getTtl(Environment env) {
+        String[] args =
+            env.getProperty(CommandLinePropertySource.DEFAULT_NON_OPTION_ARGS_PROPERTY_NAME, String[].class);
+
+        return (args != null && args.length >= 3) ?
+            Duration.ofMinutes(Long.valueOf(args[2])) :
+            Duration.ofMinutes(5);
     }
 }

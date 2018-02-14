@@ -17,7 +17,7 @@
 
 package bisq.price.mining;
 
-import bisq.price.mining.providers.BitcoinFees;
+import bisq.price.mining.providers.BitcoinFeeRateProvider;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,11 +28,11 @@ import java.util.Map;
 public class FeeRateController {
 
     private final FeeRateService feeRateService;
-    private final BitcoinFees feeRateProvider;
+    private final BitcoinFeeRateProvider bitcoinFeeRateProvider;
 
-    public FeeRateController(FeeRateService feeRateService, BitcoinFees feeRateProvider) {
+    public FeeRateController(FeeRateService feeRateService, BitcoinFeeRateProvider bitcoinFeeRateProvider) {
         this.feeRateService = feeRateService;
-        this.feeRateProvider = feeRateProvider;
+        this.bitcoinFeeRateProvider = bitcoinFeeRateProvider;
     }
 
     @GetMapping(path = "/getFees")
@@ -43,8 +43,8 @@ public class FeeRateController {
     @GetMapping(path = "/getParams")
     public String getParams() {
         return String.format("%s;%s;%s",
-            feeRateProvider.getCapacity(),
-            feeRateProvider.getMaxBlocks(),
-            feeRateProvider.getTtl().toMillis());
+            bitcoinFeeRateProvider.getCapacity(),
+            bitcoinFeeRateProvider.getMaxBlocks(),
+            bitcoinFeeRateProvider.getTtl().toMillis());
     }
 }
