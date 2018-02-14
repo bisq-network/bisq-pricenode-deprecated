@@ -2,7 +2,11 @@
 
 The list of stuff remaining to complete the PR at https://github.com/bisq-network/pricenode/pull/7
 
+ - Replace use of bisq-core's MathUtils
  - Replace use of bisq-core's HttpClient with Spring's RestTemplate
+ - Remove verbose 'Get recommended fee response' logging
+ - Customize banner
+ - Remove custom Version management in favor of Boot / Gradle version integration (incl. commit hash) exposed via Boot actuator endpoint
  - Document provider implementations w/ links to API docs, etc
  - Add integration tests
  - Enable Travis CI
@@ -14,10 +18,7 @@ Most or all of these will become individual issues / PRs. Just capturing them he
 
  - Deprecate existing get* endpoints (e.g. /getAllMarketPrices) in favor of '/exchange-rates', '/fee-estimate;
  - Eliminate dependency on bisq-core (only real need now is CurrencyUtil for list of supported coins)
- - Remove command line args for fee estimation params; hard-code these values and update them via commits,
-   not via one-off changes by each operator
- - Remove custom Version management in favor of Boot / Gradle version integration (incl. commit hash) exposed via Boot
-   actuator endpoint
+ - Remove command line args for fee estimation params; hard-code these values and update them via commits, not via one-off changes by each operator
  - Remove 'getParams' in favor of Boot actuator endpoint
  - Update bisq-network/exchange to refer to 'provider' as 'pricenode'
  - Invert the dependency arrangement. Move 'ProviderRepository' et al from bisq-network/exchange here into
