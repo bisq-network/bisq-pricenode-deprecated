@@ -27,6 +27,8 @@ import io.bisq.common.util.MathUtils;
 import org.springframework.core.env.CommandLinePropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
@@ -42,7 +44,7 @@ import java.util.LinkedList;
 
 //TODO consider alternative https://www.bitgo.com/api/v1/tx/fee?numBlocks=3
 @Component
-public class BitcoinFeeRateProvider extends FeeRateProvider {
+class BitcoinFeeRateProvider extends FeeRateProvider {
 
     private static final long MIN_TX_FEE = 10; // satoshi/byte
     private static final long MAX_TX_FEE = 1000;
@@ -142,5 +144,15 @@ public class BitcoinFeeRateProvider extends FeeRateProvider {
         return (args != null && args.length >= 3) ?
             Duration.ofMinutes(Long.valueOf(args[2])) :
             Duration.ofMinutes(5);
+    }
+
+
+    @RestController
+    class Controller {
+
+        @GetMapping(path = "/getParams")
+        public String getParams() {
+            return String.format("%s;%s;%s", getCapacity(), getMaxBlocks(), getTtl().toMillis());
+        }
     }
 }

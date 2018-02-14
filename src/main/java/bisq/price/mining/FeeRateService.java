@@ -17,8 +17,6 @@
 
 package bisq.price.mining;
 
-import bisq.price.mining.providers.BitcoinFeeRateProvider;
-
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -40,10 +38,11 @@ public class FeeRateService {
 
         providers.forEach(p -> {
             FeeRate feeRate = p.get();
-            if (p instanceof BitcoinFeeRateProvider) {
+            String currency = feeRate.getCurrency();
+            if ("BTC".equals(currency)) {
                 metadata.put("bitcoinFeesTs", feeRate.getTimestamp());
             }
-            allFeeRates.put(feeRate.getCurrency().toLowerCase() + "TxFee", feeRate.getPrice());
+            allFeeRates.put(currency.toLowerCase() + "TxFee", feeRate.getPrice());
         });
 
         return new HashMap<String, Object>() {{
