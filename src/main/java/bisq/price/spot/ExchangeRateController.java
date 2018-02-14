@@ -17,13 +17,15 @@
 
 package bisq.price.spot;
 
+import bisq.price.PriceController;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
 @RestController
-class ExchangeRateController {
+class ExchangeRateController extends PriceController {
 
     private final ExchangeRateService exchangeRateService;
 

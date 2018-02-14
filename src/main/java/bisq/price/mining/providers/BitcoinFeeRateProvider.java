@@ -17,6 +17,7 @@
 
 package bisq.price.mining.providers;
 
+import bisq.price.PriceController;
 import bisq.price.mining.FeeRate;
 import bisq.price.mining.FeeRateProvider;
 
@@ -144,7 +145,7 @@ class BitcoinFeeRateProvider extends FeeRateProvider {
 
 
     @RestController
-    class Controller {
+    class Controller extends PriceController {
 
         @GetMapping(path = "/getParams")
         public String getParams() {

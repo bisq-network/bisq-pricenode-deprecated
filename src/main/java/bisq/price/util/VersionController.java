@@ -17,11 +17,13 @@
 
 package bisq.price.util;
 
+import bisq.price.PriceController;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-class VersionController {
+class VersionController extends PriceController {
 
     private final Version version;
 

@@ -15,26 +15,21 @@
  * along with Bisq. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package bisq.price.mining;
+package bisq.price;
 
-import bisq.price.PriceController;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import javax.servlet.http.HttpServletRequest;
 
-import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@RestController
-class FeeRateController extends PriceController {
+public abstract class PriceController {
 
-    private final FeeRateService feeRateService;
+    protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    public FeeRateController(FeeRateService feeRateService) {
-        this.feeRateService = feeRateService;
-    }
-
-    @GetMapping(path = "/getFees")
-    public Map<String, Object> getFees() {
-        return feeRateService.getFees();
+    @ModelAttribute
+    public void logRequest(HttpServletRequest request) {
+        log.info("Incoming {} request from: {}", request.getServletPath(), request.getHeader("User-Agent"));
     }
 }
