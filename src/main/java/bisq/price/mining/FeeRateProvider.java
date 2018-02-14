@@ -27,7 +27,7 @@ import java.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class FeeRateProvider extends PriceProvider<Long> {
+public abstract class FeeRateProvider extends PriceProvider<FeeRate> {
 
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
 

@@ -17,6 +17,7 @@
 
 package bisq.price.mining.providers;
 
+import bisq.price.mining.FeeRate;
 import bisq.price.mining.FeeRateProvider;
 
 import io.bisq.network.http.HttpClient;
@@ -31,6 +32,7 @@ import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 
 import java.time.Duration;
+import java.time.Instant;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -84,7 +86,7 @@ public class BitcoinFees extends FeeRateProvider {
         return ttl;
     }
 
-    protected Long doGet() {
+    protected FeeRate doGet() {
         String response = getFeeJson();
 
         @SuppressWarnings("unchecked")
@@ -103,7 +105,7 @@ public class BitcoinFees extends FeeRateProvider {
             });
         fee[0] = Math.min(Math.max(fee[0], MIN_TX_FEE), MAX_TX_FEE);
 
-        return getAverage(fee[0]);
+        return new FeeRate("BTC", getAverage(fee[0]), Instant.now().getEpochSecond(), "bitcoinFees");
     }
 
     private String getFeeJson() {
