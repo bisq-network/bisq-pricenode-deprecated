@@ -25,27 +25,26 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 
 @RestController
-public class FeeEstimationController {
+public class FeeRateController {
 
-    private final FeeEstimationService feeEstimationService;
-    private final BitcoinFees feeEstimationProvider;
+    private final FeeRateService feeRateService;
+    private final BitcoinFees feeRateProvider;
 
-    public FeeEstimationController(FeeEstimationService feeEstimationService,
-                                   BitcoinFees feeEstimationProvider) {
-        this.feeEstimationService = feeEstimationService;
-        this.feeEstimationProvider = feeEstimationProvider;
+    public FeeRateController(FeeRateService feeRateService, BitcoinFees feeRateProvider) {
+        this.feeRateService = feeRateService;
+        this.feeRateProvider = feeRateProvider;
     }
 
     @GetMapping(path = "/getFees")
     public Map<String, Object> getFees() {
-        return feeEstimationService.getFees();
+        return feeRateService.getFees();
     }
 
     @GetMapping(path = "/getParams")
     public String getParams() {
         return String.format("%s;%s;%s",
-            feeEstimationProvider.getCapacity(),
-            feeEstimationProvider.getMaxBlocks(),
-            feeEstimationProvider.getTtl().toMillis());
+            feeRateProvider.getCapacity(),
+            feeRateProvider.getMaxBlocks(),
+            feeRateProvider.getTtl().toMillis());
     }
 }

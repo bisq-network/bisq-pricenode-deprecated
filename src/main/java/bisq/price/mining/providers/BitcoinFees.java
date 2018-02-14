@@ -17,7 +17,7 @@
 
 package bisq.price.mining.providers;
 
-import bisq.price.mining.FeeEstimationProvider;
+import bisq.price.mining.FeeRateProvider;
 
 import io.bisq.network.http.HttpClient;
 
@@ -40,7 +40,7 @@ import java.util.LinkedList;
 
 //TODO consider alternative https://www.bitgo.com/api/v1/tx/fee?numBlocks=3
 @Component
-public class BitcoinFees extends FeeEstimationProvider {
+public class BitcoinFees extends FeeRateProvider {
 
     private static final long MIN_TX_FEE = 10; // satoshi/byte
     private static final long MAX_TX_FEE = 1000;

@@ -25,18 +25,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class FeeEstimationService {
+public class FeeRateService {
 
-    private final FeeEstimationProvider feeEstimationProvider;
+    private final FeeRateProvider feeRateProvider;
 
-    public FeeEstimationService(FeeEstimationProvider feeEstimationProvider) {
-        this.feeEstimationProvider = feeEstimationProvider;
+    public FeeRateService(FeeRateProvider feeRateProvider) {
+        this.feeRateProvider = feeRateProvider;
     }
 
     public Map<String, Object> getFees() {
         Map<String, Object> map = new HashMap<>();
         Map<String, Long> dataMap = new HashMap<>();
-        dataMap.put("btcTxFee", feeEstimationProvider.get());
+        dataMap.put("btcTxFee", feeRateProvider.get());
         // For now we don't need a fee estimation for LTC so we set it fixed, but we keep it in the provider to
         // be flexible if fee pressure grows on LTC
         dataMap.put("ltcTxFee", 500L /*FeeService.LTC_DEFAULT_TX_FEE*/);

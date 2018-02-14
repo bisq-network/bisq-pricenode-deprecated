@@ -27,11 +27,11 @@ import java.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class FeeEstimationProvider extends PriceProvider<Long> {
+public abstract class FeeRateProvider extends PriceProvider<Long> {
 
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    public FeeEstimationProvider(Environment env) {
+    public FeeRateProvider(Environment env) {
         super(getTtl(env));
     }
 
