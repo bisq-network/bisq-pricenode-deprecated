@@ -42,9 +42,9 @@ public class FeeRateService {
         dataMap.put("dogeTxFee", 5_000_000L /*FeeService.DOGE_DEFAULT_TX_FEE*/);
         dataMap.put("dashTxFee", 50L /*FeeService.DASH_DEFAULT_TX_FEE*/);
 
-        Map<String, Object> map = new HashMap<>();
-        map.put("dataMap", dataMap);
-        map.put(feeRate.getProvider() + "Ts", feeRate.getTimestamp());
-        return map;
+        return new HashMap<String, Object>() {{
+            put("dataMap", dataMap);
+            put(feeRate.getProvider() + "Ts", feeRate.getTimestamp());
+        }};
     }
 }
