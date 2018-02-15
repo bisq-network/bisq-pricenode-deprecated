@@ -40,7 +40,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-//TODO consider alternative https://www.bitgo.com/api/v1/tx/fee?numBlocks=3
 @Component
 class BitcoinFeeRateProvider extends FeeRateProvider {
 
@@ -57,7 +56,6 @@ class BitcoinFeeRateProvider extends FeeRateProvider {
     private final int capacity;
     private final int maxBlocks;
 
-    // other: https://estimatefee.com/n/2
     public BitcoinFeeRateProvider(Environment env) {
         super(Duration.ofMinutes(ttl(env)));
         this.capacity = capacity(env);
