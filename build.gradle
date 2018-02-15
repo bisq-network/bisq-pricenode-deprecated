@@ -2,7 +2,6 @@ plugins {
     id "java"
     id "org.springframework.boot" version "1.5.10.RELEASE"
     id "com.palantir.git-version" version "0.10.1"
-    id "com.gorylenko.gradle-git-properties" version "1.4.20"
 }
 
 sourceCompatibility = 1.8
