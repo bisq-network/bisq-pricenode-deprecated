@@ -1,14 +1,21 @@
 plugins {
     id "java"
     id "org.springframework.boot" version "1.5.10.RELEASE"
+    id "com.palantir.git-version" version "0.10.1"
 }
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-jar.manifest.attributes(
-    "Implementation-Title": rootProject.name,
-    "Implementation-Version": '0.7.0')
+version gitVersion()
+
+jar.archiveName "${rootProject.name}.jar"
+
+processResources {
+    filesMatching(["application.properties", "banner.txt"]) {
+        expand(project.properties)
+    }
+}
 
 repositories {
     jcenter()
@@ -21,6 +28,7 @@ dependencies {
     compile("org.knowm.xchange:xchange-coinmarketcap:4.3.3")
     compile("org.knowm.xchange:xchange-poloniex:4.3.3")
     compile("org.springframework.boot:spring-boot-starter-web:1.5.10.RELEASE")
+    compile("org.springframework.boot:spring-boot-starter-actuator")
 }
 
 task stage {
