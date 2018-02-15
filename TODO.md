@@ -2,7 +2,6 @@
 
 The list of stuff remaining to complete the PR at https://github.com/bisq-network/pricenode/pull/7
 
- - Customize banner
  - Remove custom Version management in favor of Boot / Gradle version integration (incl. commit hash) exposed via Boot actuator endpoint
  - Document provider implementations w/ links to API docs, etc
  - Add integration tests
