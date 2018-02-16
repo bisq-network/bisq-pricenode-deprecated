@@ -17,8 +17,7 @@
 
 package bisq.price;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+import org.springframework.context.SmartLifecycle;
 
 import java.time.Duration;
 
@@ -29,7 +28,7 @@ import java.util.function.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class PriceProvider<T> implements Supplier<T> {
+public abstract class PriceProvider<T> implements SmartLifecycle, Supplier<T> {
 
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -46,10 +45,13 @@ public abstract class PriceProvider<T> implements Supplier<T> {
 
     @Override
     public final T get() {
+        if (!isRunning())
+            throw new IllegalStateException("call start() before calling get()");
+
         return cachedResult;
     }
 
-    @PostConstruct
+    @Override
     public final void start() {
         refresh();
 
@@ -65,11 +67,6 @@ public abstract class PriceProvider<T> implements Supplier<T> {
         }, ttl.toMillis(), ttl.toMillis());
     }
 
-    @PreDestroy
-    public void stop() {
-        timer.cancel();
-    }
-
     private void refresh() {
         long ts = System.currentTimeMillis();
 
@@ -83,5 +80,31 @@ public abstract class PriceProvider<T> implements Supplier<T> {
     protected abstract T doGet();
 
     protected void onRefresh() {
+    }
+
+    @Override
+    public void stop() {
+        timer.cancel();
+    }
+
+    @Override
+    public void stop(Runnable callback) {
+        stop();
+        callback.run();
+    }
+
+    @Override
+    public boolean isAutoStartup() {
+        return true;
+    }
+
+    @Override
+    public boolean isRunning() {
+        return cachedResult != null;
+    }
+
+    @Override
+    public int getPhase() {
+        return 0;
     }
 }
