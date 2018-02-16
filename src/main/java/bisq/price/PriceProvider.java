@@ -33,7 +33,7 @@ public abstract class PriceProvider<T> implements Supplier<T> {
 
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    private final Timer timer = new Timer();
+    private final Timer timer = new Timer(true);
 
     protected final Duration ttl;
 
