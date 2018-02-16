@@ -18,20 +18,36 @@
 package bisq.price.util;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.info.Info;
+import org.springframework.boot.actuate.info.InfoContributor;
+import org.springframework.core.io.Resource;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 @RestController
-class VersionController {
+class VersionController implements InfoContributor {
 
     private final String version;
 
-    public VersionController(@Value("${info.version}") String version) {
-        this.version = version;
+    public VersionController(@Value("classpath:version.txt") Resource versionTxt) throws IOException {
+        this.version = FileCopyUtils.copyToString(
+            new InputStreamReader(
+                versionTxt.getInputStream()
+            )
+        ).trim();
     }
 
     @GetMapping(path = "/getVersion")
     public String getVersion() {
         return version;
+    }
+
+    @Override
+    public void contribute(Info.Builder builder) {
+        builder.withDetail("version", version);
     }
 }

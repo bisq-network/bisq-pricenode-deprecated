@@ -6,17 +6,11 @@ plugins {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-version = '0.7.1-SNAPSHOT'
+version = file("src/main/resources/version.txt").text
 
 jar.manifest.attributes(
     "Implementation-Title": rootProject.name,
     "Implementation-Version": version)
-
-processResources() {
-    filesMatching("application.properties") {
-        expand(project.properties)
-    }
-}
 
 jar.archiveName "${rootProject.name}.jar"
 
