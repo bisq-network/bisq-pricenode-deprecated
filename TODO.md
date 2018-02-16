@@ -2,7 +2,6 @@
 
 The list of stuff remaining to complete the PR at https://github.com/bisq-network/pricenode/pull/7
 
- - Set 2 5 3 values by default
  - Document provider implementations w/ links to API docs, etc
  - Add integration tests
  - Document / discuss how operators should (ideally) operate their pricenodes on a push-to-deploy model, e.g. how it's done on Heroku
