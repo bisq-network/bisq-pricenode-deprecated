@@ -4,8 +4,6 @@ Deploy on Heroku
 Run the following commands:
 
     heroku create
-    heroku buildpacks:add https://github.com/rohitpaulk/heroku-buildpack-git-dir.git
-    heroku config:set GIT_CLONE_URL=https://github.com/[your id]/pricenode.git GIT_CLONE_SHA=master
     heroku buildpacks:add heroku/gradle
     heroku config:set BITCOIN_AVG_PUBKEY=[your pubkey] BITCOIN_AVG_PRIVKEY=[your privkey]
     git push heroku master

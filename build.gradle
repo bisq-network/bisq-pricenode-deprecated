@@ -1,21 +1,24 @@
 plugins {
     id "java"
     id "org.springframework.boot" version "1.5.10.RELEASE"
-    id "com.palantir.git-version" version "0.10.1"
 }
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-version gitVersion()
+version = '0.7.1-SNAPSHOT'
 
-jar.archiveName "${rootProject.name}.jar"
+jar.manifest.attributes(
+    "Implementation-Title": rootProject.name,
+    "Implementation-Version": version)
 
-processResources {
-    filesMatching(["application.properties", "banner.txt"]) {
+processResources() {
+    filesMatching("application.properties") {
         expand(project.properties)
     }
 }
+
+jar.archiveName "${rootProject.name}.jar"
 
 repositories {
     jcenter()
