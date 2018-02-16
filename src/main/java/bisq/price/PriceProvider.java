@@ -53,6 +53,8 @@ public abstract class PriceProvider<T> implements SmartLifecycle, Supplier<T> {
 
     @Override
     public final void start() {
+        // we call refresh outside the context of a timer once at startup to ensure that
+        // any exceptions thrown get propagated and cause the application to halt
         refresh();
 
         timer.scheduleAtFixedRate(new TimerTask() {
@@ -61,6 +63,9 @@ public abstract class PriceProvider<T> implements SmartLifecycle, Supplier<T> {
                 try {
                     refresh();
                 } catch (Throwable t) {
+                    // we only log scheduled calls to refresh that fail to ensure that
+                    // the application does *not* halt, assuming the failure is temporary
+                    // and on the side of the upstream price provider, eg. BitcoinAverage
                     log.warn("refresh failed", t);
                 }
             }
