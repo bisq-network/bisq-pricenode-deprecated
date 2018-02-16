@@ -17,13 +17,35 @@
 
 package bisq.price;
 
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+
+import java.util.Properties;
 
 @SpringBootApplication
 public class Main {
 
     public static void main(String[] args) {
-        SpringApplication.run(Main.class, args);
+        new SpringApplicationBuilder(Main.class)
+            .properties(bisqProperties())
+            .run(args);
+    }
+
+    private static Properties bisqProperties() {
+        Properties props = new Properties();
+        File propsFile = new File(System.getenv("HOME"), ".config/bisq.properties");
+        if (propsFile.exists()) {
+            try {
+                props.load(new FileInputStream(propsFile));
+            } catch (IOException ex) {
+                throw new UncheckedIOException(ex);
+            }
+        }
+        return props;
     }
 }

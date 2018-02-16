@@ -43,6 +43,13 @@ Export the following properties as environment variables, e.g.:
     $ export BITCOIN_AVG_PUBKEY=[your pubkey]
     $ export BITCOIN_AVG_PRIVKEY=[your privkey]
 
+Or add them to your `bisq.properties` config file, e.g.:
+
+    $ echo BITCOIN_AVG_PUBKEY=[your pubkey] >> $HOME/.config/bisq.properties
+    $ echo BITCOIN_AVG_PRIVKEY=[your privkey] >> $HOME/.config/bisq.properties
+
+> TIP: Using the `bisq.properties` config file has the advantage of not needing to specify environment variables in your IDE. Running the app and running tests will "just work" regardless where and how you run them.
+
 ### Build
 
     ./gradlew assemble
