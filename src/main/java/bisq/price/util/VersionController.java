@@ -17,6 +17,8 @@
 
 package bisq.price.util;
 
+import bisq.price.PriceController;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.info.Info;
 import org.springframework.boot.actuate.info.InfoContributor;
@@ -29,7 +31,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 @RestController
-class VersionController implements InfoContributor {
+class VersionController extends PriceController implements InfoContributor {
 
     private final String version;
 
