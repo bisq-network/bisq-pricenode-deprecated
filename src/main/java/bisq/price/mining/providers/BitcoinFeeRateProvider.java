@@ -34,7 +34,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.time.Duration;
 import java.time.Instant;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -46,19 +45,15 @@ class BitcoinFeeRateProvider extends FeeRateProvider {
     private static final long MIN_FEE_RATE = 10; // satoshi/byte
     private static final long MAX_FEE_RATE = 1000;
 
-    private static final int DEFAULT_CAPACITY = 1;
     private static final int DEFAULT_MAX_BLOCKS = 5;
     private static final int DEFAULT_REFRESH_INTERVAL = 2;
 
     private final RestTemplate restTemplate = new RestTemplate();
-    private final LinkedList<Long> lastFeeRates = new LinkedList<>();
 
-    private final int capacity;
     private final int maxBlocks;
 
     public BitcoinFeeRateProvider(Environment env) {
         super(Duration.ofMinutes(refreshInterval(env)));
-        this.capacity = capacity(env);
         this.maxBlocks = maxBlocks(env);
     }
 
@@ -73,11 +68,6 @@ class BitcoinFeeRateProvider extends FeeRateProvider {
             .map(p -> p.get("maxFee"))
             .map(r -> {
                 log.info("latest fee rate prediction is {} sat/byte", r);
-                return r;
-            })
-            .map(r -> movingAverage(r))
-            .map(r -> {
-                log.info("average of last {} fee rate predictions is {} sat/byte", lastFeeRates.size(), r);
                 return r;
             })
             .map(r -> Math.max(r, MIN_FEE_RATE))
@@ -100,40 +90,22 @@ class BitcoinFeeRateProvider extends FeeRateProvider {
             .flatMap(e -> e.getValue().stream());
     }
 
-    // We take the average of the last 12 calls (every 5 minute) so we smooth extreme values.
-    // We observed very radical jumps in the fee estimations, so that should help to avoid that.
-    private long movingAverage(long feeRate) {
-        if (lastFeeRates.size() == capacity)
-            lastFeeRates.removeFirst();
-
-        lastFeeRates.add(feeRate);
-
-        return ((Double) lastFeeRates.stream().mapToLong(e -> e).average().getAsDouble()).longValue();
-    }
-
     private static Optional<String[]> args(Environment env) {
         return Optional.ofNullable(
             env.getProperty(CommandLinePropertySource.DEFAULT_NON_OPTION_ARGS_PROPERTY_NAME, String[].class));
     }
 
-    private static int capacity(Environment env) {
+    private static int maxBlocks(Environment env) {
         return args(env)
             .filter(args -> args.length >= 1)
             .map(args -> Integer.valueOf(args[0]))
-            .orElse(DEFAULT_CAPACITY);
-    }
-
-    private static int maxBlocks(Environment env) {
-        return args(env)
-            .filter(args -> args.length >= 2)
-            .map(args -> Integer.valueOf(args[1]))
             .orElse(DEFAULT_MAX_BLOCKS);
     }
 
     private static long refreshInterval(Environment env) {
         return args(env)
-            .filter(args -> args.length >= 3)
-            .map(args -> Integer.valueOf(args[2]))
+            .filter(args -> args.length >= 2)
+            .map(args -> Integer.valueOf(args[1]))
             .orElse(DEFAULT_REFRESH_INTERVAL);
     }
 
@@ -143,7 +115,7 @@ class BitcoinFeeRateProvider extends FeeRateProvider {
 
         @GetMapping(path = "/getParams")
         public String getParams() {
-            return String.format("%s;%s;%s", capacity, maxBlocks, refreshInterval.toMillis());
+            return String.format("%s;%s", maxBlocks, refreshInterval.toMillis());
         }
     }
 }

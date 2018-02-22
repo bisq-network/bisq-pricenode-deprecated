@@ -56,7 +56,7 @@ Or add them to your `bisq.properties` config file, e.g.:
 
 ### Run
 
-    java -jar ./build/libs/bisq-pricenode.jar [capacity] [max-blocks] [request-interval-mins]
+    java -jar ./build/libs/bisq-pricenode.jar [max-blocks] [request-interval-mins]
 
 ### Test
 
