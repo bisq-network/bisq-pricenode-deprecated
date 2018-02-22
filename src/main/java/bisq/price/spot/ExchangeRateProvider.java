@@ -28,8 +28,8 @@ public abstract class ExchangeRateProvider extends PriceProvider<Set<ExchangeRat
     private final String name;
     private final String prefix;
 
-    public ExchangeRateProvider(String name, String prefix, Duration ttl) {
-        super(ttl);
+    public ExchangeRateProvider(String name, String prefix, Duration refreshInterval) {
+        super(refreshInterval);
         this.name = name;
         this.prefix = prefix;
     }

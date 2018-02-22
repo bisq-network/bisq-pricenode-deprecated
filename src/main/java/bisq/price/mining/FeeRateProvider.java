@@ -23,7 +23,7 @@ import java.time.Duration;
 
 public abstract class FeeRateProvider extends PriceProvider<FeeRate> {
 
-    public FeeRateProvider(Duration ttl) {
-        super(ttl);
+    public FeeRateProvider(Duration refreshInterval) {
+        super(refreshInterval);
     }
 }

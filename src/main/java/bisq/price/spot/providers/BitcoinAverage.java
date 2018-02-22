@@ -68,7 +68,7 @@ public abstract class BitcoinAverage extends ExchangeRateProvider {
      * @param symbolSet "global" or "local"; see https://apiv2.bitcoinaverage.com/#supported-currencies
      */
     public BitcoinAverage(String name, String prefix, double pctMaxRequests, String symbolSet, Environment env) {
-        super(name, prefix, ttlFor(pctMaxRequests));
+        super(name, prefix, refreshIntervalFor(pctMaxRequests));
         this.symbolSet = symbolSet;
         this.pubKey = env.getRequiredProperty("BITCOIN_AVG_PUBKEY");
         this.mac = initMac(env.getRequiredProperty("BITCOIN_AVG_PRIVKEY"));
@@ -133,7 +133,7 @@ public abstract class BitcoinAverage extends ExchangeRateProvider {
         }
     }
 
-    private static Duration ttlFor(double pctMaxRequests) {
+    private static Duration refreshIntervalFor(double pctMaxRequests) {
         long requestsPerMonth = (long) (MAX_REQUESTS_PER_MONTH * pctMaxRequests);
         return Duration.ofDays(31).dividedBy(requestsPerMonth);
     }

@@ -48,7 +48,7 @@ class BitcoinFeeRateProvider extends FeeRateProvider {
 
     private static final int DEFAULT_CAPACITY = 1;
     private static final int DEFAULT_MAX_BLOCKS = 5;
-    private static final int DEFAULT_TTL = 2;
+    private static final int DEFAULT_REFRESH_INTERVAL = 2;
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final LinkedList<Long> lastFeeRates = new LinkedList<>();
@@ -57,7 +57,7 @@ class BitcoinFeeRateProvider extends FeeRateProvider {
     private final int maxBlocks;
 
     public BitcoinFeeRateProvider(Environment env) {
-        super(Duration.ofMinutes(ttl(env)));
+        super(Duration.ofMinutes(refreshInterval(env)));
         this.capacity = capacity(env);
         this.maxBlocks = maxBlocks(env);
     }
@@ -130,11 +130,11 @@ class BitcoinFeeRateProvider extends FeeRateProvider {
             .orElse(DEFAULT_MAX_BLOCKS);
     }
 
-    private static long ttl(Environment env) {
+    private static long refreshInterval(Environment env) {
         return args(env)
             .filter(args -> args.length >= 3)
             .map(args -> Integer.valueOf(args[2]))
-            .orElse(DEFAULT_TTL);
+            .orElse(DEFAULT_REFRESH_INTERVAL);
     }
 
 
@@ -143,7 +143,7 @@ class BitcoinFeeRateProvider extends FeeRateProvider {
 
         @GetMapping(path = "/getParams")
         public String getParams() {
-            return String.format("%s;%s;%s", capacity, maxBlocks, ttl.toMillis());
+            return String.format("%s;%s;%s", capacity, maxBlocks, refreshInterval.toMillis());
         }
     }
 }

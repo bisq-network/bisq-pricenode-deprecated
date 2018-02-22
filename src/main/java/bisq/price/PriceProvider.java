@@ -34,13 +34,13 @@ public abstract class PriceProvider<T> implements SmartLifecycle, Supplier<T> {
 
     private final Timer timer = new Timer(true);
 
-    protected final Duration ttl;
+    protected final Duration refreshInterval;
 
     private T cachedResult;
 
-    public PriceProvider(Duration ttl) {
-        this.ttl = ttl;
-        log.info("will refresh every {}", ttl);
+    public PriceProvider(Duration refreshInterval) {
+        this.refreshInterval = refreshInterval;
+        log.info("will refresh every {}", refreshInterval);
     }
 
     @Override
@@ -69,7 +69,7 @@ public abstract class PriceProvider<T> implements SmartLifecycle, Supplier<T> {
                     log.warn("refresh failed", t);
                 }
             }
-        }, ttl.toMillis(), ttl.toMillis());
+        }, refreshInterval.toMillis(), refreshInterval.toMillis());
     }
 
     private void refresh() {
