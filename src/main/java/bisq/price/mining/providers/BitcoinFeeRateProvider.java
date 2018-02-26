@@ -45,7 +45,7 @@ class BitcoinFeeRateProvider extends FeeRateProvider {
     private static final long MIN_FEE_RATE = 10; // satoshi/byte
     private static final long MAX_FEE_RATE = 1000;
 
-    private static final int DEFAULT_MAX_BLOCKS = 5;
+    private static final int DEFAULT_MAX_BLOCKS = 2;
     private static final int DEFAULT_REFRESH_INTERVAL = 2;
 
     private final RestTemplate restTemplate = new RestTemplate();
