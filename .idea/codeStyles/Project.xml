@@ -15,7 +15,7 @@
         <value>
           <package name="bisq.price" withSubpackages="true" static="false" />
           <emptyLine />
-          <package name="io.bisq.common" withSubpackages="true" static="false" />
+          <package name="bisq.common" withSubpackages="true" static="false" />
           <emptyLine />
           <package name="org.knowm.xchange" withSubpackages="true" static="false" />
           <emptyLine />

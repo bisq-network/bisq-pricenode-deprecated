@@ -17,8 +17,8 @@
 
 package bisq.price.util;
 
-import io.bisq.common.locale.CurrencyUtil;
-import io.bisq.common.locale.TradeCurrency;
+import bisq.common.locale.CurrencyUtil;
+import bisq.common.locale.TradeCurrency;
 
 import java.util.Set;
 import java.util.stream.Collectors;
