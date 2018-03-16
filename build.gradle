@@ -15,9 +15,9 @@ jar.manifest.attributes(
 jar.archiveName "${rootProject.name}.jar"
 
 repositories {
-    mavenLocal()
     jcenter()
     maven { url "https://jitpack.io" }
+    maven { url "https://raw.githubusercontent.com/JesusMcCloud/tor-binary/testrelease/release/" }
 }
 
 dependencies {
