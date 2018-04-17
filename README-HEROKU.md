@@ -4,6 +4,7 @@ Deploy on Heroku
 Run the following commands:
 
     heroku create
+    heroku buildpacks:add heroku/gradle
     heroku config:set BITCOIN_AVG_PUBKEY=[your pubkey] BITCOIN_AVG_PRIVKEY=[your privkey]
     git push heroku master
     curl https://your-app-123456.herokuapp.com/getAllMarketPrices
