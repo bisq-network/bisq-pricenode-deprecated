@@ -21,6 +21,9 @@ import bisq.price.PriceProvider;
 
 import java.time.Duration;
 
+/**
+ * Abstract base class for providers of mining {@link FeeRate} data.
+ */
 public abstract class FeeRateProvider extends PriceProvider<FeeRate> {
 
     public FeeRateProvider(Duration refreshInterval) {

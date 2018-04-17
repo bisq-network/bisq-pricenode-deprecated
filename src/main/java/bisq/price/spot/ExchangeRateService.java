@@ -26,11 +26,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * High-level {@link ExchangeRate} data operations.
+ */
 @Service
 class ExchangeRateService {
 
     private final List<ExchangeRateProvider> providers;
 
+    /**
+     * Construct an {@link ExchangeRateService} with a list of all
+     * {@link ExchangeRateProvider} implementations discovered via classpath scanning.
+     *
+     * @param providers all {@link ExchangeRateProvider} implementations in ascending
+     *                  order of precedence
+     */
     public ExchangeRateService(List<ExchangeRateProvider> providers) {
         this.providers = providers;
     }

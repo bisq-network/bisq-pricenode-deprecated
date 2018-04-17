@@ -23,6 +23,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * High-level mining {@link FeeRate} operations.
+ */
 @Service
 class FeeRateService {
 

@@ -23,6 +23,18 @@ import java.time.Duration;
 
 import java.util.Set;
 
+/**
+ * Abstract base class for providers of bitcoin {@link ExchangeRate} data. Implementations
+ * are marked with the {@link org.springframework.stereotype.Component} annotation in
+ * order to be discovered via classpath scanning. Implementations are also marked with the
+ * {@link org.springframework.core.annotation.Order} annotation to determine their
+ * precedence over each other in the case of two or more services returning exchange rate
+ * data for the same currency pair. In such cases, results from the provider with the
+ * higher order value will taking precedence over the provider with a lower value,
+ * presuming that such providers are being iterated over in an ordered list.
+ *
+ * @see ExchangeRateService#ExchangeRateService(java.util.List)
+ */
 public abstract class ExchangeRateProvider extends PriceProvider<Set<ExchangeRate>> {
 
     private final String name;
