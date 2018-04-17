@@ -37,10 +37,10 @@ public class FeeRate {
     }
 
     public long getPrice() {
-        return this.price;
+        return price;
     }
 
     public long getTimestamp() {
-        return this.timestamp;
+        return timestamp;
     }
 }
