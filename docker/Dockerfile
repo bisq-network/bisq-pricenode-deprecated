@@ -11,7 +11,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     tor \
     fakeroot \
     sudo \
-    gradle \
     openjfx && rm -rf /var/lib/apt/lists/*
 
 RUN git clone https://github.com/bisq-network/pricenode.git

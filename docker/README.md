@@ -1,4 +1,4 @@
-Needed information to start a priceprovider
+Needed information to start a pricenode
 ==
 
 Copy to this directory:
@@ -40,4 +40,4 @@ Using CoreOs as host OS is entirely optional!
 * the cloudconfig.yml file is a configuration file for starting a coreos machine
 from scratch.
 * when installing a Coreos server, docker-compose needs to be additionally installed next to the
-already provided docker installation 
+already provided docker installation
