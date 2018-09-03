@@ -21,16 +21,22 @@ import bisq.price.spot.providers.BitcoinAverage;
 
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * High-level {@link ExchangeRate} data operations.
  */
 @Service
 class ExchangeRateService {
+    protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private final List<ExchangeRateProvider> providers;
 
@@ -59,14 +65,27 @@ class ExchangeRateService {
 
         return new LinkedHashMap<String, Object>() {{
             putAll(metadata);
-            put("data", allExchangeRates.values());
+            // Use a sorted list by currency code to make comparision of json data between different
+            // price nodes easier
+            List<ExchangeRate> values = new ArrayList<>(allExchangeRates.values());
+            values.sort(Comparator.comparing(ExchangeRate::getCurrency));
+            put("data", values);
         }};
     }
 
     private Map<String, Object> getMetadata(ExchangeRateProvider provider, Set<ExchangeRate> exchangeRates) {
         Map<String, Object> metadata = new LinkedHashMap<>();
 
-        long timestamp = getTimestamp(provider, exchangeRates);
+        // In case a provider is not available we still want to deliver the data of the other providers, so we catch
+        // a possible exception and leave timestamp at 0. The Bisq app will check if the timestamp is in a tolerance
+        // window and if it is too old it will show that the price is not available.
+        long timestamp = 0;
+        try {
+            timestamp = getTimestamp(provider, exchangeRates);
+        } catch (Throwable t) {
+            log.error(t.toString());
+            t.printStackTrace();
+        }
 
         if (provider instanceof BitcoinAverage.Local) {
             metadata.put("btcAverageTs", timestamp);
