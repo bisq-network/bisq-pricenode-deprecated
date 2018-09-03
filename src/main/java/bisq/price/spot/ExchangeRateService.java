@@ -21,6 +21,8 @@ import bisq.price.spot.providers.BitcoinAverage;
 
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +65,11 @@ class ExchangeRateService {
 
         return new LinkedHashMap<String, Object>() {{
             putAll(metadata);
-            put("data", allExchangeRates.values());
+            // Use a sorted list by currency code to make comparision of json data between different
+            // price nodes easier
+            List<ExchangeRate> values = new ArrayList<>(allExchangeRates.values());
+            values.sort(Comparator.comparing(ExchangeRate::getCurrency));
+            put("data", values);
         }};
     }
 
