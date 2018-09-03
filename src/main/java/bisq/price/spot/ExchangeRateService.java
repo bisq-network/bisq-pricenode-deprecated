@@ -26,11 +26,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * High-level {@link ExchangeRate} data operations.
  */
 @Service
 class ExchangeRateService {
+    protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private final List<ExchangeRateProvider> providers;
 
@@ -66,7 +70,16 @@ class ExchangeRateService {
     private Map<String, Object> getMetadata(ExchangeRateProvider provider, Set<ExchangeRate> exchangeRates) {
         Map<String, Object> metadata = new LinkedHashMap<>();
 
-        long timestamp = getTimestamp(provider, exchangeRates);
+        // In case a provider is not available we still want to deliver the data of the other providers, so we catch
+        // a possible exception and leave timestamp at 0. The Bisq app will check if the timestamp is in a tolerance
+        // window and if it is too old it will show that the price is not available.
+        long timestamp = 0;
+        try {
+            timestamp = getTimestamp(provider, exchangeRates);
+        } catch (Throwable t) {
+            log.error(t.toString());
+            t.printStackTrace();
+        }
 
         if (provider instanceof BitcoinAverage.Local) {
             metadata.put("btcAverageTs", timestamp);
