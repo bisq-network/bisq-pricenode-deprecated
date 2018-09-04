@@ -73,7 +73,7 @@ To manually test endpoints, run each of the following:
 With your pricenode running at localhost:8080, run:
 
     tor -f torrc
-        
+
 Wait for the process to report that it is "100% bootstrapped", then copy your newly-generated .onion address:
 
     export PRICENODE_ONION=$(cat build/tor-hidden-service/hostname)
@@ -87,3 +87,4 @@ How to deploy elsewhere
 --------
 
  - [README-HEROKU.md](README-HEROKU.md)
+ - [docker/README.md](docker/README.md)
