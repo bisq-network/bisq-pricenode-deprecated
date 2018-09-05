@@ -12,7 +12,7 @@ Edit docker-compose.yml:
 
 * fill in your public and private api keys (needs a btcaverage developer subscription)
 
-Needed software to start a priceprovider
+Needed software to start a pricenode
 ==
 
 * docker
